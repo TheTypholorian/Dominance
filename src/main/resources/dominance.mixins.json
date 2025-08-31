@@ -4,8 +4,13 @@
   "package": "net.typho.dominance.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "client.AxeItemMixin",
+    "client.PlayerEntityMixin",
+    "client.RemoveOffHandItemTaskMixin"
   ],
   "client": [
+    "client.AtlasLoaderMixin",
+    "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin"

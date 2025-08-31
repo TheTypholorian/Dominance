@@ -11,7 +11,7 @@
   "environment": "*",
   "entrypoints": {
     "fabric-datagen": [
-      "net.typho.dominance.client.DominanceDataGenerator"
+      "net.typho.dominance.datagen.DominanceDataGenerator"
     ],
     "client": [
       "net.typho.dominance.client.DominanceClient"

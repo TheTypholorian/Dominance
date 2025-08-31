@@ -6,6 +6,9 @@
   "mixins": [
   ],
   "client": [
+    "client.CameraMixin",
+    "client.InGameHudMixin",
+    "client.LightmapTextureManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,28 +1,24 @@
 package net.typho.dominance.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.rendertype.VeilRenderType;
-import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.option.KeyBinding;
 import net.typho.dominance.Dominance;
-import net.typho.dominance.OrbEntity;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Objects;
-
 public class DominanceClient implements ClientModInitializer {
+    public static final KeyBinding SAVE_LIGHTMAP = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.dominance.debug.save_lightmap",
+            GLFW.GLFW_KEY_F9,
+            "key.categories.misc"
+    ));
+    public static final KeyBinding TEST_CUTSCENE = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.dominance.debug.test_cutscene",
+            GLFW.GLFW_KEY_F8,
+            "key.categories.misc"
+    ));
+
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);

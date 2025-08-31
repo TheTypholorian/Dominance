@@ -27,15 +27,29 @@ public abstract class CameraMixin {
     )
     private void update(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
         if (DominanceClient.TEST_CUTSCENE.isPressed() && Cutscene.ACTIVE.isEmpty()) {
+            System.out.println("Implement test cutscene");
+            /*
             Cutscene cutscene = new Cutscene();
 
-            cutscene.nodes.add(new Cutscene.Node(new Vec3d(0, 0, 0), 0, 0, 0));
-            cutscene.nodes.add(new Cutscene.Node(new Vec3d(0, 15, 0), 0, 0, 2));
-            cutscene.nodes.add(new Cutscene.Node(new Vec3d(18, 13, 0), 35, 0, 3));
-            cutscene.nodes.add(new Cutscene.Node(new Vec3d(18, 13, 7), 30, 50, 5));
-            cutscene.nodes.add(new Cutscene.Node(new Vec3d(18, 13, 7), 30, 360, 10));
+            cutscene.nodes.add(new Cutscene.SnapNode(new Vec3d(0, 0, 0), 0, 0, 0));
+            cutscene.nodes.add(new Cutscene.SnapNode(new Vec3d(0, 15, 0), 0, 0, 2));
+            cutscene.nodes.add(new Cutscene.SnapNode(new Vec3d(18, 13, 0), 35, 0, 3));
+            cutscene.nodes.add(new Cutscene.SnapNode(new Vec3d(18, 13, 7), 30, 50, 5));
+            cutscene.nodes.add(new Cutscene.SnapNode(new Vec3d(18, 13, 7), 30, 360, 10));
 
-            cutscene.start();
+            new Cutscene().start(
+                    new Cutscene.InterpolationNode(
+                            Interpolator.LINEAR,
+                            new Cutscene.NodeInfo(0, 0, 0, 0, 0),
+                            new Cutscene.NodeInfo(0, 0, 15, 0, 0),
+                            0,
+                            2,
+                            new Cutscene.InterpolationNode(
+                                    Interpolator.LINEAR
+                            )
+                    )
+            );
+             */
         }
 
         Cutscene.ACTIVE.forEach(Cutscene::update);
@@ -43,8 +57,8 @@ public abstract class CameraMixin {
         Cutscene cutscene = Cutscene.current();
 
         if (cutscene != null) {
-            setPos(cutscene.pos);
-            setRotation(cutscene.yaw, cutscene.pitch);
+            setPos(cutscene.info.pos());
+            setRotation(cutscene.info.yaw(), cutscene.info.pitch());
             ci.cancel();
         }
     }

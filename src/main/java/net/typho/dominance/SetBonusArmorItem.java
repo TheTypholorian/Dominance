@@ -13,7 +13,6 @@ import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
@@ -45,14 +44,11 @@ public abstract class SetBonusArmorItem extends ArmorItem implements GeoItem {
             });
 
             if (!bonuses.isEmpty()) {
-                tooltip.add(ScreenTexts.EMPTY);
                 tooltip.add(Text.translatable("tooltip.dominance.set_bonus").formatted(Formatting.GRAY));
 
                 for (AttributeModifiersComponent effect : bonuses) {
                     effect.applyModifiers(getSlotType(), (attribute, modifier) -> stack.appendAttributeModifierTooltip(tooltip::add, player, attribute, modifier));
                 }
-
-                tooltip.add(ScreenTexts.EMPTY);
             }
         }
     }

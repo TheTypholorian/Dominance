@@ -1,6 +1,8 @@
 package net.typho.dominance;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -25,6 +27,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
 import net.typho.dominance.gear.RoyalGuardMaceItem;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
+import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +41,7 @@ import java.util.Set;
 import static net.minecraft.item.Item.BASE_ATTACK_DAMAGE_MODIFIER_ID;
 import static net.minecraft.item.Item.BASE_ATTACK_SPEED_MODIFIER_ID;
 
-public class Dominance implements ModInitializer {
+public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final String MOD_ID = "dominance";
 
     public static <T extends Item> T item(String id, T item) {
@@ -90,6 +97,8 @@ public class Dominance implements ModInitializer {
     );
     public static final ShieldEntityModel ROYAL_GUARD_SHIELD_MODEL;
 
+    public static final ComponentKey<RollComponent> ROLL = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of(MOD_ID, "roll"), RollComponent.class);
+
     static {
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
@@ -107,5 +116,18 @@ public class Dominance implements ModInitializer {
                 Identifier.ofVanilla("blocking"),
                 (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
         );
+        PayloadTypeRegistry.playC2S().register(StartRollC2S.ID, StartRollC2S.PACKET_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
+            RollComponent roll = ROLL.getNullable(context.player());
+
+            if (roll != null && roll.getCooldown() == 0) {
+                roll.setTime(20);
+            }
+        });
+    }
+
+    @Override
+    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.registerForPlayers(ROLL, RollComponent::new, RespawnCopyStrategy.NEVER_COPY);
     }
 }

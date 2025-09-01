@@ -18,6 +18,11 @@ public class DominanceClient implements ClientModInitializer {
             GLFW.GLFW_KEY_F8,
             "key.categories.misc"
     ));
+    public static final KeyBinding ROLL = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.dominance.roll",
+            GLFW.GLFW_KEY_TAB,
+            "key.categories.movement"
+    ));
 
     @Override
     public void onInitializeClient() {

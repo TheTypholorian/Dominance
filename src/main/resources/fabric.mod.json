@@ -18,6 +18,9 @@
     ],
     "main": [
       "net.typho.dominance.Dominance"
+    ],
+    "cardinal-components": [
+      "net.typho.dominance.Dominance"
     ]
   },
   "mixins": [
@@ -27,6 +30,11 @@
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+  "custom": {
+    "cardinal-components": [
+      "dominance:roll"
+    ]
   },
   "accessWidener": "dominance.accesswidener"
 }

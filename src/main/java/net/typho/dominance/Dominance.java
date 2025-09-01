@@ -12,13 +12,17 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.ShieldItem;
+import net.minecraft.item.*;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+
+import java.util.List;
+import java.util.Map;
 
 import static net.minecraft.item.Item.BASE_ATTACK_DAMAGE_MODIFIER_ID;
 import static net.minecraft.item.Item.BASE_ATTACK_SPEED_MODIFIER_ID;
@@ -26,6 +30,25 @@ import static net.minecraft.item.Item.BASE_ATTACK_SPEED_MODIFIER_ID;
 public class Dominance implements ModInitializer {
     public static final String MOD_ID = "dominance";
 
+    public static final RegistryEntry<ArmorMaterial> ROYAL_GUARD_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, Identifier.of(MOD_ID, "royal_guard"), new ArmorMaterial(
+            Map.of(
+                    ArmorItem.Type.BOOTS, 3,
+                    ArmorItem.Type.LEGGINGS, 6,
+                    ArmorItem.Type.CHESTPLATE, 8,
+                    ArmorItem.Type.HELMET, 3,
+                    ArmorItem.Type.BODY, 11
+            ),
+            18,
+            SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE,
+            Ingredient::empty,
+            List.of(),
+            1f,
+            0.2f
+    ));
+
+    public static final Item ROYAL_GUARD_HELMET = Items.register(Identifier.of(MOD_ID, "royal_guard_helmet"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().rarity(Rarity.EPIC)));
+    public static final Item ROYAL_GUARD_CHESTPLATE = Items.register(Identifier.of(MOD_ID, "royal_guard_chestplate"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().rarity(Rarity.EPIC)));
+    public static final Item ROYAL_GUARD_BOOTS = Items.register(Identifier.of(MOD_ID, "royal_guard_boots"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().rarity(Rarity.EPIC)));
     public static final Item ROYAL_GUARD_MACE = Items.register(Identifier.of(MOD_ID, "royal_guard_mace"), new Item(new Item.Settings().rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
             .add(
                     EntityAttributes.GENERIC_ATTACK_DAMAGE,
@@ -38,7 +61,7 @@ public class Dominance implements ModInitializer {
                     AttributeModifierSlot.MAINHAND
             )
             .build())));
-    public static final Item ROYAL_GUARD_SHIELD = Items.register(Identifier.of(MOD_ID, "royal_guard_shield"), new ShieldItem(new Item.Settings().maxCount(1).maxDamage(504)));
+    public static final Item ROYAL_GUARD_SHIELD = Items.register(Identifier.of(MOD_ID, "royal_guard_shield"), new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
 
     public static final SpriteIdentifier ROYAL_GUARD_SHIELD_SPRITE = new SpriteIdentifier(
             TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, Identifier.of(MOD_ID, "entity/royal_guard_shield")
@@ -59,8 +82,8 @@ public class Dominance implements ModInitializer {
     public void onInitialize() {
         ModelPredicateProviderRegistry.register(
                 ROYAL_GUARD_SHIELD,
-                        Identifier.ofVanilla("blocking"),
-                        (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
-                );
+                Identifier.ofVanilla("blocking"),
+                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
+        );
     }
 }

@@ -2,7 +2,7 @@ package net.typho.dominance.client;
 
 import net.minecraft.util.Identifier;
 import net.typho.dominance.Dominance;
-import net.typho.dominance.RoyalGuardArmorItem;
+import net.typho.dominance.gear.RoyalGuardArmorItem;
 import software.bernie.geckolib.model.DefaultedItemGeoModel;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 

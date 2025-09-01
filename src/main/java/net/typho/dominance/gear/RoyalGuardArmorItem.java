@@ -1,4 +1,4 @@
-package net.typho.dominance;
+package net.typho.dominance.gear;
 
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.component.type.AttributeModifierSlot;
@@ -11,6 +11,7 @@ import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
+import net.typho.dominance.Dominance;
 import net.typho.dominance.client.RoyalGuardArmorRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -23,6 +23,8 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.typho.dominance.gear.RoyalGuardArmorItem;
+import net.typho.dominance.gear.RoyalGuardMaceItem;
 
 import java.util.LinkedHashMap;
 import java.util.List;

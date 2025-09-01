@@ -1,4 +1,4 @@
-package net.typho.dominance;
+package net.typho.dominance.gear;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -24,7 +24,7 @@ public class RoyalGuardMaceItem extends Item {
         DamageSource damageSource = attacker instanceof PlayerEntity player ? target.getWorld().getDamageSources().playerAttack(player) : target.getWorld().getDamageSources().mobAttack(attacker);
         int i = 0;
 
-        for (Entity splash : target.getWorld().getOtherEntities(target, new Box(target.getBlockPos()).expand(2))) {
+        for (Entity splash : target.getWorld().getOtherEntities(target, Box.from(target.getPos()).expand(1.5))) {
             if (splash != attacker && splash instanceof LivingEntity livingSplash) {
                 livingSplash.damage(damageSource, (float) attacker.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * MathHelper.clamp(1 - splash.distanceTo(target) / 7, 0, 0.5f));
                 i++;

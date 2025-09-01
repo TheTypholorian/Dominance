@@ -1,4 +1,4 @@
-package net.typho.dominance;
+package net.typho.dominance.gear;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -16,6 +16,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
+import net.typho.dominance.Dominance;
 import software.bernie.geckolib.animatable.GeoItem;
 
 import java.util.LinkedList;

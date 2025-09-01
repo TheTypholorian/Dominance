@@ -12,7 +12,10 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.*;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.Item;
+import net.minecraft.item.ShieldItem;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -21,14 +24,22 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static net.minecraft.item.Item.BASE_ATTACK_DAMAGE_MODIFIER_ID;
 import static net.minecraft.item.Item.BASE_ATTACK_SPEED_MODIFIER_ID;
 
 public class Dominance implements ModInitializer {
     public static final String MOD_ID = "dominance";
+
+    public static <T extends Item> T item(String id, T item) {
+        return Registry.register(Registries.ITEM, Identifier.of(MOD_ID, id), item);
+    }
+
+    public static final Map<Set<ArmorItem>, AttributeModifiersComponent> ARMOR_SET_BONUSES = new LinkedHashMap<>();
 
     public static final RegistryEntry<ArmorMaterial> ROYAL_GUARD_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, Identifier.of(MOD_ID, "royal_guard"), new ArmorMaterial(
             Map.of(
@@ -46,28 +57,28 @@ public class Dominance implements ModInitializer {
             0.2f
     ));
 
-    public static final Item ROYAL_GUARD_HELMET = Items.register(Identifier.of(MOD_ID, "royal_guard_helmet"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+    public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
             .add(
                     EntityAttributes.GENERIC_MOVEMENT_SPEED,
                     new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_helmet_heavy"), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                     AttributeModifierSlot.ARMOR
             )
             .build())));
-    public static final Item ROYAL_GUARD_CHESTPLATE = Items.register(Identifier.of(MOD_ID, "royal_guard_chestplate"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+    public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
             .add(
                     EntityAttributes.GENERIC_MOVEMENT_SPEED,
                     new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_chestplate_heavy"), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                     AttributeModifierSlot.ARMOR
             )
             .build())));
-    public static final Item ROYAL_GUARD_BOOTS = Items.register(Identifier.of(MOD_ID, "royal_guard_boots"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+    public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
                     .add(
                             EntityAttributes.GENERIC_MOVEMENT_SPEED,
                             new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_boots_heavy"), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                             AttributeModifierSlot.ARMOR
                     )
             .build())));
-    public static final Item ROYAL_GUARD_MACE = Items.register(Identifier.of(MOD_ID, "royal_guard_mace"), new Item(new Item.Settings().rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+    public static final Item ROYAL_GUARD_MACE = item("royal_guard_mace", new Item(new Item.Settings().rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
             .add(
                     EntityAttributes.GENERIC_ATTACK_DAMAGE,
                     new EntityAttributeModifier(BASE_ATTACK_DAMAGE_MODIFIER_ID, 10, EntityAttributeModifier.Operation.ADD_VALUE),
@@ -79,7 +90,16 @@ public class Dominance implements ModInitializer {
                     AttributeModifierSlot.MAINHAND
             )
             .build())));
-    public static final Item ROYAL_GUARD_SHIELD = Items.register(Identifier.of(MOD_ID, "royal_guard_shield"), new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
+    public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
+
+    static {
+        ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()
+                .add(
+                        EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                        new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_set_bonus"), 3, EntityAttributeModifier.Operation.ADD_VALUE),
+                        AttributeModifierSlot.ARMOR
+                ).build());
+    }
 
     public static final SpriteIdentifier ROYAL_GUARD_SHIELD_SPRITE = new SpriteIdentifier(
             TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, Identifier.of(MOD_ID, "entity/royal_guard_shield")

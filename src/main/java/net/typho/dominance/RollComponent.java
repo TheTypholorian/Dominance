@@ -50,7 +50,7 @@ public class RollComponent implements ComponentV3, AutoSyncedComponent, ClientTi
 
     @Override
     public void clientTick() {
-        if (DominanceClient.ROLL.isPressed() && cooldown == 0) {
+        if (DominanceClient.ROLL.isPressed() && cooldown == 0 && time == 0 && player.isOnGround()) {
             ((ClientPlayerEntity) player).networkHandler.sendPacket(new CustomPayloadC2SPacket(StartRollC2S.INSTANCE));
         }
     }
@@ -63,12 +63,15 @@ public class RollComponent implements ComponentV3, AutoSyncedComponent, ClientTi
             time--;
 
             if (time == 0) {
-                cooldown = 10;
+                cooldown = Dominance.ROLL_COOLDOWN;
             }
 
-            player.setVelocity(player.getRotationVector(0, player.getYaw()).multiply(player.getMovementSpeed() * 10));
-            player.velocityModified = true;
             sync = true;
+
+            if (player.isOnGround()) {
+                player.addVelocity(player.getRotationVector(0, player.getYaw()).multiply(player.getMovementSpeed() * 20));
+                player.velocityModified = true;
+            }
         }
 
         if (cooldown > 0) {

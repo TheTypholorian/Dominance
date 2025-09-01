@@ -92,6 +92,9 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 ).build());
     }
 
+    public static final int ROLL_LENGTH = 8;
+    public static final int ROLL_COOLDOWN = 60;
+
     public static final SpriteIdentifier ROYAL_GUARD_SHIELD_SPRITE = new SpriteIdentifier(
             TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, Identifier.of(MOD_ID, "entity/royal_guard_shield")
     );
@@ -120,8 +123,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
             RollComponent roll = ROLL.getNullable(context.player());
 
-            if (roll != null && roll.getCooldown() == 0) {
-                roll.setTime(20);
+            if (roll != null && roll.getCooldown() == 0 && roll.getTime() == 0) {
+                roll.setTime(ROLL_LENGTH);
             }
         });
     }

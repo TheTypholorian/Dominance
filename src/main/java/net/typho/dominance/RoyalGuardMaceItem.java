@@ -12,6 +12,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.WorldEvents;
 
 public class RoyalGuardMaceItem extends Item {
     public RoyalGuardMaceItem(Settings settings) {
@@ -32,8 +33,9 @@ public class RoyalGuardMaceItem extends Item {
 
         if (target.getWorld() instanceof ServerWorld serverWorld) {
             serverWorld.playSound(
-                    null, target.getX(), target.getY(), target.getZ(), i > 3 ? SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY : SoundEvents.ITEM_MACE_SMASH_GROUND, target.getSoundCategory(), 1, 1
+                    null, target.getX(), target.getY(), target.getZ(), i > 3 ? SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY : SoundEvents.ITEM_MACE_SMASH_GROUND, attacker.getSoundCategory(), 1, 1
             );
+            serverWorld.syncWorldEvent(WorldEvents.SMASH_ATTACK, target.getSteppingPos(), 750);
         }
 
         return super.postHit(stack, target, attacker);

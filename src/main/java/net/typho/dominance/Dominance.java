@@ -46,9 +46,27 @@ public class Dominance implements ModInitializer {
             0.2f
     ));
 
-    public static final Item ROYAL_GUARD_HELMET = Items.register(Identifier.of(MOD_ID, "royal_guard_helmet"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().rarity(Rarity.EPIC)));
-    public static final Item ROYAL_GUARD_CHESTPLATE = Items.register(Identifier.of(MOD_ID, "royal_guard_chestplate"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().rarity(Rarity.EPIC)));
-    public static final Item ROYAL_GUARD_BOOTS = Items.register(Identifier.of(MOD_ID, "royal_guard_boots"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().rarity(Rarity.EPIC)));
+    public static final Item ROYAL_GUARD_HELMET = Items.register(Identifier.of(MOD_ID, "royal_guard_helmet"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+            .add(
+                    EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                    new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_helmet_heavy"), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                    AttributeModifierSlot.ARMOR
+            )
+            .build())));
+    public static final Item ROYAL_GUARD_CHESTPLATE = Items.register(Identifier.of(MOD_ID, "royal_guard_chestplate"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+            .add(
+                    EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                    new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_chestplate_heavy"), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                    AttributeModifierSlot.ARMOR
+            )
+            .build())));
+    public static final Item ROYAL_GUARD_BOOTS = Items.register(Identifier.of(MOD_ID, "royal_guard_boots"), new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
+                    .add(
+                            EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                            new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_boots_heavy"), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                            AttributeModifierSlot.ARMOR
+                    )
+            .build())));
     public static final Item ROYAL_GUARD_MACE = Items.register(Identifier.of(MOD_ID, "royal_guard_mace"), new Item(new Item.Settings().rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
             .add(
                     EntityAttributes.GENERIC_ATTACK_DAMAGE,

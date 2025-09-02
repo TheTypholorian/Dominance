@@ -31,5 +31,8 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .add(Dominance.ROYAL_GUARD_CHESTPLATE);
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR)
                 .add(Dominance.ROYAL_GUARD_BOOTS);
+        getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
+                .addOptionalTag(ItemTags.AXES)
+                .add(Dominance.ROYAL_GUARD_MACE);
     }
 }

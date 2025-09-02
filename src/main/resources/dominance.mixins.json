@@ -4,16 +4,16 @@
   "package": "net.typho.dominance.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AxeItemMixin",
     "EnchantmentMixin",
     "ExperienceOrbEntityMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
-    "client.AxeItemMixin",
-    "client.PlayerEntityMixin",
-    "client.RemoveOffHandItemTaskMixin",
-    "client.ShaderImportProcessorMixin",
-    "client.VeilMultiBindMixin",
-    "client.VeilShaderSourceMixin"
+    "RemoveOffHandItemTaskMixin",
+    "ShaderImportProcessorMixin",
+    "VeilMultiBindMixin",
+    "VeilShaderSourceMixin",
+    "client.PlayerEntityMixin"
   ],
   "client": [
     "client.AtlasLoaderMixin",

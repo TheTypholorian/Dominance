@@ -1,0 +1,9 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:axes",
+      "required": false
+    },
+    "dominance:royal_guard_mace"
+  ]
+}

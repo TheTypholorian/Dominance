@@ -16,7 +16,7 @@ public interface EnchantmentModifyDamageEffect {
             .getCodec()
             .dispatch(EnchantmentModifyDamageEffect::getCodec, Function.identity());
 
-    float apply(ServerWorld world, int level, ItemStack stack, float damage, Entity victim, DamageSource source, Vec3d pos);
+    DamageModifier apply(ServerWorld world, int level, ItemStack stack, Entity victim, DamageSource source, Vec3d pos);
 
     MapCodec<? extends EnchantmentModifyDamageEffect> getCodec();
 }

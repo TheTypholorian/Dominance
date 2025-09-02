@@ -1,4 +1,4 @@
-package net.typho.dominance.mixin.client;
+package net.typho.dominance.mixin;
 
 import foundry.veil.api.client.render.shader.compiler.VeilShaderSource;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;

@@ -1,5 +1,6 @@
-// 1.21.1	2025-09-02T13:06:32.0079611	Orb of Dominance/Tags for minecraft:item
+// 1.21.1	2025-09-02T14:03:49.5345	Orb of Dominance/Tags for minecraft:item
 917dbe79c8b6766d917dc5a1e4922f42e54df361 data\minecraft\tags\item\foot_armor.json
 53d14867890456969eff9bedb927ae0fcb5bcbae data\c\tags\item\tools\shields.json
+627e0b7426d78775373ccf02706c79297f23c236 data\minecraft\tags\item\enchantable\sword.json
 d83bf9bd0d1ebe6f7a4fe78d504ff8bdc0b8d2e2 data\minecraft\tags\item\chest_armor.json
 cf4d2d387689f01fe2707ab461b714618ec1d319 data\minecraft\tags\item\head_armor.json

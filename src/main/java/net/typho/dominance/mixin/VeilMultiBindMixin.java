@@ -1,4 +1,4 @@
-package net.typho.dominance.mixin.client;
+package net.typho.dominance.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

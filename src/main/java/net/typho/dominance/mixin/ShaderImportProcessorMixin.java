@@ -1,4 +1,4 @@
-package net.typho.dominance.mixin.client;
+package net.typho.dominance.mixin;
 
 import foundry.veil.api.client.render.shader.processor.ShaderImportProcessor;
 import org.spongepowered.asm.mixin.Mixin;

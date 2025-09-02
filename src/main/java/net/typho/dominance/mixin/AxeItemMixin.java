@@ -1,8 +1,8 @@
-package net.typho.dominance.mixin.client;
+package net.typho.dominance.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.entity.ai.brain.task.RemoveOffHandItemTask;
+import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -10,10 +10,10 @@ import net.typho.dominance.Dominance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(RemoveOffHandItemTask.class)
-public class RemoveOffHandItemTaskMixin {
+@Mixin(AxeItem.class)
+public class AxeItemMixin {
     @WrapOperation(
-            method = "method_47299",
+            method = "shouldCancelStripAttempt",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z"

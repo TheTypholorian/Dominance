@@ -12,12 +12,12 @@ public record AmbushEffect() implements EnchantmentModifyDamageEffect {
     public static final MapCodec<AmbushEffect> CODEC = MapCodec.unit(AmbushEffect::new);
 
     @Override
-    public float apply(ServerWorld world, int level, ItemStack stack, float damage, Entity victim, DamageSource source, Vec3d pos) {
+    public DamageModifier apply(ServerWorld world, int level, ItemStack stack, Entity victim, DamageSource source, Vec3d pos) {
         if (victim instanceof MobEntity mob && mob.getTarget() != source.getAttacker()) {
-            return damage * (1 + level / 5f);
+            return new DamageModifier(1 + level / 5f, DamageModifier.Operation.MULTIPLY);
         }
 
-        return damage;
+        return null;
     }
 
     @Override

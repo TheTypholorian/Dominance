@@ -12,11 +12,11 @@ public record CommittedEffect() implements EnchantmentModifyDamageEffect {
     public static final MapCodec<CommittedEffect> CODEC = MapCodec.unit(CommittedEffect::new);
 
     @Override
-    public float apply(ServerWorld world, int level, ItemStack stack, float damage, Entity victim, DamageSource source, Vec3d pos) {
+    public DamageModifier apply(ServerWorld world, int level, ItemStack stack, Entity victim, DamageSource source, Vec3d pos) {
         if (victim instanceof LivingEntity living) {
-            return damage * (1 + (1 - (living.getHealth() / living.getMaxHealth())) * ((float) level / 3));
+            return new DamageModifier(1 + (1 - (living.getHealth() / living.getMaxHealth())) * ((float) level / 3), DamageModifier.Operation.MULTIPLY);
         } else {
-            return damage;
+            return null;
         }
     }
 

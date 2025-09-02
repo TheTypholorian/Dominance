@@ -14,17 +14,17 @@ public record DynamoEffect() implements EnchantmentModifyDamageEffect {
     public static final MapCodec<DynamoEffect> CODEC = MapCodec.unit(DynamoEffect::new);
 
     @Override
-    public float apply(ServerWorld world, int level, ItemStack stack, float damage, Entity victim, DamageSource source, Vec3d pos) {
+    public DamageModifier apply(ServerWorld world, int level, ItemStack stack, Entity victim, DamageSource source, Vec3d pos) {
         if (source.getAttacker() instanceof PlayerEntity player) {
             DominancePlayerData data = Dominance.PLAYER_DATA.getNullable(player);
 
             if (data != null && data.hasDynamo()) {
                 data.setDynamo(false);
-                return damage * (2 + (level - 1) / 4f);
+                return new DamageModifier(2 + (level - 1) / 4f, DamageModifier.Operation.MULTIPLY);
             }
         }
 
-        return damage;
+        return null;
     }
 
     @Override

@@ -19,7 +19,8 @@
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
     "client.InGameHudMixin",
-    "client.LightmapTextureManagerMixin"
+    "client.LightmapTextureManagerMixin",
+    "client.LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

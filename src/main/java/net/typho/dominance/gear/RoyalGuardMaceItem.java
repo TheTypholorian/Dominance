@@ -14,7 +14,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldEvents;
 import net.typho.dominance.DamageParticleS2C;
 
 public class RoyalGuardMaceItem extends Item {
@@ -45,7 +44,6 @@ public class RoyalGuardMaceItem extends Item {
             serverWorld.playSound(
                     null, target.getX(), target.getY(), target.getZ(), i > 3 ? SoundEvents.ITEM_MACE_SMASH_GROUND_HEAVY : SoundEvents.ITEM_MACE_SMASH_GROUND, attacker.getSoundCategory(), 1, 1
             );
-            serverWorld.syncWorldEvent(WorldEvents.SMASH_ATTACK, target.getSteppingPos(), 750);
         }
 
         return super.postHit(stack, target, attacker);

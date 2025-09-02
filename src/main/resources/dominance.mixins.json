@@ -6,6 +6,7 @@
   "mixins": [
     "EnchantmentMixin",
     "ExperienceOrbEntityMixin",
+    "LivingEntityMixin",
     "client.AxeItemMixin",
     "client.PlayerEntityMixin",
     "client.RemoveOffHandItemTaskMixin",

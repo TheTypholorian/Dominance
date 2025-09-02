@@ -44,6 +44,11 @@ public class DominanceClient implements ClientModInitializer {
             } else if (cooldown != 0) {
                 context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
             }
+
+            for (DamageNumberParticle particle : DamageNumberParticle.PARTICLES) {
+                System.out.println("particle");
+                context.drawText(MinecraftClient.getInstance().textRenderer, String.valueOf(particle.damage), 15, 15, 0xFFFFFFFF, true);
+            }
         });
     }
 }

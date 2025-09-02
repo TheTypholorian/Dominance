@@ -4,7 +4,7 @@
     "translate": "enchantment.dominance.ambush"
   },
   "effects": {
-    "dominance:post_attack": [
+    "dominance:modify_damage": [
       {
         "effect": {
           "type": "dominance:ambush"

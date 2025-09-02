@@ -12,33 +12,44 @@ import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.entity.model.ShieldEntityModel;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentLevelBasedValue;
 import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
+import net.minecraft.enchantment.effect.EnchantmentEffectTarget;
+import net.minecraft.enchantment.effect.entity.ApplyMobEffectEnchantmentEffect;
+import net.minecraft.enchantment.effect.value.MultiplyEnchantmentEffect;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ShieldItem;
+import net.minecraft.loot.condition.EntityPropertiesLootCondition;
+import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.predicate.entity.EntityTypePredicate;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.EnchantmentTags;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.typho.dominance.client.DamageParticleEffect;
-import net.typho.dominance.enchants.AmbushEffect;
-import net.typho.dominance.enchants.CommittedEffect;
-import net.typho.dominance.enchants.EnchantmentModifyDamageEffect;
+import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
 import net.typho.dominance.gear.RoyalGuardMaceItem;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -138,21 +149,58 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
     public static final EntityType<OrbEntity> ORB_ENTITY = Registry.register(Registries.ENTITY_TYPE, Identifier.of(MOD_ID, "orb"), EntityType.Builder.<OrbEntity>create(OrbEntity::new, SpawnGroup.MISC).dimensions(1f, 1f).build("orb"));
 
-    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentModifyDamageEffect>>> ENCHANTMENT_ATTACK_EFFECTS_KEY = RegistryKey.ofRegistry(Identifier.of(MOD_ID, "enchantment_attack_effects"));
-    public static final Registry<MapCodec<? extends EnchantmentModifyDamageEffect>> ENCHANTMENT_ATTACK_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_ATTACK_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
-
-    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>> MODIFY_DAMAGE = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.of(MOD_ID, "post_attack"),
+    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentModifyDamageEffect>>> ENCHANTMENT_DAMAGE_EFFECTS_KEY = RegistryKey.ofRegistry(Identifier.of(MOD_ID, "enchantment_damage_effects"));
+    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentPostKillEffect>>> ENCHANTMENT_POST_KILL_EFFECTS_KEY = RegistryKey.ofRegistry(Identifier.of(MOD_ID, "enchantment_post_kill_effects"));
+    public static final Registry<MapCodec<? extends EnchantmentModifyDamageEffect>> ENCHANTMENT_DAMAGE_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_DAMAGE_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+    public static final Registry<MapCodec<? extends EnchantmentPostKillEffect>> ENCHANTMENT_POST_KILL_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_POST_KILL_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>> MODIFY_DAMAGE = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.of(MOD_ID, "modify_damage"),
             ComponentType.<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentModifyDamageEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
+    );    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>> POST_KILL = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.of(MOD_ID, "post_kill"),
+            ComponentType.<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentPostKillEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
     );
 
     public static final RegistryKey<Enchantment> AMBUSH = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "ambush"));
     public static final RegistryKey<Enchantment> COMMITTED = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "committed"));
+    public static final RegistryKey<Enchantment> DYNAMO = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "dynamo"));
+    public static final RegistryKey<Enchantment> EXPLODING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "exploding"));
+    public static final RegistryKey<Enchantment> FREEZING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "freezing"));
+    public static final RegistryKey<Enchantment> GRAVITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "gravity"));
+    public static final RegistryKey<Enchantment> BANE_OF_ILLAGERS = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "bane_of_illagers"));
+    public static final RegistryKey<Enchantment> LEECHING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "leeching"));
 
-    public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_ATTACK_EFFECTS, Identifier.of(MOD_ID, "ambush"), AmbushEffect.CODEC);
-    public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_ATTACK_EFFECTS, Identifier.of(MOD_ID, "committed"), CommittedEffect.CODEC);
+    public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "ambush"), AmbushEffect.CODEC);
+    public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "committed"), CommittedEffect.CODEC);
+    public static final MapCodec<DynamoEffect> DYNAMO_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "dynamo"), DynamoEffect.CODEC);
+    public static final MapCodec<ExplodingEffect> EXPLODING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "exploding"), ExplodingEffect.CODEC);
+    public static final MapCodec<GravityEffect> GRAVITY_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, Identifier.of(MOD_ID, "gravity"), GravityEffect.CODEC);
+    public static final MapCodec<LeechingEffect> LEECHING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "leeching"), LeechingEffect.CODEC);
+
+    @Override
+    public void onInitialize() {
+        ModelPredicateProviderRegistry.register(
+                ROYAL_GUARD_SHIELD,
+                Identifier.ofVanilla("blocking"),
+                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
+        );
+        PayloadTypeRegistry.playC2S().register(StartRollC2S.ID, StartRollC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(DamageParticleS2C.ID, DamageParticleS2C.PACKET_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
+            DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
+
+            if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
+                data.setTime(ROLL_LENGTH);
+            }
+        });
+    }
+
+    @Override
+    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.registerForPlayers(PLAYER_DATA, DominancePlayerData::new, RespawnCopyStrategy.NEVER_COPY);
+    }
 
     public static void enchantments(Registerable<Enchantment> registerable) {
         RegistryEntryLookup<Item> items = registerable.getRegistryLookup(RegistryKeys.ITEM);
+        RegistryEntryLookup<Enchantment> enchantments = registerable.getRegistryLookup(RegistryKeys.ENCHANTMENT);
 
         registerable.register(AMBUSH, Enchantment.builder(
                         Enchantment.definition(
@@ -182,28 +230,102 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 )
                 .addEffect(MODIFY_DAMAGE, new CommittedEffect())
                 .build(COMMITTED.getValue()));
-    }
-
-    @Override
-    public void onInitialize() {
-        ModelPredicateProviderRegistry.register(
-                ROYAL_GUARD_SHIELD,
-                Identifier.ofVanilla("blocking"),
-                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
-        );
-        PayloadTypeRegistry.playC2S().register(StartRollC2S.ID, StartRollC2S.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(DamageParticleS2C.ID, DamageParticleS2C.PACKET_CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
-            DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
-
-            if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
-                data.setTime(ROLL_LENGTH);
-            }
-        });
-    }
-
-    @Override
-    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerForPlayers(PLAYER_DATA, DominancePlayerData::new, RespawnCopyStrategy.NEVER_COPY);
+        registerable.register(DYNAMO, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(MODIFY_DAMAGE, new DynamoEffect())
+                .build(DYNAMO.getValue()));
+        registerable.register(EXPLODING, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(POST_KILL, new ExplodingEffect())
+                .build(EXPLODING.getValue()));
+        registerable.register(FREEZING, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(EnchantmentEffectComponentTypes.POST_ATTACK, EnchantmentEffectTarget.ATTACKER, EnchantmentEffectTarget.VICTIM, new ApplyMobEffectEnchantmentEffect(
+                        RegistryEntryList.of(StatusEffects.SLOWNESS),
+                        EnchantmentLevelBasedValue.constant(3),
+                        EnchantmentLevelBasedValue.constant(3),
+                        EnchantmentLevelBasedValue.linear(1, 1),
+                        EnchantmentLevelBasedValue.linear(1, 1)
+                ))
+                .build(FREEZING.getValue()));
+        registerable.register(GRAVITY, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(EnchantmentEffectComponentTypes.POST_ATTACK, EnchantmentEffectTarget.ATTACKER, EnchantmentEffectTarget.VICTIM, new GravityEffect())
+                .build(GRAVITY.getValue()));
+        registerable.register(BANE_OF_ILLAGERS, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(
+                        EnchantmentEffectComponentTypes.DAMAGE,
+                        new MultiplyEnchantmentEffect(EnchantmentLevelBasedValue.linear(1.25f, 0.1f)),
+                        EntityPropertiesLootCondition.builder(
+                                LootContext.EntityTarget.THIS, EntityPredicate.Builder.create().type(EntityTypePredicate.create(EntityTypeTags.ILLAGER))
+                        )
+                )
+                .exclusiveSet(enchantments.getOrThrow(EnchantmentTags.DAMAGE_EXCLUSIVE_SET))
+                .build(BANE_OF_ILLAGERS.getValue()));
+        registerable.register(LEECHING, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(POST_KILL, new LeechingEffect())
+                .build(LEECHING.getValue()));
     }
 }

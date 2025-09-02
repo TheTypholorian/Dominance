@@ -1,6 +1,6 @@
 package net.typho.dominance.mixin.client;
 
-import net.minecraft.client.render.RenderLayer;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -9,6 +9,8 @@ import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.Identifier;
+import net.typho.dominance.Dominance;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +29,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     )
     private void render(T entity, float f, float g, MatrixStack matrices, VertexConsumerProvider output, int i, CallbackInfo ci) {
         double d = dispatcher.getSquaredDistanceToCamera(entity);
-        if (!(d > 4096.0)) {
+        if (d < 256) {
             float hp = entity.getHealth() / entity.getMaxHealth();
 
             if (hp < 1) {
@@ -36,36 +38,27 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
                 matrices.multiply(this.dispatcher.getRotation());
 
                 Matrix4f matrix = matrices.peek().getPositionMatrix();
-                VertexConsumer consumer = output.getBuffer(RenderLayer.getTextBackground());
+                VertexConsumer consumer = output.getBuffer(VeilRenderType.get(Identifier.of(Dominance.MOD_ID, "mob_health_bar")));
                 int fullColor = 0xFFFF5555, emptyColor = 0xFF4F1515;
-                int light = 0xF000F0;
                 float width = 0.5f, height = 0.05f;
 
                 consumer.vertex(matrix, -(width * 2 * (1 - hp) - width), -height, 0.01f)
-                        .color(emptyColor)
-                        .light(light);
+                        .color(emptyColor);
                 consumer.vertex(matrix, width, -height, 0.01f)
-                        .color(emptyColor)
-                        .light(light);
+                        .color(emptyColor);
                 consumer.vertex(matrix, width, height, 0.01f)
-                        .color(emptyColor)
-                        .light(light);
+                        .color(emptyColor);
                 consumer.vertex(matrix, -(width * 2 * (1 - hp) - width), height, 0.01f)
-                        .color(emptyColor)
-                        .light(light);
+                        .color(emptyColor);
 
                 consumer.vertex(matrix, -width, -height, 0.01f)
-                        .color(fullColor)
-                        .light(light);
+                        .color(fullColor);
                 consumer.vertex(matrix, width * 2 * hp - width, -height, 0.01f)
-                        .color(fullColor)
-                        .light(light);
+                        .color(fullColor);
                 consumer.vertex(matrix, width * 2 * hp - width, height, 0.01f)
-                        .color(fullColor)
-                        .light(light);
+                        .color(fullColor);
                 consumer.vertex(matrix, -width, height, 0.01f)
-                        .color(fullColor)
-                        .light(light);
+                        .color(fullColor);
 
                 matrices.pop();
             }

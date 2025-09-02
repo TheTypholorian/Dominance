@@ -1,13 +1,13 @@
 {
   "anvil_cost": 1,
   "description": {
-    "translate": "enchantment.dominance.committed"
+    "translate": "enchantment.dominance.dynamo"
   },
   "effects": {
     "dominance:modify_damage": [
       {
         "effect": {
-          "type": "dominance:committed"
+          "type": "dominance:dynamo"
         }
       }
     ]

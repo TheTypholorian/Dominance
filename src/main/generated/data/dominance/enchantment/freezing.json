@@ -1,0 +1,45 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.dominance.freezing"
+  },
+  "effects": {
+    "minecraft:post_attack": [
+      {
+        "affected": "victim",
+        "effect": {
+          "type": "minecraft:apply_mob_effect",
+          "max_amplifier": {
+            "type": "minecraft:linear",
+            "base": 1.0,
+            "per_level_above_first": 1.0
+          },
+          "max_duration": 3.0,
+          "min_amplifier": {
+            "type": "minecraft:linear",
+            "base": 1.0,
+            "per_level_above_first": 1.0
+          },
+          "min_duration": 3.0,
+          "to_apply": "minecraft:slowness"
+        },
+        "enchanted": "attacker"
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 21,
+    "per_level_above_first": 11
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 11
+  },
+  "primary_items": "#minecraft:enchantable/sword",
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#minecraft:enchantable/sharp_weapon",
+  "weight": 3
+}

@@ -1,6 +1,5 @@
 package net.typho.dominance.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.particle.Particle;
@@ -30,8 +29,6 @@ public class DamageParticle extends Particle {
 
     @Override
     public void buildGeometry(VertexConsumer consumer, Camera camera, float tickDelta) {
-        RenderSystem.disableDepthTest();
-
         MatrixStack matrices = new MatrixStack();
         matrices.push();
         matrices.translate(

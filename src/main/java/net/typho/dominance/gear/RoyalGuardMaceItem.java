@@ -26,7 +26,7 @@ public class RoyalGuardMaceItem extends Item {
         DamageSource damageSource = attacker instanceof PlayerEntity player ? target.getWorld().getDamageSources().playerAttack(player) : target.getWorld().getDamageSources().mobAttack(attacker);
         int i = 0;
 
-        for (Entity splash : target.getWorld().getOtherEntities(target, Box.from(target.getPos()).expand(1.5))) {
+        for (Entity splash : target.getWorld().getOtherEntities(target, Box.from(target.getPos()).expand(1))) {
             if (splash != attacker && splash instanceof LivingEntity livingSplash) {
                 float damage = (float) attacker.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * MathHelper.clamp(1 - splash.distanceTo(target) / 7, 0, 0.5f);
 

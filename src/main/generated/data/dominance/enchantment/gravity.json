@@ -1,14 +1,16 @@
 {
   "anvil_cost": 1,
   "description": {
-    "translate": "enchantment.dominance.committed"
+    "translate": "enchantment.dominance.gravity"
   },
   "effects": {
-    "dominance:modify_damage": [
+    "minecraft:post_attack": [
       {
+        "affected": "victim",
         "effect": {
-          "type": "dominance:committed"
-        }
+          "type": "dominance:gravity"
+        },
+        "enchanted": "attacker"
       }
     ]
   },

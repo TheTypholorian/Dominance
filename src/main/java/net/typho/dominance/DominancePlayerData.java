@@ -13,6 +13,7 @@ import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
     private int time = 0, cooldown = 0;
+    private boolean dynamo = false;
     public final PlayerEntity player;
 
     public DominancePlayerData(PlayerEntity player) {
@@ -34,18 +35,30 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     public void setCooldown(int cooldown) {
         this.cooldown = cooldown;
+        Dominance.PLAYER_DATA.sync(player);
+    }
+
+    public boolean hasDynamo() {
+        return dynamo;
+    }
+
+    public void setDynamo(boolean dynamo) {
+        this.dynamo = dynamo;
+        Dominance.PLAYER_DATA.sync(player);
     }
 
     @Override
     public void readFromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         time = nbt.getInt("time");
         cooldown = nbt.getInt("cooldown");
+        dynamo = nbt.getBoolean("dynamo");
     }
 
     @Override
     public void writeToNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         nbt.putInt("time", time);
         nbt.putInt("cooldown", cooldown);
+        nbt.putBoolean("dynamo", dynamo);
     }
 
     @Override
@@ -64,6 +77,7 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
             if (time == 0) {
                 cooldown = Dominance.ROLL_COOLDOWN;
+                dynamo = true;
             }
 
             sync = true;

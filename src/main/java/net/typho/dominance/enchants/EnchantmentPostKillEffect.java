@@ -11,12 +11,12 @@ import net.typho.dominance.Dominance;
 
 import java.util.function.Function;
 
-public interface EnchantmentModifyDamageEffect {
-    Codec<EnchantmentModifyDamageEffect> CODEC = Dominance.ENCHANTMENT_DAMAGE_EFFECTS
+public interface EnchantmentPostKillEffect {
+    Codec<EnchantmentPostKillEffect> CODEC = Dominance.ENCHANTMENT_POST_KILL_EFFECTS
             .getCodec()
-            .dispatch(EnchantmentModifyDamageEffect::getCodec, Function.identity());
+            .dispatch(EnchantmentPostKillEffect::getCodec, Function.identity());
 
-    float apply(ServerWorld world, int level, ItemStack stack, float damage, Entity victim, DamageSource source, Vec3d pos);
+    void apply(ServerWorld world, int level, ItemStack stack, Entity victim, DamageSource source, Vec3d pos);
 
-    MapCodec<? extends EnchantmentModifyDamageEffect> getCodec();
+    MapCodec<? extends EnchantmentPostKillEffect> getCodec();
 }

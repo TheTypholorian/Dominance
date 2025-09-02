@@ -1,0 +1,23 @@
+{
+  "format": "POSITION_COLOR",
+  "mode": "QUADS",
+  "bufferSize": "TRANSIENT",
+  "sort": false,
+  "affectsCrumbling": true,
+  "outline": false,
+  "layers": [
+    {
+      "type": "veil:shader",
+      "name": "dominance:mob_health_bar"
+    },
+    {
+      "type": "minecraft:depth_test",
+      "mode": "always"
+    },
+    {
+      "type": "minecraft:write_mask",
+      "color": true,
+      "depth": true
+    }
+  ]
+}

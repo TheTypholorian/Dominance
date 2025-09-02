@@ -1,13 +1,13 @@
 {
   "anvil_cost": 1,
   "description": {
-    "translate": "enchantment.dominance.committed"
+    "translate": "enchantment.dominance.exploding"
   },
   "effects": {
-    "dominance:modify_damage": [
+    "dominance:post_kill": [
       {
         "effect": {
-          "type": "dominance:committed"
+          "type": "dominance:exploding"
         }
       }
     ]

@@ -2,6 +2,7 @@ package net.typho.dominance.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -31,6 +32,7 @@ public class DominanceClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             DominancePlayerData data = Dominance.PLAYER_DATA.get(MinecraftClient.getInstance().player);
@@ -43,11 +45,6 @@ public class DominanceClient implements ClientModInitializer {
                 context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x, y, 0, 0, 17 - time, 11, 17, 11);
             } else if (cooldown != 0) {
                 context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
-            }
-
-            for (DamageNumberParticle particle : DamageNumberParticle.PARTICLES) {
-                System.out.println("particle");
-                context.drawText(MinecraftClient.getInstance().textRenderer, String.valueOf(particle.damage), 15, 15, 0xFFFFFFFF, true);
             }
         });
     }

@@ -25,6 +25,9 @@ import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ShieldItem;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -32,6 +35,7 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.AmbushEffect;
 import net.typho.dominance.enchants.CommittedEffect;
 import net.typho.dominance.enchants.EnchantmentModifyDamageEffect;
@@ -119,6 +123,18 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         modelPartData.addChild("handle", ModelPartBuilder.create().uv(30, 0).cuboid(-1.0F, -3.0F, -1.0F, 2.0F, 6.0F, 6.0F), ModelTransform.NONE);
         ROYAL_GUARD_SHIELD_MODEL = new ShieldEntityModel(TexturedModelData.of(modelData, 64, 64).createModel());
     }
+
+    public static final ParticleType<DamageParticleEffect> DAMAGE_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "damage"), new ParticleType<DamageParticleEffect>(true) {
+        @Override
+        public MapCodec<DamageParticleEffect> getCodec() {
+            return DamageParticleEffect.createCodec(this);
+        }
+
+        @Override
+        public PacketCodec<? super RegistryByteBuf, DamageParticleEffect> getPacketCodec() {
+            return DamageParticleEffect.createPacketCodec(this);
+        }
+    });
 
     public static final EntityType<OrbEntity> ORB_ENTITY = Registry.register(Registries.ENTITY_TYPE, Identifier.of(MOD_ID, "orb"), EntityType.Builder.<OrbEntity>create(OrbEntity::new, SpawnGroup.MISC).dimensions(1f, 1f).build("orb"));
 

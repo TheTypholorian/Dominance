@@ -1,6 +1,9 @@
 package net.typho.dominance;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -8,8 +11,11 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.entity.model.ShieldEntityModel;
 import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -18,10 +24,11 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ShieldItem;
+import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
@@ -111,6 +118,36 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     }
 
     public static final EntityType<OrbEntity> ORB_ENTITY = Registry.register(Registries.ENTITY_TYPE, Identifier.of(MOD_ID, "orb"), EntityType.Builder.<OrbEntity>create(OrbEntity::new, SpawnGroup.MISC).dimensions(1f, 1f).build("orb"));
+
+    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentModifyDamageEffect>>> ENCHANTMENT_ATTACK_EFFECTS_KEY = RegistryKey.ofRegistry(Identifier.of(MOD_ID, "enchantment_attack_effects"));
+    public static final Registry<MapCodec<? extends EnchantmentModifyDamageEffect>> ENCHANTMENT_ATTACK_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_ATTACK_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+
+    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>> MODIFY_DAMAGE = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.of(MOD_ID, "post_attack"),
+            ComponentType.<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentModifyDamageEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
+    );
+
+    public static final RegistryKey<Enchantment> AMBUSH = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "ambush"));
+
+    public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_ATTACK_EFFECTS, Identifier.of(MOD_ID, "ambush"), AmbushEffect.CODEC);
+
+    public static void enchantments(Registerable<Enchantment> registerable) {
+        RegistryEntryLookup<Item> items = registerable.getRegistryLookup(RegistryKeys.ITEM);
+
+        registerable.register(AMBUSH, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                5,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(MODIFY_DAMAGE, new AmbushEffect())
+                .build(AMBUSH.getValue()));
+    }
 
     @Override
     public void onInitialize() {

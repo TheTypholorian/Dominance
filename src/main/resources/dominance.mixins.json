@@ -4,6 +4,7 @@
   "package": "net.typho.dominance.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "EnchantmentMixin",
     "ExperienceOrbEntityMixin",
     "client.AxeItemMixin",
     "client.PlayerEntityMixin",

@@ -25,6 +25,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
@@ -45,6 +47,7 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
@@ -135,6 +138,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         ROYAL_GUARD_SHIELD_MODEL = new ShieldEntityModel(TexturedModelData.of(modelData, 64, 64).createModel());
     }
 
+    public static final RegistryEntry<StatusEffect> RAMPAGE_STATUS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(MOD_ID, "rampage"), new RampageStatusEffect(StatusEffectCategory.BENEFICIAL, 0x660000));
+
     public static final ParticleType<DamageParticleEffect> DAMAGE_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "damage"), new ParticleType<DamageParticleEffect>(true) {
         @Override
         public MapCodec<DamageParticleEffect> getCodec() {
@@ -167,6 +172,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RegistryKey<Enchantment> GRAVITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "gravity"));
     public static final RegistryKey<Enchantment> BANE_OF_ILLAGERS = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "bane_of_illagers"));
     public static final RegistryKey<Enchantment> LEECHING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "leeching"));
+    public static final RegistryKey<Enchantment> RAMPAGE = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "rampage"));
+    public static final RegistryKey<Enchantment> WEAKENING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "weakening"));
 
     public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "ambush"), AmbushEffect.CODEC);
     public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "committed"), CommittedEffect.CODEC);
@@ -174,6 +181,11 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final MapCodec<ExplodingEffect> EXPLODING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "exploding"), ExplodingEffect.CODEC);
     public static final MapCodec<GravityEffect> GRAVITY_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, Identifier.of(MOD_ID, "gravity"), GravityEffect.CODEC);
     public static final MapCodec<LeechingEffect> LEECHING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "leeching"), LeechingEffect.CODEC);
+    public static final MapCodec<RampageEffect> RAMPAGE_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "rampage"), RampageEffect.CODEC);
+    public static final MapCodec<WeakeningEffect> WEAKENING_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, Identifier.of(MOD_ID, "weakening"), WeakeningEffect.CODEC);
+
+    public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "exclusive_set/inflict"));
+    public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "exclusive_set/conditional"));
 
     @Override
     public void onInitialize() {
@@ -215,6 +227,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         )
                 )
                 .addEffect(MODIFY_DAMAGE, new AmbushEffect())
+                .exclusiveSet(enchantments.getOrThrow(CONDITIONAL_EXCLUSIVE_SET))
                 .build(AMBUSH.getValue()));
         registerable.register(COMMITTED, Enchantment.builder(
                         Enchantment.definition(
@@ -229,6 +242,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         )
                 )
                 .addEffect(MODIFY_DAMAGE, new CommittedEffect())
+                .exclusiveSet(enchantments.getOrThrow(CONDITIONAL_EXCLUSIVE_SET))
                 .build(COMMITTED.getValue()));
         registerable.register(DYNAMO, Enchantment.builder(
                         Enchantment.definition(
@@ -257,6 +271,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         )
                 )
                 .addEffect(POST_KILL, new ExplodingEffect())
+                .exclusiveSet(enchantments.getOrThrow(INFLICT_EXCLUSIVE_SET))
                 .build(EXPLODING.getValue()));
         registerable.register(FREEZING, Enchantment.builder(
                         Enchantment.definition(
@@ -277,6 +292,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         EnchantmentLevelBasedValue.linear(1, 1),
                         EnchantmentLevelBasedValue.linear(1, 1)
                 ))
+                .exclusiveSet(enchantments.getOrThrow(INFLICT_EXCLUSIVE_SET))
                 .build(FREEZING.getValue()));
         registerable.register(GRAVITY, Enchantment.builder(
                         Enchantment.definition(
@@ -291,6 +307,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         )
                 )
                 .addEffect(EnchantmentEffectComponentTypes.POST_ATTACK, EnchantmentEffectTarget.ATTACKER, EnchantmentEffectTarget.VICTIM, new GravityEffect())
+                .exclusiveSet(enchantments.getOrThrow(INFLICT_EXCLUSIVE_SET))
                 .build(GRAVITY.getValue()));
         registerable.register(BANE_OF_ILLAGERS, Enchantment.builder(
                         Enchantment.definition(
@@ -327,5 +344,35 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 )
                 .addEffect(POST_KILL, new LeechingEffect())
                 .build(LEECHING.getValue()));
+        registerable.register(RAMPAGE, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(POST_KILL, new RampageEffect())
+                .exclusiveSet(enchantments.getOrThrow(CONDITIONAL_EXCLUSIVE_SET))
+                .build(RAMPAGE.getValue()));
+        registerable.register(WEAKENING, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(EnchantmentEffectComponentTypes.POST_ATTACK, EnchantmentEffectTarget.ATTACKER, EnchantmentEffectTarget.VICTIM, new WeakeningEffect())
+                .exclusiveSet(enchantments.getOrThrow(INFLICT_EXCLUSIVE_SET))
+                .build(WEAKENING.getValue()));
     }
 }

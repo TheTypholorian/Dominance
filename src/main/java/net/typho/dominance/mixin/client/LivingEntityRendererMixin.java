@@ -39,7 +39,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
                 Matrix4f matrix = matrices.peek().getPositionMatrix();
                 VertexConsumer consumer = output.getBuffer(VeilRenderType.get(Identifier.of(Dominance.MOD_ID, "mob_health_bar")));
-                int fullColor = 0xFFFF5555, emptyColor = 0xFF4F1515;
+                int fullColor = 0xFFFF1F1F, emptyColor = 0xFF4F0F0F;
                 float width = 0.5f, height = 0.05f;
 
                 consumer.vertex(matrix, -(width * 2 * (1 - hp) - width), -height, 0.01f)

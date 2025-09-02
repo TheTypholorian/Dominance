@@ -1,14 +1,16 @@
 {
   "anvil_cost": 1,
   "description": {
-    "translate": "enchantment.dominance.exploding"
+    "translate": "enchantment.dominance.weakening"
   },
   "effects": {
-    "dominance:post_kill": [
+    "minecraft:post_attack": [
       {
+        "affected": "victim",
         "effect": {
-          "type": "dominance:exploding"
-        }
+          "type": "dominance:weakening"
+        },
+        "enchanted": "attacker"
       }
     ]
   },

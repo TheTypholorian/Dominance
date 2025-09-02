@@ -14,6 +14,7 @@
       }
     ]
   },
+  "exclusive_set": "#dominance:exclusive_set/inflict",
   "max_cost": {
     "base": 21,
     "per_level_above_first": 11

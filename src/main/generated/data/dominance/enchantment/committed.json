@@ -12,6 +12,7 @@
       }
     ]
   },
+  "exclusive_set": "#dominance:exclusive_set/conditional",
   "max_cost": {
     "base": 21,
     "per_level_above_first": 11

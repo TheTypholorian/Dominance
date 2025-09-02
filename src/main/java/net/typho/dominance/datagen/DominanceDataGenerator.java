@@ -12,6 +12,7 @@ public class DominanceDataGenerator implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = gen.createPack();
 
         pack.addProvider(GenItemTags::new);
+        pack.addProvider(GenEnchantmentTags::new);
         pack.addProvider(GenRegistries::new);
     }
 

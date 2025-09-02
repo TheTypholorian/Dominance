@@ -43,7 +43,7 @@ public class DamageParticle extends Particle {
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.scale(-0.02f, -0.02f, 0.02f);
 
-        Text text = Text.literal(String.format("%.1f", params.damage));
+        Text text = Text.literal(String.valueOf((int) params.damage));
 
         MinecraftClient.getInstance().textRenderer.draw(
                 text,

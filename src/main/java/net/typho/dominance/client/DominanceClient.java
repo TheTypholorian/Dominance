@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameMode;
 import net.typho.dominance.DamageParticleS2C;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.DominancePlayerData;
@@ -37,16 +38,18 @@ public class DominanceClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
-            DominancePlayerData data = Dominance.PLAYER_DATA.get(MinecraftClient.getInstance().player);
-            int cooldown = (int) ((float) data.getCooldown() / Dominance.ROLL_COOLDOWN * 17);
-            int time = (int) ((float) data.getTime() / Dominance.ROLL_LENGTH * 17);
-            int x = context.getScaledWindowWidth() / 2 + (MinecraftClient.getInstance().player.getMainArm() == Arm.RIGHT ? 115 - 17 : -115), y = context.getScaledWindowHeight() - 17;
-            context.drawTexture(Identifier.of("dominance", "textures/gui/roll_full.png"), x, y, 0, 0, 17, 11, 17, 11);
+            if (MinecraftClient.getInstance().interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
+                DominancePlayerData data = Dominance.PLAYER_DATA.get(MinecraftClient.getInstance().player);
+                int cooldown = (int) ((float) data.getCooldown() / Dominance.ROLL_COOLDOWN * 17);
+                int time = (int) ((float) data.getTime() / Dominance.ROLL_LENGTH * 17);
+                int x = context.getScaledWindowWidth() / 2 + (MinecraftClient.getInstance().player.getMainArm() == Arm.RIGHT ? 115 - 17 : -115), y = context.getScaledWindowHeight() - 17;
+                context.drawTexture(Identifier.of("dominance", "textures/gui/roll_full.png"), x, y, 0, 0, 17, 11, 17, 11);
 
-            if (time != 0) {
-                context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x, y, 0, 0, 17 - time, 11, 17, 11);
-            } else if (cooldown != 0) {
-                context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
+                if (time != 0) {
+                    context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x, y, 0, 0, 17 - time, 11, 17, 11);
+                } else if (cooldown != 0) {
+                    context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
+                }
             }
         });
         ClientPlayNetworking.registerGlobalReceiver(DamageParticleS2C.ID, (packet, context) -> context.player().getWorld().addParticle(new DamageParticleEffect(Dominance.DAMAGE_PARTICLE, packet.damage()), packet.pos().x, packet.pos().y, packet.pos().z, 0, 0, 0));

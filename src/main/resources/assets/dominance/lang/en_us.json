@@ -12,5 +12,7 @@
   "enchantment.dominance.freezing": "Freezing",
   "enchantment.dominance.gravity": "Gravity",
   "enchantment.dominance.bane_of_illagers": "Illager's Bane",
-  "enchantment.dominance.leeching": "Leeching"
+  "enchantment.dominance.leeching": "Leeching",
+  "enchantment.dominance.rampage": "Rampage",
+  "effect.dominance.rampage": "Rampage"
 }

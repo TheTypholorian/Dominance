@@ -9,7 +9,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.typho.dominance.Dominance;
-import net.typho.dominance.RollComponent;
+import net.typho.dominance.DominancePlayerData;
 import org.lwjgl.glfw.GLFW;
 
 public class DominanceClient implements ClientModInitializer {
@@ -33,9 +33,9 @@ public class DominanceClient implements ClientModInitializer {
     public void onInitializeClient() {
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
-            RollComponent roll = Dominance.ROLL.get(MinecraftClient.getInstance().player);
-            int cooldown = (int) ((float) roll.getCooldown() / Dominance.ROLL_COOLDOWN * 17);
-            int time = (int) ((float) roll.getTime() / Dominance.ROLL_LENGTH * 17);
+            DominancePlayerData data = Dominance.PLAYER_DATA.get(MinecraftClient.getInstance().player);
+            int cooldown = (int) ((float) data.getCooldown() / Dominance.ROLL_COOLDOWN * 17);
+            int time = (int) ((float) data.getTime() / Dominance.ROLL_LENGTH * 17);
             int x = context.getScaledWindowWidth() / 2 + (MinecraftClient.getInstance().player.getMainArm() == Arm.RIGHT ? 115 - 17 : -115), y = context.getScaledWindowHeight() - 17;
             context.drawTexture(Identifier.of("dominance", "textures/gui/roll_full.png"), x, y, 0, 0, 17, 11, 17, 11);
 

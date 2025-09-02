@@ -1,4 +1,4 @@
-package net.typho.dominance;
+package net.typho.dominance.enchants;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -7,6 +7,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import net.typho.dominance.Dominance;
 
 import java.util.function.Function;
 

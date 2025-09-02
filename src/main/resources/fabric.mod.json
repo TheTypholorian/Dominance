@@ -33,7 +33,7 @@
   },
   "custom": {
     "cardinal-components": [
-      "dominance:roll"
+      "dominance:player_data"
     ]
   },
   "accessWidener": "dominance.accesswidener"

@@ -11,11 +11,11 @@ import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
-public class RollComponent implements ComponentV3, AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
+public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
     private int time = 0, cooldown = 0;
     public final PlayerEntity player;
 
-    public RollComponent(PlayerEntity player) {
+    public DominancePlayerData(PlayerEntity player) {
         this.player = player;
     }
 
@@ -25,7 +25,7 @@ public class RollComponent implements ComponentV3, AutoSyncedComponent, ClientTi
 
     public void setTime(int time) {
         this.time = time;
-        Dominance.ROLL.sync(player);
+        Dominance.PLAYER_DATA.sync(player);
     }
 
     public int getCooldown() {
@@ -80,7 +80,7 @@ public class RollComponent implements ComponentV3, AutoSyncedComponent, ClientTi
         }
 
         if (sync) {
-            Dominance.ROLL.sync(player);
+            Dominance.PLAYER_DATA.sync(player);
         }
     }
 }

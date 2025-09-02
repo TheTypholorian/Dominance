@@ -1,4 +1,4 @@
-package net.typho.dominance;
+package net.typho.dominance.enchants;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.entity.Entity;

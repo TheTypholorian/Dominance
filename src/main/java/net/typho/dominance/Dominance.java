@@ -32,6 +32,9 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.typho.dominance.enchants.AmbushEffect;
+import net.typho.dominance.enchants.CommittedEffect;
+import net.typho.dominance.enchants.EnchantmentModifyDamageEffect;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
 import net.typho.dominance.gear.RoyalGuardMaceItem;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -107,7 +110,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     );
     public static final ShieldEntityModel ROYAL_GUARD_SHIELD_MODEL;
 
-    public static final ComponentKey<RollComponent> ROLL = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of(MOD_ID, "roll"), RollComponent.class);
+    public static final ComponentKey<DominancePlayerData> PLAYER_DATA = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of(MOD_ID, "player_data"), DominancePlayerData.class);
 
     static {
         ModelData modelData = new ModelData();
@@ -127,8 +130,10 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     );
 
     public static final RegistryKey<Enchantment> AMBUSH = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "ambush"));
+    public static final RegistryKey<Enchantment> COMMITTED = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "committed"));
 
     public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_ATTACK_EFFECTS, Identifier.of(MOD_ID, "ambush"), AmbushEffect.CODEC);
+    public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_ATTACK_EFFECTS, Identifier.of(MOD_ID, "committed"), CommittedEffect.CODEC);
 
     public static void enchantments(Registerable<Enchantment> registerable) {
         RegistryEntryLookup<Item> items = registerable.getRegistryLookup(RegistryKeys.ITEM);
@@ -147,6 +152,20 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 )
                 .addEffect(MODIFY_DAMAGE, new AmbushEffect())
                 .build(AMBUSH.getValue()));
+        registerable.register(COMMITTED, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                3,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(MODIFY_DAMAGE, new CommittedEffect())
+                .build(COMMITTED.getValue()));
     }
 
     @Override
@@ -158,16 +177,16 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         );
         PayloadTypeRegistry.playC2S().register(StartRollC2S.ID, StartRollC2S.PACKET_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
-            RollComponent roll = ROLL.getNullable(context.player());
+            DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
 
-            if (roll != null && roll.getCooldown() == 0 && roll.getTime() == 0) {
-                roll.setTime(ROLL_LENGTH);
+            if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
+                data.setTime(ROLL_LENGTH);
             }
         });
     }
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerForPlayers(ROLL, RollComponent::new, RespawnCopyStrategy.NEVER_COPY);
+        registry.registerForPlayers(PLAYER_DATA, DominancePlayerData::new, RespawnCopyStrategy.NEVER_COPY);
     }
 }

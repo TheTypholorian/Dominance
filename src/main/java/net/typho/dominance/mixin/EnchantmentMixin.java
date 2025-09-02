@@ -8,7 +8,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.typho.dominance.Dominance;
-import net.typho.dominance.EnchantmentModifyDamageEffect;
+import net.typho.dominance.enchants.EnchantmentModifyDamageEffect;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,7 +25,7 @@ public abstract class EnchantmentMixin {
 
     @Inject(
             method = "modifyDamage",
-            at = @At("HEAD")
+            at = @At("TAIL")
     )
     private void onTargetDamaged(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat damage, CallbackInfo ci) {
         for (EnchantmentEffectEntry<EnchantmentModifyDamageEffect> effect : getEffect(Dominance.MODIFY_DAMAGE)) {

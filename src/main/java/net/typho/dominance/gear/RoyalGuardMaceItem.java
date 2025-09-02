@@ -1,5 +1,6 @@
 package net.typho.dominance.gear;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -8,11 +9,13 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldEvents;
+import net.typho.dominance.DamageParticleS2C;
 
 public class RoyalGuardMaceItem extends Item {
     public RoyalGuardMaceItem(Settings settings) {
@@ -26,8 +29,15 @@ public class RoyalGuardMaceItem extends Item {
 
         for (Entity splash : target.getWorld().getOtherEntities(target, Box.from(target.getPos()).expand(1.5))) {
             if (splash != attacker && splash instanceof LivingEntity livingSplash) {
-                livingSplash.damage(damageSource, (float) attacker.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * MathHelper.clamp(1 - splash.distanceTo(target) / 7, 0, 0.5f));
-                i++;
+                float damage = (float) attacker.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * MathHelper.clamp(1 - splash.distanceTo(target) / 7, 0, 0.5f);
+
+                if (livingSplash.damage(damageSource, damage)) {
+                    i++;
+
+                    if (attacker instanceof ServerPlayerEntity server) {
+                        ServerPlayNetworking.send(server, new DamageParticleS2C(livingSplash, attacker, damage));
+                    }
+                }
             }
         }
 

@@ -19,17 +19,13 @@ import java.util.Objects;
 public class DamageParticle extends Particle {
     public final DamageParticleEffect params;
 
-    protected DamageParticle(DamageParticleEffect params, ClientWorld world, double x, double y, double z) {
-        super(world, x, y, z);
-        this.params = params;
-    }
-
     public DamageParticle(DamageParticleEffect params, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
         this.velocityX /= 4;
         this.velocityY /= 4;
         this.velocityZ /= 4;
         this.params = params;
+        maxAge *= 2;
     }
 
     @Override
@@ -50,7 +46,7 @@ public class DamageParticle extends Particle {
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.scale(-0.02f, -0.02f, 0.02f);
 
-        Text text = Text.literal(String.valueOf(params.damage));
+        Text text = Text.literal(String.format("%.1f", params.damage));
 
         MinecraftClient.getInstance().textRenderer.draw(
                 text,

@@ -2,6 +2,7 @@ package net.typho.dominance.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -9,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
+import net.typho.dominance.DamageParticleS2C;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.DominancePlayerData;
 import org.lwjgl.glfw.GLFW;
@@ -47,5 +49,6 @@ public class DominanceClient implements ClientModInitializer {
                 context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
             }
         });
+        ClientPlayNetworking.registerGlobalReceiver(DamageParticleS2C.ID, (packet, context) -> context.player().getWorld().addParticle(new DamageParticleEffect(Dominance.DAMAGE_PARTICLE, packet.damage()), packet.pos().x, packet.pos().y, packet.pos().z, 0, 0, 0));
     }
 }

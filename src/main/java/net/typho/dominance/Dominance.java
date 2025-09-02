@@ -192,6 +192,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
         );
         PayloadTypeRegistry.playC2S().register(StartRollC2S.ID, StartRollC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(DamageParticleS2C.ID, DamageParticleS2C.PACKET_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
             DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
 

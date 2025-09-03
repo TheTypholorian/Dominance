@@ -65,7 +65,7 @@ import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.BurstCrossbowItem;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
-import net.typho.dominance.gear.RoyalGuardMaceItem;
+import net.typho.dominance.gear.SplashWeaponItem;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
@@ -85,6 +85,21 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
     public static <T extends Item> T item(String id, T item) {
         return Registry.register(Registries.ITEM, Identifier.of(MOD_ID, id), item);
+    }
+
+    public static AttributeModifiersComponent weaponAttributes(double damage, double speed) {
+        return AttributeModifiersComponent.builder()
+                .add(
+                        EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                        new EntityAttributeModifier(BASE_ATTACK_DAMAGE_MODIFIER_ID, damage, EntityAttributeModifier.Operation.ADD_VALUE),
+                        AttributeModifierSlot.MAINHAND
+                )
+                .add(
+                        EntityAttributes.GENERIC_ATTACK_SPEED,
+                        new EntityAttributeModifier(BASE_ATTACK_SPEED_MODIFIER_ID, speed, EntityAttributeModifier.Operation.ADD_VALUE),
+                        AttributeModifierSlot.MAINHAND
+                )
+                .build();
     }
 
     public static final Map<Set<ArmorItem>, AttributeModifiersComponent> ARMOR_SET_BONUSES = new LinkedHashMap<>();
@@ -108,18 +123,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC)));
-    public static final RoyalGuardMaceItem ROYAL_GUARD_MACE = item("royal_guard_mace", new RoyalGuardMaceItem(new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(AttributeModifiersComponent.builder()
-            .add(
-                    EntityAttributes.GENERIC_ATTACK_DAMAGE,
-                    new EntityAttributeModifier(BASE_ATTACK_DAMAGE_MODIFIER_ID, 10, EntityAttributeModifier.Operation.ADD_VALUE),
-                    AttributeModifierSlot.MAINHAND
-            )
-            .add(
-                    EntityAttributes.GENERIC_ATTACK_SPEED,
-                    new EntityAttributeModifier(BASE_ATTACK_SPEED_MODIFIER_ID, -3.2, EntityAttributeModifier.Operation.ADD_VALUE),
-                    AttributeModifierSlot.MAINHAND
-            )
-            .build())));
+    public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(10, -3.2))));
+    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(14, -3.6))));
     public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(465)));
 
@@ -356,14 +361,14 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
                     if (!player.getWorld().isClient && !weapon.isEmpty() && entity instanceof LivingEntity) {
                         if (bl6) {
-                            weapon.postDamageEntity((LivingEntity)entity, player);
+                            weapon.postDamageEntity((LivingEntity) entity, player);
                         }
 
                         if (weapon.isEmpty()) {
                             if (weapon == player.getMainHandStack()) {
-                                player.setStackInHand(Hand.MAIN_HAND, weapon.EMPTY);
+                                player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                             } else {
-                                player.setStackInHand(Hand.OFF_HAND, weapon.EMPTY);
+                                player.setStackInHand(Hand.OFF_HAND, ItemStack.EMPTY);
                             }
                         }
                     }

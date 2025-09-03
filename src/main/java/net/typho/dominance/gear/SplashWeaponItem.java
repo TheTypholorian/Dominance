@@ -16,9 +16,14 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.typho.dominance.DamageParticleS2C;
 
-public class RoyalGuardMaceItem extends Item {
-    public RoyalGuardMaceItem(Settings settings) {
+public class SplashWeaponItem extends Item {
+    public final float radius, denominator, maxSplash;
+
+    public SplashWeaponItem(float radius, float denominator, float maxSplash, Settings settings) {
         super(settings);
+        this.radius = radius;
+        this.denominator = denominator;
+        this.maxSplash = maxSplash;
     }
 
     @Override
@@ -26,9 +31,9 @@ public class RoyalGuardMaceItem extends Item {
         DamageSource damageSource = attacker instanceof PlayerEntity player ? target.getWorld().getDamageSources().playerAttack(player) : target.getWorld().getDamageSources().mobAttack(attacker);
         int i = 0;
 
-        for (Entity splash : target.getWorld().getOtherEntities(target, Box.from(target.getPos()).expand(1))) {
+        for (Entity splash : target.getWorld().getOtherEntities(target, Box.from(target.getPos()).expand(radius))) {
             if (splash != attacker && splash instanceof LivingEntity livingSplash) {
-                float damage = (float) attacker.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * MathHelper.clamp(1 - splash.distanceTo(target) / 7, 0, 0.5f);
+                float damage = (float) attacker.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE) * MathHelper.clamp(1 - splash.distanceTo(target) / denominator, 0, maxSplash);
 
                 if (livingSplash.damage(damageSource, damage)) {
                     i++;

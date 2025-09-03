@@ -63,6 +63,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
+import net.typho.dominance.gear.BurstCrossbowItem;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
 import net.typho.dominance.gear.RoyalGuardMaceItem;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -120,6 +121,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             )
             .build())));
     public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
+    public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(465)));
 
     static {
         ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()

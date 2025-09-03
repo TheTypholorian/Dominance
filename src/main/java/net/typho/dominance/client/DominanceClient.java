@@ -7,7 +7,12 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.item.CrossbowItem;
+import net.minecraft.item.Items;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -53,5 +58,22 @@ public class DominanceClient implements ClientModInitializer {
             }
         });
         ClientPlayNetworking.registerGlobalReceiver(DamageParticleS2C.ID, (packet, context) -> context.player().getWorld().addParticle(new DamageParticleEffect(Dominance.DAMAGE_PARTICLE, packet.damage()), packet.pos().x, packet.pos().y, packet.pos().z, 0, 0, 0));
+        ModelPredicateProviderRegistry.register(Dominance.BURST_CROSSBOW, Identifier.ofVanilla("pull"), (stack, world, entity, seed) -> {
+            if (entity == null) {
+                return 0.0F;
+            } else {
+                return CrossbowItem.isCharged(stack) ? 0.0F : (float)(stack.getMaxUseTime(entity) - entity.getItemUseTimeLeft()) / CrossbowItem.getPullTime(stack, entity);
+            }
+        });
+        ModelPredicateProviderRegistry.register(
+                Dominance.BURST_CROSSBOW,
+                Identifier.ofVanilla("pulling"),
+                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F
+        );
+        ModelPredicateProviderRegistry.register(Dominance.BURST_CROSSBOW, Identifier.ofVanilla("charged"), (stack, world, entity, seed) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(Dominance.BURST_CROSSBOW, Identifier.ofVanilla("firework"), (stack, world, entity, seed) -> {
+            ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
+            return chargedProjectilesComponent != null && chargedProjectilesComponent.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+        });
     }
 }

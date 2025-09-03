@@ -64,6 +64,7 @@ import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.BurstCrossbowItem;
+import net.typho.dominance.gear.HuntingBowItem;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
 import net.typho.dominance.gear.SplashWeaponItem;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -133,6 +134,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(14, -3.6))));
     public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 2, -2f))));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(465)));
+    public static final HuntingBowItem HUNTING_BOW = item("hunting_bow", new HuntingBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(384)));
 
     static {
         ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()

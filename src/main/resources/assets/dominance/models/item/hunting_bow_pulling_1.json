@@ -1,0 +1,6 @@
+{
+  "parent": "dominance:item/hunting_bow",
+  "textures": {
+    "layer0": "dominance:item/hunting_bow_pulling_1"
+  }
+}

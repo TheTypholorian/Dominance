@@ -3,6 +3,7 @@
     {
       "id": "#minecraft:enchantable/bow",
       "required": false
-    }
+    },
+    "dominance:burst_crossbow"
   ]
 }

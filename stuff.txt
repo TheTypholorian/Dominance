@@ -1,1 +1,10 @@
 dominance:highblock/statue_room
+
+- glaive
+- starless night
+- sickles
+- soul scythe
+- red snake
+- exploding crossbow
+- heavy crossbow
+- rapid crossbow

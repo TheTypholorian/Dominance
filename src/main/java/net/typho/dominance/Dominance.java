@@ -4,6 +4,8 @@ import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -56,6 +58,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
@@ -226,6 +229,12 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         EXCLUSIVE_SET_COLORS.put(CONDITIONAL_EXCLUSIVE_SET.id(), new Color(145, 50, 115));
     }
 
+    public static final RegistryKey<ItemGroup> CREATIVE_TAB_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, id("tab"));
+    public static final ItemGroup CREATIVE_TAB = Registry.register(Registries.ITEM_GROUP, CREATIVE_TAB_KEY, FabricItemGroup.builder()
+            .icon(() -> new ItemStack(GREAT_HAMMER))
+            .displayName(Text.translatable("itemGroup.dominance"))
+            .build());
+
     @Override
     public void onInitialize() {
         ModelPredicateProviderRegistry.register(
@@ -241,6 +250,17 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
                 data.setTime(ROLL_LENGTH);
             }
+        });
+        ItemGroupEvents.modifyEntriesEvent(CREATIVE_TAB_KEY).register(entries -> {
+            entries.add(ROYAL_GUARD_HELMET);
+            entries.add(ROYAL_GUARD_CHESTPLATE);
+            entries.add(ROYAL_GUARD_BOOTS);
+            entries.add(ROYAL_GUARD_SHIELD);
+            entries.add(ROYAL_GUARD_MACE);
+            entries.add(GREAT_HAMMER);
+            entries.add(KATANA);
+            entries.add(BURST_CROSSBOW);
+            entries.add(HUNTING_BOW);
         });
     }
 

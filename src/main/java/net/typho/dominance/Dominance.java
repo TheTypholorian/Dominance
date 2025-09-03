@@ -129,8 +129,9 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(10, -3.2))));
-    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(14, -3.6))));
     public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
+    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(14, -3.6))));
+    public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 2, -2f))));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(465)));
 
     static {

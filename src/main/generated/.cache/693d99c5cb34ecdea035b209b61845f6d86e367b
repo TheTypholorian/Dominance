@@ -1,8 +1,8 @@
-// 1.21.1	2025-09-02T21:13:39.5943542	Orb of Dominance/Tags for minecraft:item
-c871853605ab46cb68ccade8ddbc5597b325a441 data\minecraft\tags\item\enchantable\durability.json
-cf4d2d387689f01fe2707ab461b714618ec1d319 data\minecraft\tags\item\head_armor.json
+// 1.21.1	2025-09-03T07:09:17.6494531	Orb of Dominance/Tags for minecraft:item
 887fdebc154dc473f30383f6a66228745a507976 data\minecraft\tags\item\enchantable\crossbow.json
-d83bf9bd0d1ebe6f7a4fe78d504ff8bdc0b8d2e2 data\minecraft\tags\item\chest_armor.json
 917dbe79c8b6766d917dc5a1e4922f42e54df361 data\minecraft\tags\item\foot_armor.json
 53d14867890456969eff9bedb927ae0fcb5bcbae data\c\tags\item\tools\shields.json
-42c3db075c233b5ee718f4bdb94555811952f97f data\minecraft\tags\item\enchantable\sword.json
+831dce6e69b2e5046bc6e22bd652ea9cd80ea887 data\minecraft\tags\item\enchantable\sword.json
+d83bf9bd0d1ebe6f7a4fe78d504ff8bdc0b8d2e2 data\minecraft\tags\item\chest_armor.json
+cf4d2d387689f01fe2707ab461b714618ec1d319 data\minecraft\tags\item\head_armor.json
+ededdffdbedd78782ee6460f375f18c02a025878 data\minecraft\tags\item\enchantable\durability.json

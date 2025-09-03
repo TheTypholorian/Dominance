@@ -33,11 +33,13 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .add(Dominance.ROYAL_GUARD_BOOTS);
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
                 .add(Dominance.ROYAL_GUARD_MACE)
-                .add(Dominance.GREAT_HAMMER);
+                .add(Dominance.GREAT_HAMMER)
+                .add(Dominance.KATANA);
         getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
                 .addOptionalTag(ItemTags.AXES)
                 .add(Dominance.ROYAL_GUARD_MACE)
-                .add(Dominance.GREAT_HAMMER);
+                .add(Dominance.GREAT_HAMMER)
+                .add(Dominance.KATANA);
         getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE)
                 .addOptionalTag(ItemTags.BOW_ENCHANTABLE);
     }

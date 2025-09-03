@@ -1,0 +1,8 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:enchantable/armor",
+      "required": false
+    }
+  ]
+}

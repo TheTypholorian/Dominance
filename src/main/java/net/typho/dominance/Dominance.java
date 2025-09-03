@@ -1,7 +1,11 @@
 package net.typho.dominance;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -13,6 +17,8 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.entity.model.ShieldEntityModel;
 import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.command.argument.NbtCompoundArgumentType;
+import net.minecraft.command.argument.RegistryKeyArgumentType;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
@@ -39,6 +45,9 @@ import net.minecraft.item.*;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -54,11 +63,14 @@ import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
@@ -107,6 +119,16 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 )
                 .build();
     }
+
+    public static final TagKey<Item> ARMOR_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/armor"));
+    public static final TagKey<Item> HANDHELD_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/handheld"));
+
+    public static final RegistryKey<Registry<Reforge.Factory<?>>> REFORGES_KEY = RegistryKey.ofRegistry(id("reforges"));
+    public static final Registry<Reforge.Factory<?>> REFORGES = FabricRegistryBuilder.createSimple(REFORGES_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+    public static final ComponentType<Reforge> REFORGE_COMPONENT = Registry.register(Registries.DATA_COMPONENT_TYPE, id("reforge"), new ComponentType.Builder<Reforge>().codec(Reforge.CODEC).packetCodec(Reforge.PACKET_CODEC).build());
+
+    public static final VitalityReforge VITALITY = Registry.register(REFORGES, VitalityReforge.ID, new VitalityReforge());
+    public static final LightweightReforge LIGHTWEIGHT = Registry.register(REFORGES, LightweightReforge.ID, new LightweightReforge());
 
     public static final Map<Set<ArmorItem>, AttributeModifiersComponent> ARMOR_SET_BONUSES = new LinkedHashMap<>();
 
@@ -256,6 +278,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             .build());
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onInitialize() {
         ModelPredicateProviderRegistry.register(
                 ROYAL_GUARD_SHIELD,
@@ -283,6 +306,79 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(KATANA);
             entries.add(BURST_CROSSBOW);
             entries.add(HUNTING_BOW);
+        });
+        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
+            commandDispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("reforge")
+                    .requires(source -> source.hasPermissionLevel(2))
+                    .executes(context -> {
+                        if (context.getSource().isExecutedByPlayer()) {
+                            ItemStack stack = context.getSource().getPlayerOrThrow().getMainHandStack();
+                            Reforge.Factory<?> reforge = Reforge.pickForStack(stack);
+
+                            if (reforge == null) {
+                                return 0;
+                            }
+
+                            stack.set(REFORGE_COMPONENT, reforge.generate(stack));
+                            return 1;
+                        }
+
+                        return 0;
+                    })
+                    .then(CommandManager.argument("type", RegistryKeyArgumentType.registryKey(REFORGES_KEY))
+                            .executes(context -> {
+                                if (context.getSource().isExecutedByPlayer()) {
+                                    ItemStack stack = context.getSource().getPlayerOrThrow().getMainHandStack();
+                                    RegistryKey<Reforge.Factory<?>> key = (RegistryKey<Reforge.Factory<?>>) context.getArgument("type", RegistryKey.class);
+                                    Reforge.Factory<?> reforge = REFORGES.get(key);
+
+                                    if (reforge == null) {
+                                        context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key).formatted(Formatting.RED), false);
+                                        return 0;
+                                    }
+
+                                    if (!reforge.isValidItem(stack)) {
+                                        context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_item", key, stack.getItem().getName()).formatted(Formatting.RED), false);
+                                        return 0;
+                                    }
+
+                                    stack.set(REFORGE_COMPONENT, reforge.generate(stack));
+                                    return 1;
+                                }
+
+                                return 0;
+                            })
+                            .then(CommandManager.argument("nbt", NbtCompoundArgumentType.nbtCompound())
+                                    .executes(context -> {
+                                        if (context.getSource().isExecutedByPlayer()) {
+                                            ItemStack stack = context.getSource().getPlayerOrThrow().getMainHandStack();
+                                            RegistryKey<Reforge.Factory<?>> key = (RegistryKey<Reforge.Factory<?>>) context.getArgument("type", RegistryKey.class);
+                                            Reforge.Factory<?> reforge = REFORGES.get(key);
+
+                                            if (reforge == null) {
+                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key).formatted(Formatting.RED), false);
+                                                return 0;
+                                            }
+
+                                            if (!reforge.isValidItem(stack)) {
+                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_item", key, stack.getItem().getName()).formatted(Formatting.RED), false);
+                                                return 0;
+                                            }
+
+                                            NbtCompound nbt = context.getArgument("nbt", NbtCompound.class);
+                                            DataResult<? extends Pair<? extends Reforge, NbtElement>> result = reforge.codec().codec().decode(NbtOps.INSTANCE, nbt);
+
+                                            if (result.isError()) {
+                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_nbt", nbt).formatted(Formatting.RED), false);
+                                                return 0;
+                                            }
+
+                                            stack.set(REFORGE_COMPONENT, result.getOrThrow().getFirst());
+                                            return 1;
+                                        }
+
+                                        return 0;
+                                    }))));
         });
     }
 

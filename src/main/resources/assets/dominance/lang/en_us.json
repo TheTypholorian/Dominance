@@ -21,5 +21,12 @@
   "enchantment.dominance.leeching": "Leeching",
   "enchantment.dominance.rampage": "Rampage",
   "effect.dominance.rampage": "Rampage",
-  "itemGroup.dominance": "Dominance"
+  "itemGroup.dominance": "Dominance",
+  "reforge.dominance.vitality": "Vitality",
+  "reforge.dominance.vitality.name": "Vitalitous",
+  "reforge.dominance.lightweight": "Lightweight",
+  "reforge.dominance.lightweight.name": "Lightweight",
+  "command.dominance.reforge.no_reforge": "Nonexistent reforge %s",
+  "command.dominance.reforge.bad_item": "Cannot apply reforge %s to %s",
+  "command.dominance.reforge.bad_nbt": "Bad nbt %s"
 }

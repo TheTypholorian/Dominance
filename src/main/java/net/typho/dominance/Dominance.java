@@ -66,10 +66,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
-import net.typho.dominance.gear.BurstCrossbowItem;
-import net.typho.dominance.gear.HuntingBowItem;
-import net.typho.dominance.gear.RoyalGuardArmorItem;
-import net.typho.dominance.gear.SplashWeaponItem;
+import net.typho.dominance.gear.*;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
@@ -128,12 +125,29 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             1f,
             0.2f
     ));
+    public static final RegistryEntry<ArmorMaterial> EVOCATION_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, id("royal_guard"), new ArmorMaterial(
+            Map.of(
+                    ArmorItem.Type.BOOTS, 1,
+                    ArmorItem.Type.LEGGINGS, 2,
+                    ArmorItem.Type.CHESTPLATE, 3,
+                    ArmorItem.Type.HELMET, 1,
+                    ArmorItem.Type.BODY, 3
+            ),
+            18,
+            SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE,
+            Ingredient::empty,
+            List.of(),
+            0,
+            0
+    ));
 
     public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC)));
     public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(10, -3.2))));
     public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
+    public static final EvocationRobeItem EVOCATION_HAT = item("evocation_hat", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(22)).rarity(Rarity.EPIC)));
+    public static final EvocationRobeItem EVOCATION_ROBE = item("evocation-robe", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(22)).rarity(Rarity.EPIC)));
     public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(14, -3.6))));
     public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 2, -2f))));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(465)));
@@ -144,6 +158,12 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .add(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
                         new EntityAttributeModifier(id("royal_guard_set_bonus"), 3, EntityAttributeModifier.Operation.ADD_VALUE),
+                        AttributeModifierSlot.ARMOR
+                ).build());
+        ARMOR_SET_BONUSES.put(Set.of(EVOCATION_HAT, EVOCATION_ROBE), AttributeModifiersComponent.builder()
+                .add(
+                        EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                        new EntityAttributeModifier(id("evocation_robe_set_bonus"), 0.25, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                         AttributeModifierSlot.ARMOR
                 ).build());
     }
@@ -256,6 +276,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(ROYAL_GUARD_CHESTPLATE);
             entries.add(ROYAL_GUARD_BOOTS);
             entries.add(ROYAL_GUARD_SHIELD);
+            entries.add(EVOCATION_HAT);
+            entries.add(EVOCATION_ROBE);
             entries.add(ROYAL_GUARD_MACE);
             entries.add(GREAT_HAMMER);
             entries.add(KATANA);

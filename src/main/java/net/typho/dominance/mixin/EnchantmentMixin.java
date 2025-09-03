@@ -31,8 +31,6 @@ public abstract class EnchantmentMixin {
             at = @At("TAIL")
     )
     private void onTargetDamaged(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat damage, CallbackInfo ci) {
-        System.out.println("Base damage " + damage);
-
         List<DamageModifier> modifiers = new LinkedList<>();
 
         for (EnchantmentEffectEntry<EnchantmentModifyDamageEffect> effect : getEffect(Dominance.MODIFY_DAMAGE)) {
@@ -49,7 +47,6 @@ public abstract class EnchantmentMixin {
 
         for (DamageModifier modifier : modifiers) {
             modifier.accept(damage);
-            System.out.println("Now " + damage + " because " + modifier);
         }
     }
 }

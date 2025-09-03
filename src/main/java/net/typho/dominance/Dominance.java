@@ -16,28 +16,32 @@ import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelBasedValue;
 import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.enchantment.effect.EnchantmentEffectTarget;
 import net.minecraft.enchantment.effect.entity.ApplyMobEffectEnchantmentEffect;
 import net.minecraft.enchantment.effect.value.MultiplyEnchantmentEffect;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.boss.dragon.EnderDragonPart;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ShieldItem;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.item.*;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.EntityTypePredicate;
 import net.minecraft.recipe.Ingredient;
@@ -48,9 +52,15 @@ import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.stat.Stats;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.RoyalGuardArmorItem;
@@ -208,6 +218,170 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerForPlayers(PLAYER_DATA, DominancePlayerData::new, RespawnCopyStrategy.NEVER_COPY);
+    }
+
+    public static void attack(PlayerEntity player, Entity target) {
+        float damage = player.isUsingRiptide() ? player.riptideAttackDamage : (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        ItemStack weapon = player.getWeaponStack();
+        DamageSource source = player.getDamageSources().playerAttack(player);
+        damage += weapon.getItem().getBonusAttackDamage(target, damage, source);
+        damage = player.getDamageAgainst(target, damage, source);
+        damage *= player.getAttackCooldownProgress(0.5f);
+        player.resetLastAttackedTicks();
+
+        if (target.getType().isIn(EntityTypeTags.REDIRECTABLE_PROJECTILE)
+                && target instanceof ProjectileEntity proj
+                && proj.deflect(ProjectileDeflection.REDIRECTED, player, player, true)) {
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory());
+        } else {
+            if (damage > 0) {
+                boolean knockback;
+
+                if (player.isSprinting()) {
+                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0F, 1.0F);
+                    knockback = true;
+                } else {
+                    knockback = false;
+                }
+
+                boolean crit = player.fallDistance > 0.0F
+                        && !player.isOnGround()
+                        && !player.isClimbing()
+                        && !player.isTouchingWater()
+                        && !player.hasStatusEffect(StatusEffects.BLINDNESS)
+                        && !player.hasVehicle()
+                        && target instanceof LivingEntity;
+                if (crit) {
+                    damage *= 1.25f;
+                }
+
+                boolean sweep = false;
+                double d = player.horizontalSpeed - player.prevHorizontalSpeed;
+
+                if (!crit && !knockback && player.isOnGround() && d < player.getMovementSpeed()) {
+                    ItemStack itemStack2 = player.getStackInHand(Hand.MAIN_HAND);
+
+                    if (itemStack2.getItem() instanceof SwordItem) {
+                        sweep = true;
+                    }
+                }
+
+                float hp = 0.0F;
+                if (target instanceof LivingEntity livingEntity) {
+                    hp = livingEntity.getHealth();
+                }
+
+                Vec3d vec3d = target.getVelocity();
+                boolean bl5 = target.damage(source, damage);
+
+                if (bl5) {
+                    if (player instanceof ServerPlayerEntity serverPlayer) {
+                        ServerPlayNetworking.send(serverPlayer, new DamageParticleS2C(target, serverPlayer, damage));
+                    }
+
+                    float k = player.getKnockbackAgainst(target, source) + (knockback ? 1.0F : 0.0F);
+
+                    if (k > 0.0F) {
+                        if (target instanceof LivingEntity livingEntity2) {
+                            livingEntity2.takeKnockback(
+                                    k * 0.5F, MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)), -MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0))
+                            );
+                        } else {
+                            target.addVelocity(
+                                    -MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)) * k * 0.5F, 0.1, MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0)) * k * 0.5F
+                            );
+                        }
+
+                        player.setVelocity(player.getVelocity().multiply(0.6, 1.0, 0.6));
+                        player.setSprinting(false);
+                    }
+
+                    if (sweep) {
+                        for (LivingEntity livingEntity3 : player.getWorld().getNonSpectatingEntities(LivingEntity.class, target.getBoundingBox().expand(1.0, 0.25, 1.0))) {
+                            if (livingEntity3 != player
+                                    && livingEntity3 != target
+                                    && !player.isTeammate(livingEntity3)
+                                    && (!(livingEntity3 instanceof ArmorStandEntity) || !((ArmorStandEntity)livingEntity3).isMarker())
+                                    && player.squaredDistanceTo(livingEntity3) < 9.0) {
+                                livingEntity3.takeKnockback(
+                                        0.4F, MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)), -MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0))
+                                );
+
+                                if (livingEntity3.damage(source, damage * (float) player.getAttributeValue(EntityAttributes.PLAYER_SWEEPING_DAMAGE_RATIO)) && player instanceof ServerPlayerEntity serverPlayer) {
+                                    ServerPlayNetworking.send(serverPlayer, new DamageParticleS2C(target, serverPlayer, damage));
+                                }
+
+                                if (player.getWorld() instanceof ServerWorld serverWorld) {
+                                    EnchantmentHelper.onTargetDamaged(serverWorld, livingEntity3, source);
+                                }
+                            }
+                        }
+
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
+                        player.spawnSweepAttackParticles();
+                    }
+
+                    if (target instanceof ServerPlayerEntity && target.velocityModified) {
+                        ((ServerPlayerEntity)target).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(target));
+                        target.velocityModified = false;
+                        target.setVelocity(vec3d);
+                    }
+
+                    if (damage > 30) {
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
+                        player.addCritParticles(target);
+                    } else if (crit) {
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
+                        player.addCritParticles(target);
+                    } else {
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
+                    }
+
+                    player.onAttacking(target);
+                    Entity entity = target;
+                    if (target instanceof EnderDragonPart) {
+                        entity = ((EnderDragonPart)target).owner;
+                    }
+
+                    boolean bl6 = false;
+                    if (player.getWorld() instanceof ServerWorld serverWorld2) {
+                        if (entity instanceof LivingEntity livingEntity3x) {
+                            bl6 = weapon.postHit(livingEntity3x, player);
+                        }
+
+                        EnchantmentHelper.onTargetDamaged(serverWorld2, target, source);
+                    }
+
+                    if (!player.getWorld().isClient && !weapon.isEmpty() && entity instanceof LivingEntity) {
+                        if (bl6) {
+                            weapon.postDamageEntity((LivingEntity)entity, player);
+                        }
+
+                        if (weapon.isEmpty()) {
+                            if (weapon == player.getMainHandStack()) {
+                                player.setStackInHand(Hand.MAIN_HAND, weapon.EMPTY);
+                            } else {
+                                player.setStackInHand(Hand.OFF_HAND, weapon.EMPTY);
+                            }
+                        }
+                    }
+
+                    if (target instanceof LivingEntity) {
+                        float n = hp - ((LivingEntity)target).getHealth();
+                        player.increaseStat(Stats.DAMAGE_DEALT, Math.round(n * 10.0F));
+                        if (player.getWorld() instanceof ServerWorld && n > 2.0F) {
+                            int o = (int)(n * 0.5);
+                            ((ServerWorld)player.getWorld())
+                                    .spawnParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5), target.getZ(), o, 0.1, 0.0, 0.1, 0.2);
+                        }
+                    }
+
+                    player.addExhaustion(0.1F);
+                } else {
+                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0F, 1.0F);
+                }
+            }
+        }
     }
 
     public static void enchantments(Registerable<Enchantment> registerable) {

@@ -11,7 +11,7 @@ import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.typho.dominance.Dominance;
-import net.typho.dominance.client.RoyalGuardArmorRenderer;
+import net.typho.dominance.client.DominanceArmorRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -50,7 +50,7 @@ public class RoyalGuardArmorItem extends SetBonusArmorItem {
             @Override
             public <T extends LivingEntity> @NotNull BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
                 if (renderer == null) {
-                    renderer = new RoyalGuardArmorRenderer(type.getName());
+                    renderer = new DominanceArmorRenderer(RoyalGuardArmorItem.this);
                 }
 
                 return renderer;

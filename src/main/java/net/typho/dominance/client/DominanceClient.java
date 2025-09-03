@@ -75,5 +75,17 @@ public class DominanceClient implements ClientModInitializer {
             ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
             return chargedProjectilesComponent != null && chargedProjectilesComponent.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
         });
+        ModelPredicateProviderRegistry.register(Dominance.HUNTING_BOW, Identifier.ofVanilla("pull"), (stack, world, entity, seed) -> {
+            if (entity == null) {
+                return 0.0F;
+            } else {
+                return entity.getActiveItem() != stack ? 0.0F : (stack.getMaxUseTime(entity) - entity.getItemUseTimeLeft()) / 20.0F;
+            }
+        });
+        ModelPredicateProviderRegistry.register(
+                Dominance.HUNTING_BOW,
+                Identifier.ofVanilla("pulling"),
+                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
+        );
     }
 }

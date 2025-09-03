@@ -2,23 +2,15 @@ package net.typho.dominance.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
-import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EnderDragonEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.OrbEntity;
-import org.joml.Quaternionf;
-
-import java.util.Objects;
 
 public class OrbEntityRenderer extends EntityRenderer<OrbEntity> {
     protected OrbEntityRenderer(EntityRendererFactory.Context ctx) {
@@ -28,7 +20,7 @@ public class OrbEntityRenderer extends EntityRenderer<OrbEntity> {
     @Override
     public void render(OrbEntity entity, float yaw, float tickDelta, MatrixStack stack, VertexConsumerProvider vertexConsumers, int light) {
         try {
-            RenderLayer layer = VeilRenderType.get(Identifier.of(Dominance.MOD_ID, "orb"));
+            RenderLayer layer = VeilRenderType.get(Dominance.id("orb"));
 
             if (layer != null) {
                 VertexConsumer consumer = vertexConsumers.getBuffer(layer);

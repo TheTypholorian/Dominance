@@ -10,7 +10,6 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.client.RoyalGuardArmorRenderer;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +36,7 @@ public class RoyalGuardArmorItem extends SetBonusArmorItem {
         modifiers.modifiers().addAll(super.getAttributeModifiers().modifiers());
         modifiers.modifiers().add(new AttributeModifiersComponent.Entry(
                 EntityAttributes.GENERIC_MOVEMENT_SPEED,
-                new EntityAttributeModifier(Identifier.of(Dominance.MOD_ID, "royal_guard_slow_speed_" + type.getName()), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                new EntityAttributeModifier(Dominance.id("royal_guard_slow_speed_" + type.getName()), -0.1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                 AttributeModifierSlot.ARMOR
         ));
         return modifiers;

@@ -26,7 +26,7 @@ public class AtlasLoaderMixin {
     )
     private static void addAll(ResourceManager resourceManager, Identifier id, CallbackInfoReturnable<AtlasLoader> cir, @Local List<AtlasSource> list) {
         if (id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE) && id.getPath().equals("shield_patterns")) {
-            list.add(new SingleAtlasSource(Identifier.of(Dominance.MOD_ID, "entity/royal_guard_shield"), Optional.empty()));
+            list.add(new SingleAtlasSource(Dominance.id("entity/royal_guard_shield"), Optional.empty()));
         }
     }
 }

@@ -72,6 +72,7 @@ import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
+import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,12 @@ import static net.minecraft.item.Item.BASE_ATTACK_SPEED_MODIFIER_ID;
 public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final String MOD_ID = "dominance";
 
+    public static Identifier id(String id) {
+        return Identifier.of(MOD_ID, id);
+    }
+
     public static <T extends Item> T item(String id, T item) {
-        return Registry.register(Registries.ITEM, Identifier.of(MOD_ID, id), item);
+        return Registry.register(Registries.ITEM, id(id), item);
     }
 
     public static AttributeModifiersComponent weaponAttributes(double damage, double speed) {
@@ -104,7 +109,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
     public static final Map<Set<ArmorItem>, AttributeModifiersComponent> ARMOR_SET_BONUSES = new LinkedHashMap<>();
 
-    public static final RegistryEntry<ArmorMaterial> ROYAL_GUARD_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, Identifier.of(MOD_ID, "royal_guard"), new ArmorMaterial(
+    public static final RegistryEntry<ArmorMaterial> ROYAL_GUARD_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, id("royal_guard"), new ArmorMaterial(
             Map.of(
                     ArmorItem.Type.BOOTS, 3,
                     ArmorItem.Type.LEGGINGS, 6,
@@ -132,7 +137,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()
                 .add(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
-                        new EntityAttributeModifier(Identifier.of(MOD_ID, "royal_guard_set_bonus"), 3, EntityAttributeModifier.Operation.ADD_VALUE),
+                        new EntityAttributeModifier(id("royal_guard_set_bonus"), 3, EntityAttributeModifier.Operation.ADD_VALUE),
                         AttributeModifierSlot.ARMOR
                 ).build());
     }
@@ -141,11 +146,11 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final int ROLL_COOLDOWN = 60;
 
     public static final SpriteIdentifier ROYAL_GUARD_SHIELD_SPRITE = new SpriteIdentifier(
-            TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, Identifier.of(MOD_ID, "entity/royal_guard_shield")
+            TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, id("entity/royal_guard_shield")
     );
     public static final ShieldEntityModel ROYAL_GUARD_SHIELD_MODEL;
 
-    public static final ComponentKey<DominancePlayerData> PLAYER_DATA = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of(MOD_ID, "player_data"), DominancePlayerData.class);
+    public static final ComponentKey<DominancePlayerData> PLAYER_DATA = ComponentRegistryV3.INSTANCE.getOrCreate(id("player_data"), DominancePlayerData.class);
 
     static {
         ModelData modelData = new ModelData();
@@ -155,9 +160,9 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         ROYAL_GUARD_SHIELD_MODEL = new ShieldEntityModel(TexturedModelData.of(modelData, 64, 64).createModel());
     }
 
-    public static final RegistryEntry<StatusEffect> RAMPAGE_STATUS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, Identifier.of(MOD_ID, "rampage"), new RampageStatusEffect(StatusEffectCategory.BENEFICIAL, 0x660000));
+    public static final RegistryEntry<StatusEffect> RAMPAGE_STATUS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, id("rampage"), new RampageStatusEffect(StatusEffectCategory.BENEFICIAL, 0x660000));
 
-    public static final ParticleType<DamageParticleEffect> DAMAGE_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, "damage"), new ParticleType<DamageParticleEffect>(true) {
+    public static final ParticleType<DamageParticleEffect> DAMAGE_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, id("damage"), new ParticleType<DamageParticleEffect>(true) {
         @Override
         public MapCodec<DamageParticleEffect> getCodec() {
             return DamageParticleEffect.createCodec(this);
@@ -169,40 +174,54 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         }
     });
 
-    public static final EntityType<OrbEntity> ORB_ENTITY = Registry.register(Registries.ENTITY_TYPE, Identifier.of(MOD_ID, "orb"), EntityType.Builder.<OrbEntity>create(OrbEntity::new, SpawnGroup.MISC).dimensions(1f, 1f).build("orb"));
+    public static final EntityType<OrbEntity> ORB_ENTITY = Registry.register(Registries.ENTITY_TYPE, id("orb"), EntityType.Builder.<OrbEntity>create(OrbEntity::new, SpawnGroup.MISC).dimensions(1f, 1f).build("orb"));
 
-    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentModifyDamageEffect>>> ENCHANTMENT_DAMAGE_EFFECTS_KEY = RegistryKey.ofRegistry(Identifier.of(MOD_ID, "enchantment_damage_effects"));
-    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentPostKillEffect>>> ENCHANTMENT_POST_KILL_EFFECTS_KEY = RegistryKey.ofRegistry(Identifier.of(MOD_ID, "enchantment_post_kill_effects"));
+    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentModifyDamageEffect>>> ENCHANTMENT_DAMAGE_EFFECTS_KEY = RegistryKey.ofRegistry(id("enchantment_damage_effects"));
+    public static final RegistryKey<Registry<MapCodec<? extends EnchantmentPostKillEffect>>> ENCHANTMENT_POST_KILL_EFFECTS_KEY = RegistryKey.ofRegistry(id("enchantment_post_kill_effects"));
     public static final Registry<MapCodec<? extends EnchantmentModifyDamageEffect>> ENCHANTMENT_DAMAGE_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_DAMAGE_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
     public static final Registry<MapCodec<? extends EnchantmentPostKillEffect>> ENCHANTMENT_POST_KILL_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_POST_KILL_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
-    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>> MODIFY_DAMAGE = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.of(MOD_ID, "modify_damage"),
+    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>> MODIFY_DAMAGE = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, id("modify_damage"),
             ComponentType.<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentModifyDamageEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
-    );    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>> POST_KILL = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, Identifier.of(MOD_ID, "post_kill"),
+    );    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>> POST_KILL = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, id("post_kill"),
             ComponentType.<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentPostKillEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
     );
 
-    public static final RegistryKey<Enchantment> AMBUSH = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "ambush"));
-    public static final RegistryKey<Enchantment> COMMITTED = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "committed"));
-    public static final RegistryKey<Enchantment> DYNAMO = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "dynamo"));
-    public static final RegistryKey<Enchantment> EXPLODING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "exploding"));
-    public static final RegistryKey<Enchantment> FREEZING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "freezing"));
-    public static final RegistryKey<Enchantment> GRAVITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "gravity"));
-    public static final RegistryKey<Enchantment> BANE_OF_ILLAGERS = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "bane_of_illagers"));
-    public static final RegistryKey<Enchantment> LEECHING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "leeching"));
-    public static final RegistryKey<Enchantment> RAMPAGE = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "rampage"));
-    public static final RegistryKey<Enchantment> WEAKENING = RegistryKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "weakening"));
+    public static final RegistryKey<Enchantment> AMBUSH = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("ambush"));
+    public static final RegistryKey<Enchantment> COMMITTED = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("committed"));
+    public static final RegistryKey<Enchantment> DYNAMO = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("dynamo"));
+    public static final RegistryKey<Enchantment> EXPLODING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("exploding"));
+    public static final RegistryKey<Enchantment> FREEZING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("freezing"));
+    public static final RegistryKey<Enchantment> GRAVITY = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("gravity"));
+    public static final RegistryKey<Enchantment> BANE_OF_ILLAGERS = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("bane_of_illagers"));
+    public static final RegistryKey<Enchantment> LEECHING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("leeching"));
+    public static final RegistryKey<Enchantment> RAMPAGE = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("rampage"));
+    public static final RegistryKey<Enchantment> WEAKENING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("weakening"));
 
-    public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "ambush"), AmbushEffect.CODEC);
-    public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "committed"), CommittedEffect.CODEC);
-    public static final MapCodec<DynamoEffect> DYNAMO_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, Identifier.of(MOD_ID, "dynamo"), DynamoEffect.CODEC);
-    public static final MapCodec<ExplodingEffect> EXPLODING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "exploding"), ExplodingEffect.CODEC);
-    public static final MapCodec<GravityEffect> GRAVITY_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, Identifier.of(MOD_ID, "gravity"), GravityEffect.CODEC);
-    public static final MapCodec<LeechingEffect> LEECHING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "leeching"), LeechingEffect.CODEC);
-    public static final MapCodec<RampageEffect> RAMPAGE_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, Identifier.of(MOD_ID, "rampage"), RampageEffect.CODEC);
-    public static final MapCodec<WeakeningEffect> WEAKENING_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, Identifier.of(MOD_ID, "weakening"), WeakeningEffect.CODEC);
+    public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("ambush"), AmbushEffect.CODEC);
+    public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("committed"), CommittedEffect.CODEC);
+    public static final MapCodec<DynamoEffect> DYNAMO_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("dynamo"), DynamoEffect.CODEC);
+    public static final MapCodec<ExplodingEffect> EXPLODING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("exploding"), ExplodingEffect.CODEC);
+    public static final MapCodec<GravityEffect> GRAVITY_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, id("gravity"), GravityEffect.CODEC);
+    public static final MapCodec<LeechingEffect> LEECHING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("leeching"), LeechingEffect.CODEC);
+    public static final MapCodec<RampageEffect> RAMPAGE_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("rampage"), RampageEffect.CODEC);
+    public static final MapCodec<WeakeningEffect> WEAKENING_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, id("weakening"), WeakeningEffect.CODEC);
 
-    public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "exclusive_set/inflict"));
-    public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, Identifier.of(MOD_ID, "exclusive_set/conditional"));
+    public static final Map<Identifier, Color> EXCLUSIVE_SET_COLORS = new LinkedHashMap<>();
+
+    public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/inflict"));
+    public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/conditional"));
+
+    static {
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.RIPTIDE_EXCLUSIVE_SET.id(), new Color(160, 255, 255));
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.DAMAGE_EXCLUSIVE_SET.id(), new Color(115, 40, 40));
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.ARMOR_EXCLUSIVE_SET.id(), new Color(200, 145, 255));
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.BOOTS_EXCLUSIVE_SET.id(), new Color(0, 145, 255));
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.BOW_EXCLUSIVE_SET.id(), new Color(0, 165, 130));
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.CROSSBOW_EXCLUSIVE_SET.id(), new Color(0, 110, 130));
+        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.MINING_EXCLUSIVE_SET.id(), new Color(255, 230, 0));
+        EXCLUSIVE_SET_COLORS.put(INFLICT_EXCLUSIVE_SET.id(), new Color(170, 45, 45));
+        EXCLUSIVE_SET_COLORS.put(CONDITIONAL_EXCLUSIVE_SET.id(), new Color(145, 50, 115));
+    }
 
     @Override
     public void onInitialize() {

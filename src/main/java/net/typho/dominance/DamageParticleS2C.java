@@ -4,7 +4,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 public record DamageParticleS2C(Vec3d pos, float damage) implements CustomPayload {
@@ -27,7 +26,7 @@ public record DamageParticleS2C(Vec3d pos, float damage) implements CustomPayloa
             buf.writeFloat(pkt.damage());
         }
     };
-    public static final Id<DamageParticleS2C> ID = new Id<>(Identifier.of(Dominance.MOD_ID, "damage_particle"));
+    public static final Id<DamageParticleS2C> ID = new Id<>(Dominance.id("damage_particle"));
 
     public DamageParticleS2C(Entity target, Entity attacker, float damage) {
         this(target.getEyePos().add(attacker.getEyePos().subtract(target.getEyePos()).normalize().multiply(0.5)), damage);

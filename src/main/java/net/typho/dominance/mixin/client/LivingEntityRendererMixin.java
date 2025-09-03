@@ -9,7 +9,6 @@ import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Identifier;
 import net.typho.dominance.Dominance;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,7 +37,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
                 matrices.multiply(this.dispatcher.getRotation());
 
                 Matrix4f matrix = matrices.peek().getPositionMatrix();
-                VertexConsumer consumer = output.getBuffer(VeilRenderType.get(Identifier.of(Dominance.MOD_ID, "mob_health_bar")));
+                VertexConsumer consumer = output.getBuffer(VeilRenderType.get(Dominance.id("mob_health_bar")));
                 int fullColor = 0xFFFF1F1F, emptyColor = 0xFF4F0F0F;
                 float width = 0.5f, height = 0.05f;
 

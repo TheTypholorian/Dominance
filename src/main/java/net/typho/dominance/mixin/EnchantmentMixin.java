@@ -1,12 +1,17 @@
 package net.typho.dominance.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.component.ComponentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.enchants.DamageModifier;
 import net.typho.dominance.enchants.EnchantmentModifyDamageEffect;
@@ -48,5 +53,19 @@ public abstract class EnchantmentMixin {
         for (DamageModifier modifier : modifiers) {
             modifier.accept(damage);
         }
+    }
+
+    @ModifyReturnValue(
+            method = "getName",
+            at = @At("RETURN")
+    )
+    private static Text getName(Text original, @Local(argsOnly = true) RegistryEntry<Enchantment> enchant) {
+        TagKey<Enchantment> tag = enchant.value().exclusiveSet().getTagKey().orElse(null);
+
+        if (tag != null) {
+            return original.copy().styled(style -> style.withColor(Dominance.EXCLUSIVE_SET_COLORS.get(tag.id()).getRGB()));
+        }
+
+        return original;
     }
 }

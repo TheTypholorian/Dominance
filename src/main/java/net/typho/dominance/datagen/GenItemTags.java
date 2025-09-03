@@ -38,5 +38,7 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .addOptionalTag(ItemTags.AXES)
                 .add(Dominance.ROYAL_GUARD_MACE)
                 .add(Dominance.GREAT_HAMMER);
+        getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE)
+                .addOptionalTag(ItemTags.BOW_ENCHANTABLE);
     }
 }

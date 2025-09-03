@@ -10,6 +10,7 @@
     "ExperienceOrbEntityMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
+    "ProjectileEntityMixin",
     "RemoveOffHandItemTaskMixin",
     "ShaderImportProcessorMixin",
     "VeilMultiBindMixin",

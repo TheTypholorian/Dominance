@@ -7,7 +7,7 @@ import net.typho.dominance.Dominance;
 
 import java.awt.*;
 
-public class LightweightReforge extends SimpleReforge.Factory {
+public class LightweightReforge extends BasicReforge.Factory {
     public static final Identifier ID = Dominance.id("lightweight");
 
     public LightweightReforge() {

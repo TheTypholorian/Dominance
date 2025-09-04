@@ -3,12 +3,12 @@ package net.typho.dominance.gear;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -21,11 +21,11 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-public class SimpleReforge implements Reforge {
+public class BasicReforge implements Reforge {
     public final Factory factory;
     public final double value;
 
-    public SimpleReforge(Factory factory, double value) {
+    public BasicReforge(Factory factory, double value) {
         this.factory = factory;
         this.value = value;
     }
@@ -40,19 +40,24 @@ public class SimpleReforge implements Reforge {
         return factory.id;
     }
 
+    @Override
+    public RegistryEntry<Reforge.Factory<?>> factory() {
+        return factory;
+    }
+
     public int getColor() {
         return Reforge.blendColors(factory.badColor, factory.goodColor, value / factory.max).getRGB();
     }
 
     @Override
     public Text name(ItemStack stack, Text name) {
-        return Text.translatable(id().toTranslationKey("reforge", "name")).styled(style -> style.withColor(getColor())).append(" ").append(name);
+        return Text.translatable(id().toTranslationKey("reforge")).styled(style -> style.withColor(getColor())).append(" ").append(name);
     }
 
-    public abstract static class Factory implements Reforge.Factory<SimpleReforge> {
+    public abstract static class Factory implements Reforge.Factory<BasicReforge> {
         public final Identifier id;
-        public final MapCodec<SimpleReforge> codec;
-        public final PacketCodec<ByteBuf, SimpleReforge> packetCodec;
+        public final MapCodec<BasicReforge> codec;
+        public final PacketCodec<RegistryByteBuf, BasicReforge> packetCodec;
         public final int weight;
         public final double max;
         public final RegistryEntry<EntityAttribute> attribute;
@@ -64,10 +69,10 @@ public class SimpleReforge implements Reforge {
             this.id = id;
             codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Codec.DOUBLE.fieldOf("value").forGetter(simple -> simple.value)
-            ).apply(instance, value -> new SimpleReforge(Factory.this, value)));
+            ).apply(instance, value -> new BasicReforge(Factory.this, value)));
             packetCodec = PacketCodec.tuple(
                     PacketCodecs.DOUBLE, simple -> simple.value,
-                    value -> new SimpleReforge(Factory.this, value)
+                    value -> new BasicReforge(Factory.this, value)
             );
             this.weight = weight;
             this.max = max;
@@ -79,12 +84,12 @@ public class SimpleReforge implements Reforge {
         }
 
         @Override
-        public MapCodec<SimpleReforge> codec() {
+        public MapCodec<BasicReforge> codec() {
             return codec;
         }
 
         @Override
-        public PacketCodec<ByteBuf, SimpleReforge> packetCodec() {
+        public PacketCodec<RegistryByteBuf, BasicReforge> packetCodec() {
             return packetCodec;
         }
 
@@ -99,8 +104,8 @@ public class SimpleReforge implements Reforge {
         }
 
         @Override
-        public SimpleReforge generate(ItemStack stack) {
-            return new SimpleReforge(this, new Random().nextDouble() * MathHelper.clamp(stack.getItem().getEnchantability() / 20f, 0, 1) * max);
+        public BasicReforge generate(ItemStack stack) {
+            return new BasicReforge(this, new Random().nextDouble() * MathHelper.clamp(stack.getItem().getEnchantability() / 20f, 0, 1) * max);
         }
     }
 }

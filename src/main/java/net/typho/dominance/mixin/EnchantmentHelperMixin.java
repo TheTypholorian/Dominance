@@ -35,6 +35,10 @@ public abstract class EnchantmentHelperMixin {
             at = @At("TAIL")
     )
     private static void applyAttributeModifiers(ItemStack stack, EquipmentSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> output, CallbackInfo ci) {
+        if (stack.getHolder() == null) {
+            System.out.println("no holder");
+        }
+
         Reforge reforge = stack.get(Dominance.REFORGE_COMPONENT);
 
         if (reforge != null) {
@@ -51,6 +55,10 @@ public abstract class EnchantmentHelperMixin {
             at = @At("TAIL")
     )
     private static void applyAttributeModifiers(ItemStack stack, AttributeModifierSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> output, CallbackInfo ci) {
+        if (stack.getHolder() == null) {
+            System.out.println("no holder");
+        }
+
         Reforge reforge = stack.get(Dominance.REFORGE_COMPONENT);
 
         if (reforge != null) {

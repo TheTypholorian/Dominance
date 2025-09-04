@@ -7,7 +7,7 @@ import net.typho.dominance.Dominance;
 
 import java.awt.*;
 
-public class VitalityReforge extends SimpleReforge.Factory {
+public class VitalityReforge extends BasicReforge.Factory {
     public static final Identifier ID = Dominance.id("vitality");
 
     public VitalityReforge() {

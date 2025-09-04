@@ -2,15 +2,17 @@ package net.typho.dominance.gear;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryFixedCodec;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -22,20 +24,18 @@ import java.util.List;
 import java.util.Random;
 
 public interface Reforge {
-    Codec<Reforge> CODEC = Identifier.CODEC.dispatch(
-            Reforge::id,
-            id -> Dominance.REFORGES.getOrEmpty(id).map(Factory::codec).orElse(null)
-    );
-    PacketCodec<ByteBuf, Reforge> PACKET_CODEC = Identifier.PACKET_CODEC.dispatch(
-            Reforge::id,
-            id -> Dominance.REFORGES.getOrEmpty(id).map(Factory::packetCodec).orElse(null)
-    );
+    Codec<Reforge> CODEC = RegistryFixedCodec.of(Dominance.REFORGES_KEY)
+            .dispatch(Reforge::factory, factory -> factory.value().codec());
+    PacketCodec<RegistryByteBuf, Reforge> PACKET_CODEC = PacketCodecs.registryValue(Dominance.REFORGES_KEY)
+            .dispatch(reforge -> reforge.factory().value(), Factory::packetCodec);
 
     List<AttributeModifiersComponent.Entry> modifiers(ItemStack stack);
 
     Identifier id();
 
     Text name(ItemStack stack, Text name);
+
+    RegistryEntry<Factory<?>> factory();
 
     default AttributeModifiersComponent.Entry modifierForStack(RegistryEntry<EntityAttribute> attrib, double value, EntityAttributeModifier.Operation op, ItemStack stack) {
         return modifierForStack(attrib, value, op, stack, false);
@@ -99,7 +99,7 @@ public interface Reforge {
     interface Factory<R extends Reforge> {
         MapCodec<R> codec();
 
-        PacketCodec<ByteBuf, R> packetCodec();
+        PacketCodec<RegistryByteBuf, R> packetCodec();
 
         int weight();
 

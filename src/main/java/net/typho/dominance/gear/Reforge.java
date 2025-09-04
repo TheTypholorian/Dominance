@@ -1,8 +1,7 @@
 package net.typho.dominance.gear;
 
 import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.*;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -14,8 +13,8 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryFixedCodec;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -25,6 +24,7 @@ import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public interface Reforge {
     Codec<Color> COLOR_CODEC = Codec.either(
@@ -44,10 +44,50 @@ public interface Reforge {
             color -> Either.left(Either.right(color))
     );
 
-    Codec<Reforge> CODEC = RegistryFixedCodec.of(Dominance.REFORGE_KEY)
-            .fieldOf("type")
-            .codec()
-            .dispatch(Reforge::factory, key -> key.value().codec());
+    @SuppressWarnings("unchecked")
+    private static <R extends Reforge, T> void encode(MapCodec<R> codec, Reforge input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
+        R r = (R) input;
+        codec.encode(r, ops, prefix);
+    }
+
+    Codec<Reforge> CODEC = new MapCodec<Reforge>() {
+        @Override
+        public <T> RecordBuilder<T> encode(Reforge input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
+            if (!(ops instanceof RegistryOps<T> reg)) {
+                throw new IllegalStateException("Reforge needs registry ops to encode");
+            }
+
+            prefix.add("type", ops.createString(input.id().toString()));
+            Reforge.encode(reg.getEntryLookup(Dominance.REFORGE_KEY).orElseThrow().getOrThrow(input.factory()).value().codec(), input, ops, prefix);
+            return prefix;
+        }
+
+        @Override
+        public <T> DataResult<Reforge> decode(DynamicOps<T> ops, MapLike<T> input) {
+            try {
+                if (!(ops instanceof RegistryOps<T> reg)) {
+                    throw new IllegalStateException("Reforge needs registry ops to decode");
+                }
+
+                Identifier type = Identifier.of(ops.getStringValue(input.get("type")).getOrThrow());
+                MapCodec<? extends Reforge> codec = reg.getEntryLookup(Dominance.REFORGE_KEY).orElseThrow().getOrThrow(RegistryKey.of(Dominance.REFORGE_KEY, type)).value().codec();
+                DataResult<? extends Reforge> result = codec.decode(ops, input);
+
+                if (result.isSuccess()) {
+                    return DataResult.success(result.getOrThrow());
+                } else {
+                    return DataResult.error(() -> "Couldn't parse reforge " + type + " " + result);
+                }
+            } catch (RuntimeException e) {
+                return DataResult.error(e::getMessage);
+            }
+        }
+
+        @Override
+        public <T> Stream<T> keys(DynamicOps<T> ops) {
+            return Stream.of(ops.createString("type"));
+        }
+    }.codec();
     PacketCodec<RegistryByteBuf, Reforge> PACKET_CODEC = PacketCodecs.registryCodec(CODEC);
 
     List<AttributeModifiersComponent.Entry> modifiers(ItemStack stack);
@@ -56,7 +96,7 @@ public interface Reforge {
 
     Text name(ItemStack stack, Text name);
 
-    RegistryEntry<Factory<?>> factory();
+    RegistryKey<Factory<?>> factory();
 
     default AttributeModifiersComponent.Entry modifierForStack(RegistryEntry<EntityAttribute> attrib, double value, EntityAttributeModifier.Operation op, ItemStack stack) {
         return modifierForStack(attrib, value, op, stack, false);
@@ -119,8 +159,6 @@ public interface Reforge {
 
     interface Factory<R extends Reforge> {
         Codec<Factory<?>> CODEC = RegistryKey.createCodec(Dominance.REFORGE_TYPE_KEY)
-                .fieldOf("type")
-                .codec()
                 .dispatch(Factory::type, key -> Dominance.REFORGE_TYPE.getOrEmpty(key).map(Type::codec).orElse(null));
 
         MapCodec<R> codec();

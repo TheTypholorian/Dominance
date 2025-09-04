@@ -28,6 +28,7 @@ public final class BasicReforge implements Reforge {
     public BasicReforge(Factory factory, double value) {
         this.factory = factory;
         this.value = value;
+        System.out.println("Created basic reforge " + factory.attribute + " " + id());
     }
 
     @Override
@@ -37,12 +38,13 @@ public final class BasicReforge implements Reforge {
 
     @Override
     public Identifier id() {
-        return factory.id;
+        return factory.key.getValue();
     }
 
     @Override
-    public RegistryEntry<Reforge.Factory<?>> factory() {
-        return new RegistryEntry.Direct<>(factory);
+    public RegistryKey<Reforge.Factory<?>> factory() {
+        return factory.key;
+        //return RegistryEntry.Reference.standAlone(Dominance.REFORGE_KEY, factory.key);
     }
 
     public int getColor() {
@@ -56,7 +58,7 @@ public final class BasicReforge implements Reforge {
 
     public final static class Factory implements Reforge.Factory<BasicReforge> {
         public static final MapCodec<Factory> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Identifier.CODEC.fieldOf("id").forGetter(f -> f.id),
+                RegistryKey.createCodec(Dominance.REFORGE_KEY).fieldOf("key").forGetter(f -> f.key),
                 Codec.INT.fieldOf("weight").forGetter(f -> f.weight),
                 Codec.DOUBLE.fieldOf("min").forGetter(f -> f.min),
                 Codec.DOUBLE.fieldOf("max").forGetter(f -> f.max),
@@ -67,7 +69,7 @@ public final class BasicReforge implements Reforge {
                 TagKey.codec(RegistryKeys.ITEM).fieldOf("tag").forGetter(f -> f.tag)
         ).apply(instance, Factory::new));
 
-        public final Identifier id;
+        public final RegistryKey<Reforge.Factory<?>> key;
         public final MapCodec<BasicReforge> codec;
         public final int weight;
         public final double min, max;
@@ -76,11 +78,11 @@ public final class BasicReforge implements Reforge {
         public final Color minColor, maxColor;
         public final TagKey<Item> tag;
 
-        public Factory(Identifier id, int weight, double min, double max, RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier.Operation op, Color minColor, Color maxColor, TagKey<Item> tag) {
-            this.id = id;
+        public Factory(RegistryKey<Reforge.Factory<?>> key, int weight, double min, double max, RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier.Operation op, Color minColor, Color maxColor, TagKey<Item> tag) {
             codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Codec.DOUBLE.fieldOf("value").forGetter(simple -> simple.value)
             ).apply(instance, value -> new BasicReforge(Factory.this, value)));
+            this.key = key;
             this.weight = weight;
             this.min = min;
             this.max = max;

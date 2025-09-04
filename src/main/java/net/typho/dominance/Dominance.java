@@ -319,6 +319,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                             Reforge.Factory<?> reforge = Reforge.pickForStack(stack, context.getSource().getWorld().getRegistryManager());
 
                             if (reforge == null) {
+                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_possible_reforge").formatted(Formatting.RED), false);
                                 return 0;
                             }
 
@@ -552,6 +553,21 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 }
             }
         }
+    }
+
+    public static void reforges(Registerable<Reforge.Factory<?>> registerable) {
+        RegistryKey<Reforge.Factory<?>> vitality = RegistryKey.of(REFORGE_KEY, id("vitality"));
+        registerable.register(vitality, new BasicReforge.Factory(
+                vitality,
+                1,
+                0,
+                4,
+                EntityAttributes.GENERIC_MAX_HEALTH,
+                EntityAttributeModifier.Operation.ADD_VALUE,
+                new Color(150, 50, 50),
+                new Color(250, 50, 50),
+                ARMOR_REFORGABLE
+        ));
     }
 
     public static void enchantments(Registerable<Enchantment> registerable) {

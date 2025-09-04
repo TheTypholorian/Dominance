@@ -19,5 +19,6 @@ public class DominanceDataGenerator implements DataGeneratorEntrypoint {
     @Override
     public void buildRegistry(RegistryBuilder builder) {
         builder.addRegistry(RegistryKeys.ENCHANTMENT, Dominance::enchantments);
+        builder.addRegistry(Dominance.REFORGE_KEY, Dominance::reforges);
     }
 }

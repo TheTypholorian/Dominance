@@ -26,9 +26,11 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "tools/shields")))
                 .add(Dominance.ROYAL_GUARD_SHIELD);
         getOrCreateTagBuilder(ItemTags.HEAD_ARMOR)
-                .add(Dominance.ROYAL_GUARD_HELMET);
+                .add(Dominance.ROYAL_GUARD_HELMET)
+                .add(Dominance.EVOCATION_HAT);
         getOrCreateTagBuilder(ItemTags.CHEST_ARMOR)
-                .add(Dominance.ROYAL_GUARD_CHESTPLATE);
+                .add(Dominance.ROYAL_GUARD_CHESTPLATE)
+                .add(Dominance.EVOCATION_ROBE);
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR)
                 .add(Dominance.ROYAL_GUARD_BOOTS);
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)

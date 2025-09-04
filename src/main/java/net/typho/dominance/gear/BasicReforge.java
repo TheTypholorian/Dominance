@@ -8,20 +8,20 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.typho.dominance.Dominance;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-public class BasicReforge implements Reforge {
+public final class BasicReforge implements Reforge {
     public final Factory factory;
     public final double value;
 
@@ -42,11 +42,11 @@ public class BasicReforge implements Reforge {
 
     @Override
     public RegistryEntry<Reforge.Factory<?>> factory() {
-        return factory;
+        return new RegistryEntry.Direct<>(factory);
     }
 
     public int getColor() {
-        return Reforge.blendColors(factory.badColor, factory.goodColor, value / factory.max).getRGB();
+        return Reforge.blendColors(factory.minColor, factory.maxColor, value / factory.max).getRGB();
     }
 
     @Override
@@ -54,32 +54,40 @@ public class BasicReforge implements Reforge {
         return Text.translatable(id().toTranslationKey("reforge")).styled(style -> style.withColor(getColor())).append(" ").append(name);
     }
 
-    public abstract static class Factory implements Reforge.Factory<BasicReforge> {
+    public final static class Factory implements Reforge.Factory<BasicReforge> {
+        public static final MapCodec<Factory> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Identifier.CODEC.fieldOf("id").forGetter(f -> f.id),
+                Codec.INT.fieldOf("weight").forGetter(f -> f.weight),
+                Codec.DOUBLE.fieldOf("min").forGetter(f -> f.min),
+                Codec.DOUBLE.fieldOf("max").forGetter(f -> f.max),
+                EntityAttribute.CODEC.fieldOf("attribute").forGetter(f -> f.attribute),
+                EntityAttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(f -> f.op),
+                Reforge.COLOR_CODEC.fieldOf("min_color").forGetter(f -> f.minColor),
+                Reforge.COLOR_CODEC.fieldOf("max_color").forGetter(f -> f.maxColor),
+                TagKey.codec(RegistryKeys.ITEM).fieldOf("tag").forGetter(f -> f.tag)
+        ).apply(instance, Factory::new));
+
         public final Identifier id;
         public final MapCodec<BasicReforge> codec;
-        public final PacketCodec<RegistryByteBuf, BasicReforge> packetCodec;
         public final int weight;
-        public final double max;
+        public final double min, max;
         public final RegistryEntry<EntityAttribute> attribute;
         public final EntityAttributeModifier.Operation op;
-        public final Color badColor, goodColor;
+        public final Color minColor, maxColor;
         public final TagKey<Item> tag;
 
-        public Factory(Identifier id, int weight, double max, RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier.Operation op, Color badColor, Color goodColor, TagKey<Item> tag) {
+        public Factory(Identifier id, int weight, double min, double max, RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier.Operation op, Color minColor, Color maxColor, TagKey<Item> tag) {
             this.id = id;
             codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Codec.DOUBLE.fieldOf("value").forGetter(simple -> simple.value)
             ).apply(instance, value -> new BasicReforge(Factory.this, value)));
-            packetCodec = PacketCodec.tuple(
-                    PacketCodecs.DOUBLE, simple -> simple.value,
-                    value -> new BasicReforge(Factory.this, value)
-            );
             this.weight = weight;
+            this.min = min;
             this.max = max;
             this.attribute = attribute;
             this.op = op;
-            this.badColor = badColor;
-            this.goodColor = goodColor;
+            this.minColor = minColor;
+            this.maxColor = maxColor;
             this.tag = tag;
         }
 
@@ -89,8 +97,8 @@ public class BasicReforge implements Reforge {
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, BasicReforge> packetCodec() {
-            return packetCodec;
+        public RegistryKey<Type<?>> type() {
+            return Dominance.BASIC_REFORGE.getKey().orElseThrow();
         }
 
         @Override
@@ -105,7 +113,7 @@ public class BasicReforge implements Reforge {
 
         @Override
         public BasicReforge generate(ItemStack stack) {
-            return new BasicReforge(this, new Random().nextDouble() * MathHelper.clamp(stack.getItem().getEnchantability() / 20f, 0, 1) * max);
+            return new BasicReforge(this, new Random().nextDouble() * MathHelper.clamp(stack.getItem().getEnchantability() / 20f, 0, 1) * (max - min) + min);
         }
     }
 }

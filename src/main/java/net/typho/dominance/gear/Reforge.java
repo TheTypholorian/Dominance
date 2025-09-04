@@ -1,5 +1,6 @@
 package net.typho.dominance.gear;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.component.type.AttributeModifierSlot;
@@ -11,6 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryFixedCodec;
 import net.minecraft.text.Text;
@@ -24,10 +27,28 @@ import java.util.List;
 import java.util.Random;
 
 public interface Reforge {
-    Codec<Reforge> CODEC = RegistryFixedCodec.of(Dominance.REFORGES_KEY)
-            .dispatch(Reforge::factory, factory -> factory.value().codec());
-    PacketCodec<RegistryByteBuf, Reforge> PACKET_CODEC = PacketCodecs.registryValue(Dominance.REFORGES_KEY)
-            .dispatch(reforge -> reforge.factory().value(), Factory::packetCodec);
+    Codec<Color> COLOR_CODEC = Codec.either(
+            Codec.either(
+                    Codec.INT.xmap(Color::new, Color::getRGB),
+                    Codec.INT.listOf(3, 4).xmap(list -> list.size() == 3 ? new Color(list.getFirst(), list.get(1), list.get(2)) : new Color(list.getFirst(), list.get(1), list.get(2), list.get(3)), color -> List.of(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()))
+            ),
+            Codec.FLOAT.listOf(3, 4).xmap(list -> list.size() == 3 ? new Color(list.getFirst(), list.get(1), list.get(2)) : new Color(list.getFirst(), list.get(1), list.get(2), list.get(3)), color -> List.of(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f))
+    ).xmap(
+            either -> either.map(
+                    color -> color.map(
+                            color1 -> color1,
+                            color1 -> color1
+                    ),
+                    inner -> inner
+            ),
+            color -> Either.left(Either.right(color))
+    );
+
+    Codec<Reforge> CODEC = RegistryFixedCodec.of(Dominance.REFORGE_KEY)
+            .fieldOf("type")
+            .codec()
+            .dispatch(Reforge::factory, key -> key.value().codec());
+    PacketCodec<RegistryByteBuf, Reforge> PACKET_CODEC = PacketCodecs.registryCodec(CODEC);
 
     List<AttributeModifiersComponent.Entry> modifiers(ItemStack stack);
 
@@ -69,11 +90,11 @@ public interface Reforge {
         );
     }
 
-    static Factory<?> pickForStack(ItemStack stack) {
+    static Factory<?> pickForStack(ItemStack stack, DynamicRegistryManager registries) {
         int total = 0;
         List<Factory<?>> options = new LinkedList<>();
 
-        for (Factory<?> factory : Dominance.REFORGES) {
+        for (Factory<?> factory : registries.get(Dominance.REFORGE_KEY)) {
             if (factory.isValidItem(stack)) {
                 options.add(factory);
                 total += factory.weight();
@@ -97,14 +118,23 @@ public interface Reforge {
     }
 
     interface Factory<R extends Reforge> {
+        Codec<Factory<?>> CODEC = RegistryKey.createCodec(Dominance.REFORGE_TYPE_KEY)
+                .fieldOf("type")
+                .codec()
+                .dispatch(Factory::type, key -> Dominance.REFORGE_TYPE.getOrEmpty(key).map(Type::codec).orElse(null));
+
         MapCodec<R> codec();
 
-        PacketCodec<RegistryByteBuf, R> packetCodec();
+        RegistryKey<Type<?>> type();
 
         int weight();
 
         boolean isValidItem(ItemStack stack);
 
         R generate(ItemStack stack);
+    }
+
+    interface Type<F extends Factory<?>> {
+        MapCodec<F> codec();
     }
 }

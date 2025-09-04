@@ -6,6 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -123,12 +124,13 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final TagKey<Item> ARMOR_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/armor"));
     public static final TagKey<Item> HANDHELD_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/handheld"));
 
-    public static final RegistryKey<Registry<Reforge.Factory<?>>> REFORGES_KEY = RegistryKey.ofRegistry(id("reforges"));
-    public static final Registry<Reforge.Factory<?>> REFORGES = FabricRegistryBuilder.createSimple(REFORGES_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+    public static final RegistryKey<Registry<Reforge.Factory<?>>> REFORGE_KEY = RegistryKey.ofRegistry(id("reforge"));
     public static final ComponentType<Reforge> REFORGE_COMPONENT = Registry.register(Registries.DATA_COMPONENT_TYPE, id("reforge"), new ComponentType.Builder<Reforge>().codec(Reforge.CODEC).packetCodec(Reforge.PACKET_CODEC).build());
 
-    public static final VitalityReforge VITALITY = Registry.register(REFORGES, VitalityReforge.ID, new VitalityReforge());
-    public static final LightweightReforge LIGHTWEIGHT = Registry.register(REFORGES, LightweightReforge.ID, new LightweightReforge());
+    public static final RegistryKey<Registry<Reforge.Type<?>>> REFORGE_TYPE_KEY = RegistryKey.ofRegistry(id("reforge_type"));
+    public static final Registry<Reforge.Type<?>> REFORGE_TYPE = FabricRegistryBuilder.createSimple(REFORGE_TYPE_KEY).buildAndRegister();
+
+    public static final RegistryEntry<Reforge.Type<?>> BASIC_REFORGE = Registry.registerReference(REFORGE_TYPE, id("basic"), (Reforge.Type<BasicReforge.Factory>) () -> BasicReforge.Factory.CODEC);
 
     public static final Map<Set<ArmorItem>, AttributeModifiersComponent> ARMOR_SET_BONUSES = new LinkedHashMap<>();
 
@@ -280,6 +282,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     @Override
     @SuppressWarnings("unchecked")
     public void onInitialize() {
+        DynamicRegistries.registerSynced(REFORGE_KEY, Reforge.Factory.CODEC);
         ModelPredicateProviderRegistry.register(
                 ROYAL_GUARD_SHIELD,
                 Identifier.ofVanilla("blocking"),
@@ -313,7 +316,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                     .executes(context -> {
                         if (context.getSource().isExecutedByPlayer()) {
                             ItemStack stack = context.getSource().getPlayerOrThrow().getMainHandStack();
-                            Reforge.Factory<?> reforge = Reforge.pickForStack(stack);
+                            Reforge.Factory<?> reforge = Reforge.pickForStack(stack, context.getSource().getWorld().getRegistryManager());
 
                             if (reforge == null) {
                                 return 0;
@@ -325,12 +328,12 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
                         return 0;
                     })
-                    .then(CommandManager.argument("type", RegistryKeyArgumentType.registryKey(REFORGES_KEY))
+                    .then(CommandManager.argument("type", RegistryKeyArgumentType.registryKey(REFORGE_KEY))
                             .executes(context -> {
                                 if (context.getSource().isExecutedByPlayer()) {
                                     ItemStack stack = context.getSource().getPlayerOrThrow().getMainHandStack();
                                     RegistryKey<Reforge.Factory<?>> key = (RegistryKey<Reforge.Factory<?>>) context.getArgument("type", RegistryKey.class);
-                                    Reforge.Factory<?> reforge = REFORGES.get(key);
+                                    Reforge.Factory<?> reforge = context.getSource().getWorld().getRegistryManager().get(REFORGE_KEY).get(key);
 
                                     if (reforge == null) {
                                         context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key).formatted(Formatting.RED), false);
@@ -353,7 +356,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                                         if (context.getSource().isExecutedByPlayer()) {
                                             ItemStack stack = context.getSource().getPlayerOrThrow().getMainHandStack();
                                             RegistryKey<Reforge.Factory<?>> key = (RegistryKey<Reforge.Factory<?>>) context.getArgument("type", RegistryKey.class);
-                                            Reforge.Factory<?> reforge = REFORGES.get(key);
+                                            Reforge.Factory<?> reforge = context.getSource().getWorld().getRegistryManager().get(REFORGE_KEY).get(key);
 
                                             if (reforge == null) {
                                                 context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key).formatted(Formatting.RED), false);

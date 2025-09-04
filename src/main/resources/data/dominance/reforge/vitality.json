@@ -1,0 +1,12 @@
+{
+  "type": "basic",
+  "id": "dominance:vitality",
+  "weight": 1,
+  "min": 0,
+  "max": 4,
+  "attribute": "minecraft:generic.max_health",
+  "operation": "add",
+  "min_color": [150, 50, 50],
+  "max_color": [250, 50, 50],
+  "tag": "dominance:reforgable/armor"
+}

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "dominance:royal_guard_boots_reforging"
+        "recipe": "dominance:reforge"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "dominance:royal_guard_boots_reforging"
+      "dominance:reforge"
     ]
   }
 }

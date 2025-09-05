@@ -1,4 +1,4 @@
-// 1.21.1	2025-09-04T20:51:28.6235705	Orb of Dominance/
+// 1.21.1	2025-09-05T07:22:58.7216697	Orb of Dominance/
 1b9051bdf07aed715a20eaae8322268dcd79fe25 data\dominance\enchantment\rampage.json
 d422cd9c358c76012107453fa3ae9b774703497a data\dominance\dominance\reforge\heavy.json
 6b7dbf4151b5d14acbc416e4f5a26e79e17b0b8a data\dominance\dominance\reforge\swift.json
@@ -10,8 +10,8 @@ e276dc7ee17b8c59c85e642db6a697e9e69ad44d data\dominance\dominance\reforge\nether
 7ae4430b8e370afb88641642bd1c75b6bacd06a1 data\dominance\enchantment\dynamo.json
 2373957e4603ab1215476d00de9e553be0be71a1 data\dominance\enchantment\exploding.json
 e4e46fd1934fc9ed3496eec20c4331ffc7d66f3e data\dominance\dominance\reforge\lightweight.json
-70fa1733d436f655366f78e1be7b8ed05cdf4433 data\dominance\enchantment\freezing.json
 2e78c8d1a66d21756b81527eaa3c6921732cb5b3 data\dominance\enchantment\gravity.json
+70fa1733d436f655366f78e1be7b8ed05cdf4433 data\dominance\enchantment\freezing.json
 2230b596773063fac4d3dcb89ccc76ef830b5fb5 data\dominance\enchantment\committed.json
 73d8859d1adb184360ade91b14a9bca6a5c7736b data\dominance\enchantment\weakening.json
 4c9ada004b3ba71d912b8968480e8c9039e9e070 data\dominance\enchantment\ambush.json

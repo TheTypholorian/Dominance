@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "dominance:item/reforge_smithing_template"
+  }
+}

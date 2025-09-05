@@ -57,6 +57,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.EntityTypePredicate;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
@@ -121,9 +122,11 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .build();
     }
 
-    public static final TagKey<Item> ANYREFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/any"));
+    public static final TagKey<Item> ANY_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/any"));
     public static final TagKey<Item> ARMOR_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/armor"));
     public static final TagKey<Item> MELEE_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/melee"));
+
+    public static final RecipeSerializer<ReforgeRecipe> REFORGE_RECIPE = Registry.register(Registries.RECIPE_SERIALIZER, id("reforge"), new ReforgeRecipe.Serializer());
 
     public static final RegistryKey<Registry<Reforge.Factory<?>>> REFORGE_KEY = RegistryKey.ofRegistry(id("reforge"));
     public static final ComponentType<Reforge> REFORGE_COMPONENT = Registry.register(Registries.DATA_COMPONENT_TYPE, id("reforge"), new ComponentType.Builder<Reforge>().codec(Reforge.CODEC).packetCodec(Reforge.PACKET_CODEC).build());

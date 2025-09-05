@@ -1,0 +1,6 @@
+{
+  "type": "dominance:reforge",
+  "template": {
+    "item": "dominance:reforge_smithing_template"
+  }
+}

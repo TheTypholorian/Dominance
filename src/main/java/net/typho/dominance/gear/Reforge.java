@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryOps;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -100,16 +100,21 @@ public interface Reforge {
         }
     }
 
-    static Factory<?> pickForStack(ItemStack stack, DynamicRegistryManager registries) {
-        int total = 0;
+    static boolean stackCanReforge(ItemStack stack, RegistryWrapper.WrapperLookup lookup) {
+        return lookup.getWrapperOrThrow(Dominance.REFORGE_KEY).streamEntries().anyMatch(ref -> ref.value().isValidItem(stack));
+    }
+
+    static Factory<?> pickForStack(ItemStack stack, RegistryWrapper.WrapperLookup lookup) {
         List<Factory<?>> options = new LinkedList<>();
 
-        for (Factory<?> factory : registries.get(Dominance.REFORGE_KEY)) {
-            if (factory.isValidItem(stack)) {
-                options.add(factory);
-                total += factory.weight();
+        int total = lookup.getWrapperOrThrow(Dominance.REFORGE_KEY).streamEntries().mapToInt(ref -> {
+            if (ref.value().isValidItem(stack)) {
+                options.add(ref.value());
+                return ref.value().weight();
             }
-        }
+
+            return 0;
+        }).sum();
 
         if (total == 0) {
             return null;
@@ -124,7 +129,7 @@ public interface Reforge {
             }
         }
 
-        return arr[new Random().nextInt(total)];
+        return arr[new Random(ItemStack.hashCode(stack)).nextInt(total)];
     }
 
     interface Factory<R extends Reforge> {

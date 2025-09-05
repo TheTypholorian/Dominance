@@ -1,9 +1,6 @@
 {
   "values": [
-    {
-      "id": "#minecraft:enchantable/bow",
-      "required": false
-    },
+    "#minecraft:enchantable/bow",
     "dominance:burst_crossbow"
   ]
 }

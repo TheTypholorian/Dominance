@@ -23,7 +23,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-public class RoyalGuardArmorItem extends SetBonusArmorItem implements Salvageable {
+public class RoyalGuardArmorItem extends SetBonusArmorItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public RoyalGuardArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {

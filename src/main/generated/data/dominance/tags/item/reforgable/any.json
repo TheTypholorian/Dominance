@@ -1,12 +1,6 @@
 {
   "values": [
-    {
-      "id": "#dominance:reforgable/armor",
-      "required": false
-    },
-    {
-      "id": "#dominance:reforgable/melee",
-      "required": false
-    }
+    "#dominance:reforgable/armor",
+    "#dominance:reforgable/melee"
   ]
 }

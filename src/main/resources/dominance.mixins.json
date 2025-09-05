@@ -8,6 +8,7 @@
     "EnchantmentHelperMixin",
     "EnchantmentMixin",
     "ExperienceOrbEntityMixin",
+    "GrindstoneScreenHandlerMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",

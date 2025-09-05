@@ -5,7 +5,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.CrossbowItem;
 import org.jetbrains.annotations.Nullable;
 
-public class BurstCrossbowItem extends CrossbowItem implements Salvageable {
+public class BurstCrossbowItem extends CrossbowItem {
     public BurstCrossbowItem(Settings settings) {
         super(settings);
     }

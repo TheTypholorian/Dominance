@@ -5,9 +5,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.typho.dominance.gear.Salvageable;
+import net.typho.dominance.Dominance;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,7 +22,7 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @Shadow
-    public abstract Item getItem();
+    public abstract boolean isIn(TagKey<Item> tag);
 
     @Inject(
             method = "getTooltip",
@@ -32,7 +33,7 @@ public abstract class ItemStackMixin {
             )
     )
     private void getTooltip(Item.TooltipContext context, @Nullable PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> cir, @Local Consumer<Text> consumer) {
-        if (getItem() instanceof Salvageable) {
+        if (isIn(Dominance.ANY_REFORGABLE)) {
             consumer.accept(Text.translatable("tooltip.dominance.salvageable").formatted(Formatting.BLUE));
         }
     }

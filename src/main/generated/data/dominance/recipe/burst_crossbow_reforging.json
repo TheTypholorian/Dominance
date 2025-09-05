@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": [],
+  "base": {
+    "item": "dominance:burst_crossbow"
+  },
+  "result": {
+    "count": 1,
+    "id": "dominance:burst_crossbow"
+  },
+  "template": {
+    "item": "dominance:reforge_smithing_template"
+  }
+}

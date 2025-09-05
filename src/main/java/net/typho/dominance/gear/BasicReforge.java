@@ -117,7 +117,7 @@ public final class BasicReforge implements Reforge {
         ).apply(instance, Entry::new));
 
         public double get(double value) {
-            return Math.round((value * (max - min) + min) / increment) * increment;
+            return Math.round(((value * (max - min) + min) - 0.5) / increment) * increment + 0.5;
         }
     }
 }

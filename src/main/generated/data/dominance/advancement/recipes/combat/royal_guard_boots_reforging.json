@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_reforge_smithing_template": {
+      "conditions": {
+        "items": [
+          {
+            "items": "dominance:reforge_smithing_template"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "dominance:royal_guard_boots_reforging"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_reforge_smithing_template"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "dominance:royal_guard_boots_reforging"
+    ]
+  }
+}

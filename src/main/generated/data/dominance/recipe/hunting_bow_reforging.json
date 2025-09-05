@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": [],
+  "base": {
+    "item": "dominance:hunting_bow"
+  },
+  "result": {
+    "count": 1,
+    "id": "dominance:hunting_bow"
+  },
+  "template": {
+    "item": "dominance:reforge_smithing_template"
+  }
+}

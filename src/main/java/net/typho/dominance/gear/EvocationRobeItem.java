@@ -23,7 +23,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-public class EvocationRobeItem extends SetBonusArmorItem {
+public class EvocationRobeItem extends SetBonusArmorItem implements Salvageable {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public EvocationRobeItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {

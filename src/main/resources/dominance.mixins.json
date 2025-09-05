@@ -16,6 +16,7 @@
     "ShaderImportProcessorMixin",
     "VeilMultiBindMixin",
     "VeilShaderSourceMixin",
+    "client.ItemStackMixin",
     "client.PlayerEntityMixin"
   ],
   "client": [

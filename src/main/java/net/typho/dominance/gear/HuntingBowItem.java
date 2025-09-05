@@ -5,7 +5,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.BowItem;
 import org.jetbrains.annotations.Nullable;
 
-public class HuntingBowItem extends BowItem {
+public class HuntingBowItem extends BowItem implements Salvageable {
     public HuntingBowItem(Settings settings) {
         super(settings);
     }

@@ -281,6 +281,16 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         EXCLUSIVE_SET_COLORS.put(CONDITIONAL_EXCLUSIVE_SET.id(), new Color(145, 50, 115));
     }
 
+    public static final SmithingTemplateItem REFORGE_SMITHING_TEMPLATE = item("reforge_smithing_template", new SmithingTemplateItem(
+            Text.translatable("item.dominance.reforge_smithing_template.applies_to").formatted(Formatting.BLUE),
+            Text.translatable("item.dominance.reforge_smithing_template.ingredients").formatted(Formatting.BLUE),
+            Text.translatable("upgrade.dominance.reforge").formatted(Formatting.BLUE),
+            Text.translatable("item.dominance.reforge_smithing_template.base_slot_description"),
+            Text.translatable("item.dominance.reforge_smithing_template.additions_slot_description"),
+            SmithingTemplateItem.getNetheriteUpgradeEmptyBaseSlotTextures(),
+            SmithingTemplateItem.getNetheriteUpgradeEmptyAdditionsSlotTextures()
+    ));
+
     public static final RegistryKey<ItemGroup> CREATIVE_TAB_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, id("tab"));
     public static final ItemGroup CREATIVE_TAB = Registry.register(Registries.ITEM_GROUP, CREATIVE_TAB_KEY, FabricItemGroup.builder()
             .icon(() -> new ItemStack(GREAT_HAMMER))
@@ -629,9 +639,9 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ), new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ARMOR_TOUGHNESS,
-                        0.1,
-                        0.5,
-                        0.1,
+                        0.25,
+                        2,
+                        0.25,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
                 ARMOR_REFORGABLE

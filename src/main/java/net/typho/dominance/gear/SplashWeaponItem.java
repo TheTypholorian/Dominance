@@ -16,7 +16,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.typho.dominance.DamageParticleS2C;
 
-public class SplashWeaponItem extends Item {
+public class SplashWeaponItem extends Item implements Salvageable {
     public final float radius, denominator, maxSplash;
 
     public SplashWeaponItem(float radius, float denominator, float maxSplash, Settings settings) {

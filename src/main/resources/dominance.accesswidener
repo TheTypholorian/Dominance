@@ -8,3 +8,5 @@ accessible class net/minecraft/enchantment/EnchantmentHelper$Consumer
 accessible field net/minecraft/entity/LivingEntity riptideAttackDamage F
 accessible method net/minecraft/entity/player/PlayerEntity getDamageAgainst (Lnet/minecraft/entity/Entity;FLnet/minecraft/entity/damage/DamageSource;)F
 accessible method net/minecraft/entity/LivingEntity getKnockbackAgainst (Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;)F
+accessible method net/minecraft/item/SmithingTemplateItem getNetheriteUpgradeEmptyBaseSlotTextures ()Ljava/util/List;
+accessible method net/minecraft/item/SmithingTemplateItem getNetheriteUpgradeEmptyAdditionsSlotTextures ()Ljava/util/List;

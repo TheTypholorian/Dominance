@@ -4,19 +4,19 @@
     {
       "attribute": "minecraft:generic.attack_speed",
       "increment": 0.05,
-      "max": 0.2,
-      "min": 0.1,
+      "max": -0.2,
+      "min": -0.1,
       "operation": "add_multiplied_base"
     },
     {
       "attribute": "minecraft:generic.attack_damage",
       "increment": 0.05,
-      "max": -0.2,
-      "min": -0.1,
+      "max": 0.2,
+      "min": 0.1,
       "operation": "add_multiplied_base"
     }
   ],
-  "key": "dominance:lightweight",
+  "key": "dominance:heavy",
   "rarity": "common",
   "tag": "#dominance:reforgable/melee"
 }

@@ -1,0 +1,15 @@
+{
+  "type": "dominance:attribute",
+  "attributes": [
+    {
+      "attribute": "minecraft:generic.max_health",
+      "increment": 0.5,
+      "max": 2.0,
+      "min": 0.5,
+      "operation": "add_multiplied_base"
+    }
+  ],
+  "key": "dominance:vitality",
+  "rarity": "epic",
+  "tag": "#dominance:reforgable/armor"
+}

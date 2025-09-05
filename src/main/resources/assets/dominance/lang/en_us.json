@@ -23,6 +23,7 @@
   "effect.dominance.rampage": "Rampage",
   "itemGroup.dominance": "Dominance",
   "reforge.dominance.lightweight": "Lightweight %s",
+  "reforge.dominance.heavy": "Heavy %s",
   "reforge.dominance.fortified": "Fortified %s",
   "reforge.dominance.nether_forged": "Nether Forged %s",
   "reforge.dominance.swift": "Swift %s",

@@ -17,6 +17,7 @@ import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
 import net.minecraft.util.math.MathHelper;
 import net.typho.dominance.Dominance;
 
@@ -165,7 +166,16 @@ public interface Reforge {
 
         RegistryKey<Type<?>> type();
 
-        int weight();
+        Rarity rarity();
+
+        default int weight() {
+            return switch (rarity()) {
+                case COMMON -> 4;
+                case UNCOMMON -> 3;
+                case RARE -> 2;
+                case EPIC -> 1;
+            };
+        }
 
         boolean isValidItem(ItemStack stack);
 

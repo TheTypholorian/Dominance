@@ -25,6 +25,7 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
     protected void configure(RegistryWrapper.WrapperLookup lookup) {
         getOrCreateTagBuilder(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "tools/shields")))
                 .add(Dominance.ROYAL_GUARD_SHIELD);
+
         getOrCreateTagBuilder(ItemTags.HEAD_ARMOR)
                 .add(Dominance.ROYAL_GUARD_HELMET)
                 .add(Dominance.EVOCATION_HAT);
@@ -33,6 +34,7 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .add(Dominance.EVOCATION_ROBE);
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR)
                 .add(Dominance.ROYAL_GUARD_BOOTS);
+
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
                 .add(Dominance.ROYAL_GUARD_MACE)
                 .add(Dominance.GREAT_HAMMER)
@@ -47,6 +49,10 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .add(Dominance.BURST_CROSSBOW);
         getOrCreateTagBuilder(ItemTags.BOW_ENCHANTABLE)
                 .add(Dominance.HUNTING_BOW);
+
+        getOrCreateTagBuilder(Dominance.ANYREFORGABLE)
+                .addOptionalTag(Dominance.ARMOR_REFORGABLE)
+                .addOptionalTag(Dominance.MELEE_REFORGABLE);
         getOrCreateTagBuilder(Dominance.ARMOR_REFORGABLE)
                 .addOptionalTag(ItemTags.ARMOR_ENCHANTABLE);
         getOrCreateTagBuilder(Dominance.MELEE_REFORGABLE)

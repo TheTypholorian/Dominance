@@ -1,26 +1,22 @@
 {
-  "type": "dominance:basic",
+  "type": "dominance:attribute",
   "attributes": [
     {
       "attribute": "minecraft:generic.armor",
+      "increment": 0.1,
       "max": 1.0,
       "min": 0.25,
+      "operation": "add_value"
+    },
+    {
+      "attribute": "minecraft:generic.knockback_resistance",
+      "increment": 0.05,
+      "max": 0.25,
+      "min": 0.1,
       "operation": "add_value"
     }
   ],
   "key": "dominance:fortified",
-  "max_color": [
-    150,
-    150,
-    150,
-    255
-  ],
-  "min_color": [
-    50,
-    50,
-    50,
-    255
-  ],
-  "tag": "#dominance:reforgable/armor",
-  "weight": 2
+  "rarity": "uncommon",
+  "tag": "#dominance:reforgable/armor"
 }

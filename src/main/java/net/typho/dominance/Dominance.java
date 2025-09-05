@@ -121,6 +121,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .build();
     }
 
+    public static final TagKey<Item> ANYREFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/any"));
     public static final TagKey<Item> ARMOR_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/armor"));
     public static final TagKey<Item> MELEE_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/melee"));
 
@@ -248,6 +249,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RegistryKey<Enchantment> WEAKENING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("weakening"));
 
     public static final RegistryKey<Reforge.Factory<?>> LIGHTWEIGHT = RegistryKey.of(REFORGE_KEY, id("lightweight"));
+    public static final RegistryKey<Reforge.Factory<?>> HEAVY = RegistryKey.of(REFORGE_KEY, id("heavy"));
     public static final RegistryKey<Reforge.Factory<?>> FORTIFIED = RegistryKey.of(REFORGE_KEY, id("fortified"));
     public static final RegistryKey<Reforge.Factory<?>> NETHER_FORGED = RegistryKey.of(REFORGE_KEY, id("nether_forged"));
     public static final RegistryKey<Reforge.Factory<?>> SWIFT = RegistryKey.of(REFORGE_KEY, id("swift"));
@@ -343,12 +345,12 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                                     Reforge.Factory<?> reforge = context.getSource().getWorld().getRegistryManager().get(REFORGE_KEY).get(key);
 
                                     if (reforge == null) {
-                                        context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key).formatted(Formatting.RED), false);
+                                        context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key.getValue().toString()).formatted(Formatting.RED), false);
                                         return 0;
                                     }
 
                                     if (!reforge.isValidItem(stack)) {
-                                        context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_item", key, stack.getItem().getName()).formatted(Formatting.RED), false);
+                                        context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_item", key.getValue().toString(), stack.getItem().getName()).formatted(Formatting.RED), false);
                                         return 0;
                                     }
 
@@ -366,12 +368,12 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                                             Reforge.Factory<?> reforge = context.getSource().getWorld().getRegistryManager().get(REFORGE_KEY).get(key);
 
                                             if (reforge == null) {
-                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key).formatted(Formatting.RED), false);
+                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.no_reforge", key.getValue().toString()).formatted(Formatting.RED), false);
                                                 return 0;
                                             }
 
                                             if (!reforge.isValidItem(stack)) {
-                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_item", key, stack.getItem().getName()).formatted(Formatting.RED), false);
+                                                context.getSource().sendFeedback(() -> Text.translatable("command.dominance.reforge.bad_item", key.getValue().toString(), stack.getItem().getName()).formatted(Formatting.RED), false);
                                                 return 0;
                                             }
 
@@ -564,87 +566,104 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static void reforges(Registerable<Reforge.Factory<?>> registerable) {
         registerable.register(LIGHTWEIGHT, new BasicReforge.Factory(
                 LIGHTWEIGHT,
-                2,
+                Rarity.COMMON,
                 List.of(new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ATTACK_SPEED,
                         0.1,
                         0.2,
+                        0.05,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ), new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
                         -0.1,
                         -0.2,
+                        0.05,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
-                new Color(100, 100, 120),
-                new Color(200, 200, 220),
+                MELEE_REFORGABLE
+        ));
+        registerable.register(HEAVY, new BasicReforge.Factory(
+                HEAVY,
+                Rarity.COMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_ATTACK_SPEED,
+                        -0.1,
+                        -0.2,
+                        0.05,
+                        EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                ), new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                        0.1,
+                        0.2,
+                        0.05,
+                        EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                )),
                 MELEE_REFORGABLE
         ));
         registerable.register(FORTIFIED, new BasicReforge.Factory(
                 FORTIFIED,
-                2,
+                Rarity.UNCOMMON,
                 List.of(new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ARMOR,
                         0.25,
                         1,
+                        0.1,
                         EntityAttributeModifier.Operation.ADD_VALUE
                 ), new BasicReforge.Entry(
                         EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE,
                         0.1,
                         0.25,
+                        0.05,
                         EntityAttributeModifier.Operation.ADD_VALUE
                 )),
-                new Color(50, 50, 50),
-                new Color(150, 150, 150),
                 ARMOR_REFORGABLE
         ));
         registerable.register(NETHER_FORGED, new BasicReforge.Factory(
                 NETHER_FORGED,
-                1,
+                Rarity.RARE,
                 List.of(new BasicReforge.Entry(
                         EntityAttributes.GENERIC_BURNING_TIME,
                         -0.1,
                         -0.25,
+                        0.05,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ), new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ARMOR_TOUGHNESS,
                         0.1,
-                        0.25,
+                        0.5,
+                        0.1,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
-                new Color(50, 25, 20),
-                new Color(200, 70, 50),
                 ARMOR_REFORGABLE
         ));
         registerable.register(SWIFT, new BasicReforge.Factory(
                 SWIFT,
-                2,
+                Rarity.UNCOMMON,
                 List.of(new BasicReforge.Entry(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED,
                         0.1,
                         0.25,
+                        0.05,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ), new BasicReforge.Entry(
                         EntityAttributes.PLAYER_SNEAKING_SPEED,
                         0.1,
                         0.5,
+                        0.1,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
-                new Color(100, 140, 100),
-                new Color(200, 240, 200),
                 ARMOR_REFORGABLE
         ));
         registerable.register(VITALITY, new BasicReforge.Factory(
                 VITALITY,
-                1,
+                Rarity.EPIC,
                 List.of(new BasicReforge.Entry(
                         EntityAttributes.GENERIC_MAX_HEALTH,
                         0.5,
                         2,
+                        0.5,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
-                new Color(100, 50, 50),
-                new Color(250, 70, 70),
                 ARMOR_REFORGABLE
         ));
     }

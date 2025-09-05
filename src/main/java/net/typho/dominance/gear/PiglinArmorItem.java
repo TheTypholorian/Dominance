@@ -23,10 +23,10 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-public class EvocationRobeItem extends SetBonusArmorItem {
+public class PiglinArmorItem extends SetBonusArmorItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public EvocationRobeItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
+    public PiglinArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
         super(material, type, settings);
     }
 
@@ -35,8 +35,8 @@ public class EvocationRobeItem extends SetBonusArmorItem {
         AttributeModifiersComponent modifiers = new AttributeModifiersComponent(new LinkedList<>(), true);
         modifiers.modifiers().addAll(super.getAttributeModifiers().modifiers());
         modifiers.modifiers().add(new AttributeModifiersComponent.Entry(
-                EntityAttributes.GENERIC_MAX_HEALTH,
-                new EntityAttributeModifier(Dominance.id("evocation_robe_bonus_health_" + type.getName()), 4, EntityAttributeModifier.Operation.ADD_VALUE),
+                EntityAttributes.GENERIC_BURNING_TIME,
+                new EntityAttributeModifier(Dominance.id("piglin_armor_fire_res_" + type.getName()), -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                 AttributeModifierSlot.ARMOR
         ));
         return modifiers;
@@ -50,7 +50,7 @@ public class EvocationRobeItem extends SetBonusArmorItem {
             @Override
             public <T extends LivingEntity> @NotNull BipedEntityModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable BipedEntityModel<T> original) {
                 if (renderer == null) {
-                    renderer = new DominanceArmorRenderer(EvocationRobeItem.this);
+                    renderer = new DominanceArmorRenderer(PiglinArmorItem.this);
                 }
 
                 return renderer;

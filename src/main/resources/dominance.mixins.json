@@ -12,6 +12,7 @@
     "GrindstoneScreenHandlerMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
+    "PiglinBrainMixin",
     "PlayerEntityMixin",
     "ProjectileEntityMixin",
     "RemoveOffHandItemTaskMixin",

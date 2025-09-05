@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -43,9 +44,15 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.*;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTables;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.function.EnchantRandomlyLootFunction;
+import net.minecraft.loot.function.SetDamageLootFunction;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
@@ -122,6 +129,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .build();
     }
 
+    public static final TagKey<ArmorMaterial> PIGLIN_NEUTRAL = TagKey.of(RegistryKeys.ARMOR_MATERIAL, id("piglin_neutral"));
     public static final TagKey<Item> ANY_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/any"));
     public static final TagKey<Item> ARMOR_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/armor"));
     public static final TagKey<Item> MELEE_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/melee"));
@@ -150,7 +158,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE,
             Ingredient::empty,
             List.of(),
-            1f,
+            3f,
             0.2f
     ));
     public static final RegistryEntry<ArmorMaterial> EVOCATION_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, id("evocation"), new ArmorMaterial(
@@ -161,25 +169,44 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                     ArmorItem.Type.HELMET, 1,
                     ArmorItem.Type.BODY, 3
             ),
-            18,
-            SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE,
+            20,
+            SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
             Ingredient::empty,
             List.of(),
             0,
             0
     ));
+    public static final RegistryEntry<ArmorMaterial> PIGLIN_MATERIAL = Registry.registerReference(Registries.ARMOR_MATERIAL, id("piglin"), new ArmorMaterial(
+            Map.of(
+                    ArmorItem.Type.BOOTS, 3,
+                    ArmorItem.Type.LEGGINGS, 6,
+                    ArmorItem.Type.CHESTPLATE, 8,
+                    ArmorItem.Type.HELMET, 3,
+                    ArmorItem.Type.BODY, 11
+            ),
+            15,
+            SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
+            Ingredient::empty,
+            List.of(),
+            1f,
+            0.1f
+    ));
 
-    public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.EPIC)));
-    public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.EPIC)));
-    public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.EPIC)));
-    public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(10, -3.2))));
-    public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(504)));
+    public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.RARE)));
+    public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.RARE)));
+    public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.RARE)));
+    public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(10, -3.2))));
+    public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(504)));
     public static final EvocationRobeItem EVOCATION_HAT = item("evocation_hat", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(22)).rarity(Rarity.EPIC)));
     public static final EvocationRobeItem EVOCATION_ROBE = item("evocation_robe", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(22)).rarity(Rarity.EPIC)));
-    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(14, -3.6))));
+    public static final PiglinArmorItem PIGLIN_HELMET = item("piglin_helmet", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
+    public static final PiglinArmorItem PIGLIN_CHESTPLATE = item("piglin_chestplate", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
+    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(14, -3.6))));
+    public static final SplashWeaponItem BASTION_BUSTER = item("bastion_buster", new SplashWeaponItem(4, 6, 1, new Item.Settings().maxDamage(600).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(15, -3.6))));
     public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 2, -2f))));
-    public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1).maxDamage(465)));
+    public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(465)));
     public static final HuntingBowItem HUNTING_BOW = item("hunting_bow", new HuntingBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(384)));
+
 
     static {
         ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()
@@ -332,12 +359,28 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(ROYAL_GUARD_SHIELD);
             entries.add(EVOCATION_HAT);
             entries.add(EVOCATION_ROBE);
+            entries.add(PIGLIN_HELMET);
+            entries.add(PIGLIN_CHESTPLATE);
             entries.add(ROYAL_GUARD_MACE);
             entries.add(GREAT_HAMMER);
+            entries.add(BASTION_BUSTER);
             entries.add(KATANA);
             entries.add(BURST_CROSSBOW);
             entries.add(HUNTING_BOW);
             entries.add(REFORGE_SMITHING_TEMPLATE);
+        });
+        LootTableEvents.MODIFY.register((key, builder, source, wrapperLookup) -> {
+            if (key == LootTables.BASTION_TREASURE_CHEST) {
+                builder.pool(
+                        LootPool.builder()
+                                .with(ItemEntry.builder(PIGLIN_HELMET).weight(5)
+                                        .apply(SetDamageLootFunction.builder(UniformLootNumberProvider.create(0.8f, 1)))
+                                        .apply(EnchantRandomlyLootFunction.builder(wrapperLookup)))
+                                .with(ItemEntry.builder(PIGLIN_CHESTPLATE).weight(5)
+                                        .apply(SetDamageLootFunction.builder(UniformLootNumberProvider.create(0.8f, 1)))
+                                        .apply(EnchantRandomlyLootFunction.builder(wrapperLookup)))
+                );
+            }
         });
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
             commandDispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("reforge")

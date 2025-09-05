@@ -3,10 +3,6 @@
     {
       "id": "#minecraft:enchantable/sword",
       "required": false
-    },
-    {
-      "id": "#minecraft:enchantable/weapon",
-      "required": false
     }
   ]
 }

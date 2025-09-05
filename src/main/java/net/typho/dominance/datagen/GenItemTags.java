@@ -49,8 +49,7 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .add(Dominance.HUNTING_BOW);
         getOrCreateTagBuilder(Dominance.ARMOR_REFORGABLE)
                 .addOptionalTag(ItemTags.ARMOR_ENCHANTABLE);
-        getOrCreateTagBuilder(Dominance.HANDHELD_REFORGABLE)
-                .addOptionalTag(ItemTags.SWORD_ENCHANTABLE)
-                .addOptionalTag(ItemTags.WEAPON_ENCHANTABLE);
+        getOrCreateTagBuilder(Dominance.MELEE_REFORGABLE)
+                .addOptionalTag(ItemTags.SWORD_ENCHANTABLE);
     }
 }

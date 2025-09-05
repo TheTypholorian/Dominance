@@ -18,6 +18,7 @@ import net.minecraft.util.math.MathHelper;
 import net.typho.dominance.Dominance;
 
 import java.awt.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -27,13 +28,18 @@ public final class BasicReforge implements Reforge {
 
     public BasicReforge(Factory factory, double value) {
         this.factory = factory;
-        this.value = value;
-        System.out.println("Created basic reforge " + factory.attribute + " " + id());
+        this.value = MathHelper.clamp(value, 0, 1);
     }
 
     @Override
     public List<AttributeModifiersComponent.Entry> modifiers(ItemStack stack) {
-        return List.of(modifierForStack(factory.attribute, value, factory.op, stack, true));
+        List<AttributeModifiersComponent.Entry> modifiers = new LinkedList<>();
+
+        for (Entry entry : factory.attributes) {
+            modifiers.add(modifierForStack(entry.attribute, value * (entry.max - entry.min) + entry.min, entry.op, stack));
+        }
+
+        return modifiers;
     }
 
     @Override
@@ -44,11 +50,10 @@ public final class BasicReforge implements Reforge {
     @Override
     public RegistryKey<Reforge.Factory<?>> factory() {
         return factory.key;
-        //return RegistryEntry.Reference.standAlone(Dominance.REFORGE_KEY, factory.key);
     }
 
     public int getColor() {
-        return Reforge.blendColors(factory.minColor, factory.maxColor, value / factory.max).getRGB();
+        return Reforge.blendColors(factory.minColor, factory.maxColor, value).getRGB();
     }
 
     @Override
@@ -60,10 +65,7 @@ public final class BasicReforge implements Reforge {
         public static final MapCodec<Factory> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 RegistryKey.createCodec(Dominance.REFORGE_KEY).fieldOf("key").forGetter(f -> f.key),
                 Codec.INT.fieldOf("weight").forGetter(f -> f.weight),
-                Codec.DOUBLE.fieldOf("min").forGetter(f -> f.min),
-                Codec.DOUBLE.fieldOf("max").forGetter(f -> f.max),
-                EntityAttribute.CODEC.fieldOf("attribute").forGetter(f -> f.attribute),
-                EntityAttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(f -> f.op),
+                Entry.CODEC.codec().listOf().fieldOf("attributes").forGetter(f -> f.attributes),
                 Reforge.COLOR_CODEC.fieldOf("min_color").forGetter(f -> f.minColor),
                 Reforge.COLOR_CODEC.fieldOf("max_color").forGetter(f -> f.maxColor),
                 TagKey.codec(RegistryKeys.ITEM).fieldOf("tag").forGetter(f -> f.tag)
@@ -72,22 +74,17 @@ public final class BasicReforge implements Reforge {
         public final RegistryKey<Reforge.Factory<?>> key;
         public final MapCodec<BasicReforge> codec;
         public final int weight;
-        public final double min, max;
-        public final RegistryEntry<EntityAttribute> attribute;
-        public final EntityAttributeModifier.Operation op;
+        public final List<Entry> attributes;
         public final Color minColor, maxColor;
         public final TagKey<Item> tag;
 
-        public Factory(RegistryKey<Reforge.Factory<?>> key, int weight, double min, double max, RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier.Operation op, Color minColor, Color maxColor, TagKey<Item> tag) {
+        public Factory(RegistryKey<Reforge.Factory<?>> key, int weight, List<Entry> attributes, Color minColor, Color maxColor, TagKey<Item> tag) {
             codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Codec.DOUBLE.fieldOf("value").forGetter(simple -> simple.value)
             ).apply(instance, value -> new BasicReforge(Factory.this, value)));
             this.key = key;
             this.weight = weight;
-            this.min = min;
-            this.max = max;
-            this.attribute = attribute;
-            this.op = op;
+            this.attributes = attributes;
             this.minColor = minColor;
             this.maxColor = maxColor;
             this.tag = tag;
@@ -100,7 +97,7 @@ public final class BasicReforge implements Reforge {
 
         @Override
         public RegistryKey<Type<?>> type() {
-            return Dominance.BASIC_REFORGE.getKey().orElseThrow();
+            return Dominance.ATTRIBUTES_REFORGE_TYPE.getKey().orElseThrow();
         }
 
         @Override
@@ -115,7 +112,16 @@ public final class BasicReforge implements Reforge {
 
         @Override
         public BasicReforge generate(ItemStack stack) {
-            return new BasicReforge(this, new Random().nextDouble() * MathHelper.clamp(stack.getItem().getEnchantability() / 20f, 0, 1) * (max - min) + min);
+            return new BasicReforge(this, MathHelper.clamp(new Random().nextDouble() * stack.getItem().getEnchantability() / 20f, 0, 1));
         }
+    }
+
+    public record Entry(RegistryEntry<EntityAttribute> attribute, double min, double max, EntityAttributeModifier.Operation op) {
+        public static final MapCodec<Entry> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                EntityAttribute.CODEC.fieldOf("attribute").forGetter(f -> f.attribute),
+                Codec.DOUBLE.fieldOf("min").forGetter(f -> f.min),
+                Codec.DOUBLE.fieldOf("max").forGetter(f -> f.max),
+                EntityAttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(f -> f.op)
+        ).apply(instance, Entry::new));
     }
 }

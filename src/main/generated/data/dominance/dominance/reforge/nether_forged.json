@@ -1,0 +1,26 @@
+{
+  "type": "dominance:basic",
+  "attributes": [
+    {
+      "attribute": "minecraft:generic.burning_time",
+      "max": -0.25,
+      "min": -0.1,
+      "operation": "add_multiplied_base"
+    }
+  ],
+  "key": "dominance:nether_forged",
+  "max_color": [
+    200,
+    70,
+    50,
+    255
+  ],
+  "min_color": [
+    50,
+    25,
+    20,
+    255
+  ],
+  "tag": "#dominance:reforgable/armor",
+  "weight": 1
+}

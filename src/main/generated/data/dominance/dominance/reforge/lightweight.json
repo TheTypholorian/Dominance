@@ -1,0 +1,26 @@
+{
+  "type": "dominance:basic",
+  "attributes": [
+    {
+      "attribute": "minecraft:generic.attack_speed",
+      "max": 0.2,
+      "min": 0.1,
+      "operation": "add_multiplied_base"
+    }
+  ],
+  "key": "dominance:lightweight",
+  "max_color": [
+    200,
+    200,
+    220,
+    255
+  ],
+  "min_color": [
+    100,
+    100,
+    120,
+    255
+  ],
+  "tag": "#dominance:reforgable/melee",
+  "weight": 2
+}

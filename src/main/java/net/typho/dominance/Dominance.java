@@ -363,7 +363,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
 
             if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
-                data.setTime((int) context.player().getAttributeValue(PLAYER_ROLL_COOLDOWN));
+                data.setTime((int) context.player().getAttributeValue(PLAYER_ROLL_LENGTH));
             }
         });
         ItemGroupEvents.modifyEntriesEvent(CREATIVE_TAB_KEY).register(entries -> {

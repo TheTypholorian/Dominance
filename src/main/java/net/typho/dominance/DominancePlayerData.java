@@ -1,10 +1,16 @@
 package net.typho.dominance;
 
+import net.minecraft.block.FireBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.client.DominanceClient;
 import org.ladysnake.cca.api.v3.component.ComponentV3;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -76,14 +82,26 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
             time--;
 
             if (time == 0) {
-                cooldown = Dominance.ROLL_COOLDOWN;
+                cooldown = (int) player.getAttributeValue(Dominance.PLAYER_ROLL_COOLDOWN);
                 dynamo = true;
+
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, (int) player.getAttributeValue(Dominance.PLAYER_SWIFT_FOOTED)));
             }
 
             sync = true;
 
             if (player.isOnGround()) {
-                player.addVelocity(player.getRotationVector(0, player.getYaw()).multiply(player.getMovementSpeed() * 20));
+                Vec3d rotVec = player.getRotationVector(0, player.getYaw());
+
+                BlockPos pos = BlockPos.ofFloored(player.getPos().subtract(rotVec.multiply(2)));
+
+                if (player.getRandom().nextDouble() <= player.getAttributeValue(Dominance.PLAYER_FIRE_TRAIL)) {
+                    if (FireBlock.canPlaceAt(player.getWorld(), pos, Direction.DOWN)) {
+                        player.getWorld().setBlockState(pos, FireBlock.getState(player.getWorld(), player.getBlockPos()));
+                    }
+                }
+
+                player.addVelocity(rotVec.multiply(player.getMovementSpeed() * 20));
                 player.velocityModified = true;
             }
         }

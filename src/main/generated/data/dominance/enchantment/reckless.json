@@ -1,0 +1,40 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.dominance.reckless"
+  },
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "amount": -0.4,
+        "attribute": "minecraft:generic.max_health",
+        "id": "dominance:enchantment.reckless_max_health",
+        "operation": "add_multiplied_total"
+      },
+      {
+        "amount": {
+          "type": "minecraft:linear",
+          "base": 0.5,
+          "per_level_above_first": 0.2
+        },
+        "attribute": "minecraft:generic.attack_damage",
+        "id": "dominance:enchantment.reckless_damage",
+        "operation": "add_multiplied_base"
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 21,
+    "per_level_above_first": 11
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 11
+  },
+  "slots": [
+    "feet"
+  ],
+  "supported_items": "#minecraft:enchantable/foot_armor",
+  "weight": 1
+}

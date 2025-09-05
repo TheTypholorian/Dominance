@@ -1,18 +1,17 @@
 {
   "anvil_cost": 1,
   "description": {
-    "translate": "enchantment.dominance.exploding"
+    "translate": "enchantment.dominance.cowardice"
   },
   "effects": {
-    "dominance:post_kill": [
+    "dominance:modify_damage": [
       {
         "effect": {
-          "type": "dominance:exploding"
+          "type": "dominance:cowardice"
         }
       }
     ]
   },
-  "exclusive_set": "#dominance:exclusive_set/inflict",
   "max_cost": {
     "base": 21,
     "per_level_above_first": 11
@@ -26,5 +25,5 @@
     "mainhand"
   ],
   "supported_items": "#minecraft:enchantable/sword",
-  "weight": 1
+  "weight": 2
 }

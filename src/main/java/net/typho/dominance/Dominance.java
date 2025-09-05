@@ -28,11 +28,14 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelBasedValue;
+import net.minecraft.enchantment.effect.AttributeEnchantmentEffect;
 import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.enchantment.effect.EnchantmentEffectTarget;
 import net.minecraft.enchantment.effect.entity.ApplyMobEffectEnchantmentEffect;
 import net.minecraft.enchantment.effect.value.MultiplyEnchantmentEffect;
 import net.minecraft.entity.*;
+import net.minecraft.entity.attribute.ClampedEntityAttribute;
+import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.dragon.EnderDragonPart;
@@ -186,7 +189,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             ),
             15,
             SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
-            Ingredient::empty,
+            () -> Ingredient.ofItems(Items.LEATHER),
             List.of(),
             1f,
             0.1f
@@ -218,13 +221,10 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         ARMOR_SET_BONUSES.put(Set.of(EVOCATION_HAT, EVOCATION_ROBE), AttributeModifiersComponent.builder()
                 .add(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED,
-                        new EntityAttributeModifier(id("evocation_robe_set_bonus"), 0.25, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        new EntityAttributeModifier(id("evocation_robe_set_bonus"), 0.25, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                         AttributeModifierSlot.ARMOR
                 ).build());
     }
-
-    public static final int ROLL_LENGTH = 8;
-    public static final int ROLL_COOLDOWN = 60;
 
     public static final SpriteIdentifier ROYAL_GUARD_SHIELD_SPRITE = new SpriteIdentifier(
             TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, id("entity/royal_guard_shield")
@@ -267,8 +267,20 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             ComponentType.<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentPostKillEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
     );
 
+    public static final RegistryEntry<EntityAttribute> PLAYER_ROLL_COOLDOWN = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.roll_cooldown"), new ClampedEntityAttribute("attribute.name.dominance.player.roll_cooldown", 60, 0, 100));
+    public static final RegistryEntry<EntityAttribute> PLAYER_ROLL_LENGTH = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.roll_length"), new ClampedEntityAttribute("attribute.name.dominance.player.roll_length", 8, 0, 40));
+    public static final RegistryEntry<EntityAttribute> PLAYER_FIRE_TRAIL = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.fire_trail"), new ClampedEntityAttribute("attribute.name.dominance.player.fire_trail", 0, 0, 1));
+    public static final RegistryEntry<EntityAttribute> PLAYER_SWIFT_FOOTED = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.swift_footed"), new ClampedEntityAttribute("attribute.name.dominance.player.swift_footed", 0, 0, 1200));
+
+    public static final Map<Identifier, Color> EXCLUSIVE_SET_COLORS = new LinkedHashMap<>();
+
+    public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/inflict"));
+    public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/conditional"));
+    public static final TagKey<Enchantment> ROLL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/roll"));
+
     public static final RegistryKey<Enchantment> AMBUSH = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("ambush"));
     public static final RegistryKey<Enchantment> COMMITTED = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("committed"));
+    public static final RegistryKey<Enchantment> COWARDICE = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("cowardice"));
     public static final RegistryKey<Enchantment> DYNAMO = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("dynamo"));
     public static final RegistryKey<Enchantment> EXPLODING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("exploding"));
     public static final RegistryKey<Enchantment> FREEZING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("freezing"));
@@ -277,6 +289,11 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RegistryKey<Enchantment> LEECHING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("leeching"));
     public static final RegistryKey<Enchantment> RAMPAGE = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("rampage"));
     public static final RegistryKey<Enchantment> WEAKENING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("weakening"));
+
+    public static final RegistryKey<Enchantment> ACROBAT = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("acrobat"));
+    public static final RegistryKey<Enchantment> FIRE_TRAIL = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("fire_trail"));
+    public static final RegistryKey<Enchantment> RECKLESS = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("reckless"));
+    public static final RegistryKey<Enchantment> SWIFT_FOOTED = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("swift_footed"));
 
     public static final RegistryKey<Reforge.Factory<?>> LIGHTWEIGHT = RegistryKey.of(REFORGE_KEY, id("lightweight"));
     public static final RegistryKey<Reforge.Factory<?>> HEAVY_MELEE = RegistryKey.of(REFORGE_KEY, id("heavy_melee"));
@@ -294,17 +311,13 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
     public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("ambush"), AmbushEffect.CODEC);
     public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("committed"), CommittedEffect.CODEC);
+    public static final MapCodec<CowardiceEffect> COWARDICE_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("cowardice"), CowardiceEffect.CODEC);
     public static final MapCodec<DynamoEffect> DYNAMO_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("dynamo"), DynamoEffect.CODEC);
     public static final MapCodec<ExplodingEffect> EXPLODING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("exploding"), ExplodingEffect.CODEC);
     public static final MapCodec<GravityEffect> GRAVITY_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, id("gravity"), GravityEffect.CODEC);
     public static final MapCodec<LeechingEffect> LEECHING_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("leeching"), LeechingEffect.CODEC);
     public static final MapCodec<RampageEffect> RAMPAGE_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("rampage"), RampageEffect.CODEC);
     public static final MapCodec<WeakeningEffect> WEAKENING_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, id("weakening"), WeakeningEffect.CODEC);
-
-    public static final Map<Identifier, Color> EXCLUSIVE_SET_COLORS = new LinkedHashMap<>();
-
-    public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/inflict"));
-    public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/conditional"));
 
     static {
         EXCLUSIVE_SET_COLORS.put(EnchantmentTags.RIPTIDE_EXCLUSIVE_SET.id(), new Color(160, 255, 255));
@@ -316,6 +329,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         EXCLUSIVE_SET_COLORS.put(EnchantmentTags.MINING_EXCLUSIVE_SET.id(), new Color(255, 230, 0));
         EXCLUSIVE_SET_COLORS.put(INFLICT_EXCLUSIVE_SET.id(), new Color(170, 45, 45));
         EXCLUSIVE_SET_COLORS.put(CONDITIONAL_EXCLUSIVE_SET.id(), new Color(145, 50, 115));
+        EXCLUSIVE_SET_COLORS.put(ROLL_EXCLUSIVE_SET.id(), new Color(140, 203, 255));
     }
 
     public static final SmithingTemplateItem REFORGE_SMITHING_TEMPLATE = item("reforge_smithing_template", new SmithingTemplateItem(
@@ -349,7 +363,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
 
             if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
-                data.setTime(ROLL_LENGTH);
+                data.setTime((int) context.player().getAttributeValue(PLAYER_ROLL_COOLDOWN));
             }
         });
         ItemGroupEvents.modifyEntriesEvent(CREATIVE_TAB_KEY).register(entries -> {
@@ -379,6 +393,15 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                                 .with(ItemEntry.builder(PIGLIN_CHESTPLATE).weight(5)
                                         .apply(SetDamageLootFunction.builder(UniformLootNumberProvider.create(0.8f, 1)))
                                         .apply(EnchantRandomlyLootFunction.builder(wrapperLookup)))
+                                .with(ItemEntry.builder(BASTION_BUSTER).weight(2)
+                                        .apply(SetDamageLootFunction.builder(UniformLootNumberProvider.create(0.8f, 1)))
+                                        .apply(EnchantRandomlyLootFunction.builder(wrapperLookup)))
+                );
+            } else if (key.getValue().getNamespace().equals(Identifier.DEFAULT_NAMESPACE) && key.getValue().getPath().equals("entities/evoker")) {
+                builder.pool(
+                        LootPool.builder()
+                                .with(ItemEntry.builder(EVOCATION_HAT).weight(5))
+                                .with(ItemEntry.builder(EVOCATION_ROBE).weight(5))
                 );
             }
         });
@@ -830,7 +853,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(AMBUSH, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                5,
+                                3,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -844,7 +867,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(COMMITTED, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                1,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -855,10 +878,23 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .addEffect(MODIFY_DAMAGE, new CommittedEffect())
                 .exclusiveSet(enchantments.getOrThrow(CONDITIONAL_EXCLUSIVE_SET))
                 .build(COMMITTED.getValue()));
+        registerable.register(COWARDICE, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                2,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.MAINHAND
+                        )
+                )
+                .addEffect(MODIFY_DAMAGE, new CowardiceEffect())
+                .build(COWARDICE.getValue()));
         registerable.register(DYNAMO, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -871,7 +907,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(EXPLODING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                1,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -885,7 +921,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(FREEZING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -905,7 +941,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(GRAVITY, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                1,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -939,7 +975,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(LEECHING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -952,7 +988,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(RAMPAGE, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                1,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -966,7 +1002,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(WEAKENING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -977,5 +1013,102 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .addEffect(EnchantmentEffectComponentTypes.POST_ATTACK, EnchantmentEffectTarget.ATTACKER, EnchantmentEffectTarget.VICTIM, new WeakeningEffect())
                 .exclusiveSet(enchantments.getOrThrow(INFLICT_EXCLUSIVE_SET))
                 .build(WEAKENING.getValue()));
+
+        registerable.register(ACROBAT, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
+                                1,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.FEET
+                        )
+                )
+                .addEffect(
+                        EnchantmentEffectComponentTypes.ATTRIBUTES,
+                        new AttributeEnchantmentEffect(
+                                id("enchantment.acrobat"),
+                                PLAYER_ROLL_COOLDOWN,
+                                EnchantmentLevelBasedValue.linear(-0.15f),
+                                EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                        )
+                )
+                .exclusiveSet(enchantments.getOrThrow(ROLL_EXCLUSIVE_SET))
+                .build(ACROBAT.getValue()));
+        registerable.register(FIRE_TRAIL, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
+                                2,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.FEET
+                        )
+                )
+                .addEffect(
+                        EnchantmentEffectComponentTypes.ATTRIBUTES,
+                        new AttributeEnchantmentEffect(
+                                id("enchantment.fire_trail"),
+                                PLAYER_FIRE_TRAIL,
+                                EnchantmentLevelBasedValue.linear(0.5f, 0.25f),
+                                EntityAttributeModifier.Operation.ADD_VALUE
+                        )
+                )
+                .exclusiveSet(enchantments.getOrThrow(ROLL_EXCLUSIVE_SET))
+                .build(FIRE_TRAIL.getValue()));
+        registerable.register(RECKLESS, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
+                                1,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.FEET
+                        )
+                )
+                .addEffect(
+                        EnchantmentEffectComponentTypes.ATTRIBUTES,
+                        new AttributeEnchantmentEffect(
+                                id("enchantment.reckless_max_health"),
+                                EntityAttributes.GENERIC_MAX_HEALTH,
+                                EnchantmentLevelBasedValue.constant(-0.4f),
+                                EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+                        )
+                )
+                .addEffect(
+                        EnchantmentEffectComponentTypes.ATTRIBUTES,
+                        new AttributeEnchantmentEffect(
+                                id("enchantment.reckless_damage"),
+                                EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                                EnchantmentLevelBasedValue.linear(0.5f, 0.2f),
+                                EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                        )
+                )
+                .build(RECKLESS.getValue()));
+        registerable.register(SWIFT_FOOTED, Enchantment.builder(
+                        Enchantment.definition(
+                                items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
+                                2,
+                                3,
+                                Enchantment.leveledCost(1, 11),
+                                Enchantment.leveledCost(21, 11),
+                                1,
+                                AttributeModifierSlot.FEET
+                        )
+                )
+                .addEffect(
+                        EnchantmentEffectComponentTypes.ATTRIBUTES,
+                        new AttributeEnchantmentEffect(
+                                id("enchantment.swift_footed"),
+                                PLAYER_SWIFT_FOOTED,
+                                EnchantmentLevelBasedValue.linear(20),
+                                EntityAttributeModifier.Operation.ADD_VALUE
+                        )
+                )
+                .exclusiveSet(enchantments.getOrThrow(ROLL_EXCLUSIVE_SET))
+                .build(SWIFT_FOOTED.getValue()));
     }
 }

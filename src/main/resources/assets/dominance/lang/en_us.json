@@ -30,6 +30,11 @@
   "enchantment.dominance.bane_of_illagers": "Illager's Bane",
   "enchantment.dominance.leeching": "Leeching",
   "enchantment.dominance.rampage": "Rampage",
+  "enchantment.dominance.weakening": "Weakening",
+  "enchantment.dominance.acrobat": "Acrobat",
+  "enchantment.dominance.fire_trail": "Fire Trail",
+  "enchantment.dominance.reckless": "Reckless",
+  "enchantment.dominance.swift_footed": "Swift Footed",
   "effect.dominance.rampage": "Rampage",
   "itemGroup.dominance": "Dominance",
   "reforge.dominance.lightweight": "Lightweight %s",
@@ -47,5 +52,10 @@
   "command.dominance.reforge.no_possible_reforge": "No possible reforges for item",
   "command.dominance.reforge.no_reforge": "Nonexistent reforge %s",
   "command.dominance.reforge.bad_item": "Cannot apply reforge %s to %s",
-  "command.dominance.reforge.bad_nbt": "Bad nbt %s"
+  "command.dominance.reforge.bad_nbt": "Bad nbt %s",
+  "attribute.name.dominance.player.roll_cooldown": "Roll Cooldown",
+  "attribute.name.dominance.player.roll_length": "Roll Length",
+  "attribute.name.dominance.player.fire_trail": "Fire Trail",
+  "attribute.name.dominance.player.swift_footed": "Swift Footed",
+  "key.dominance.roll": "Roll"
 }

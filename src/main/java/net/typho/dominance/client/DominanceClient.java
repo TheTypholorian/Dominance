@@ -11,6 +11,7 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
 import net.minecraft.util.Arm;
@@ -44,9 +45,10 @@ public class DominanceClient implements ClientModInitializer {
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             if (MinecraftClient.getInstance().interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
-                DominancePlayerData data = Dominance.PLAYER_DATA.get(MinecraftClient.getInstance().player);
-                int cooldown = (int) ((float) data.getCooldown() / Dominance.ROLL_COOLDOWN * 17);
-                int time = (int) ((float) data.getTime() / Dominance.ROLL_LENGTH * 17);
+                PlayerEntity player = MinecraftClient.getInstance().player;
+                DominancePlayerData data = Dominance.PLAYER_DATA.get(player);
+                int cooldown = (int) ((float) data.getCooldown() / player.getAttributeValue(Dominance.PLAYER_ROLL_COOLDOWN) * 17);
+                int time = (int) ((float) data.getTime() / player.getAttributeValue(Dominance.PLAYER_ROLL_LENGTH) * 17);
                 int x = context.getScaledWindowWidth() / 2 + (MinecraftClient.getInstance().player.getMainArm() == Arm.RIGHT ? 115 - 17 : -115), y = context.getScaledWindowHeight() - 17;
                 context.drawTexture(Identifier.of("dominance", "textures/gui/roll_full.png"), x, y, 0, 0, 17, 11, 17, 11);
 

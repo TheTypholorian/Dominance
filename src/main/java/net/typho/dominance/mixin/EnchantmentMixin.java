@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +64,11 @@ public abstract class EnchantmentMixin {
         TagKey<Enchantment> tag = enchant.value().exclusiveSet().getTagKey().orElse(null);
 
         if (tag != null) {
-            return original.copy().styled(style -> style.withColor(Dominance.EXCLUSIVE_SET_COLORS.get(tag.id()).getRGB()));
+            Color color = Dominance.EXCLUSIVE_SET_COLORS.get(tag.id());
+
+            if (color != null) {
+                return original.copy().styled(style -> style.withColor(color.getRGB()));
+            }
         }
 
         return original;

@@ -26,5 +26,9 @@ public class GenEnchantmentTags extends FabricTagProvider.EnchantmentTagProvider
                 .add(Dominance.AMBUSH)
                 .add(Dominance.COMMITTED)
                 .add(Dominance.RAMPAGE);
+        getOrCreateTagBuilder(Dominance.ROLL_EXCLUSIVE_SET)
+                .add(Dominance.ACROBAT)
+                .add(Dominance.FIRE_TRAIL)
+                .add(Dominance.SWIFT_FOOTED);
     }
 }

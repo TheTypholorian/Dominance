@@ -1,0 +1,22 @@
+{
+  "type": "dominance:attribute",
+  "attributes": [
+    {
+      "attribute": "minecraft:generic.movement_speed",
+      "increment": 0.05,
+      "max": -0.25,
+      "min": -0.1,
+      "operation": "add_multiplied_base"
+    },
+    {
+      "attribute": "minecraft:player.sneaking_speed",
+      "increment": 0.1,
+      "max": -0.5,
+      "min": -0.1,
+      "operation": "add_multiplied_base"
+    }
+  ],
+  "key": "dominance:heavy_armor",
+  "rarity": "common",
+  "tag": "#dominance:reforgable/armor"
+}

@@ -1,0 +1,21 @@
+{
+  "type": "dominance:attribute",
+  "attributes": [
+    {
+      "attribute": "minecraft:generic.armor",
+      "max": -2.0,
+      "min": -0.25,
+      "operation": "add_value"
+    },
+    {
+      "attribute": "minecraft:generic.knockback_resistance",
+      "increment": 0.05,
+      "max": -0.25,
+      "min": -0.1,
+      "operation": "add_value"
+    }
+  ],
+  "key": "dominance:crumbling",
+  "rarity": "common",
+  "tag": "#dominance:reforgable/armor"
+}

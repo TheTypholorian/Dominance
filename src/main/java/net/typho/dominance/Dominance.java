@@ -252,11 +252,18 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RegistryKey<Enchantment> WEAKENING = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("weakening"));
 
     public static final RegistryKey<Reforge.Factory<?>> LIGHTWEIGHT = RegistryKey.of(REFORGE_KEY, id("lightweight"));
-    public static final RegistryKey<Reforge.Factory<?>> HEAVY = RegistryKey.of(REFORGE_KEY, id("heavy"));
+    public static final RegistryKey<Reforge.Factory<?>> HEAVY_MELEE = RegistryKey.of(REFORGE_KEY, id("heavy_melee"));
+    public static final RegistryKey<Reforge.Factory<?>> LENGTHY = RegistryKey.of(REFORGE_KEY, id("lengthy"));
+    public static final RegistryKey<Reforge.Factory<?>> SHARP = RegistryKey.of(REFORGE_KEY, id("sharp"));
+    public static final RegistryKey<Reforge.Factory<?>> WEAK = RegistryKey.of(REFORGE_KEY, id("weak"));
+    public static final RegistryKey<Reforge.Factory<?>> SLOW = RegistryKey.of(REFORGE_KEY, id("slow"));
+
     public static final RegistryKey<Reforge.Factory<?>> FORTIFIED = RegistryKey.of(REFORGE_KEY, id("fortified"));
     public static final RegistryKey<Reforge.Factory<?>> NETHER_FORGED = RegistryKey.of(REFORGE_KEY, id("nether_forged"));
     public static final RegistryKey<Reforge.Factory<?>> SWIFT = RegistryKey.of(REFORGE_KEY, id("swift"));
     public static final RegistryKey<Reforge.Factory<?>> VITALITY = RegistryKey.of(REFORGE_KEY, id("vitality"));
+    public static final RegistryKey<Reforge.Factory<?>> CRUMBLING = RegistryKey.of(REFORGE_KEY, id("crumbling"));
+    public static final RegistryKey<Reforge.Factory<?>> HEAVY_ARMOR = RegistryKey.of(REFORGE_KEY, id("heavy_armor"));
 
     public static final MapCodec<AmbushEffect> AMBUSH_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("ambush"), AmbushEffect.CODEC);
     public static final MapCodec<CommittedEffect> COMMITTED_EFFECT = Registry.register(ENCHANTMENT_DAMAGE_EFFECTS, id("committed"), CommittedEffect.CODEC);
@@ -588,15 +595,15 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ), new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
-                        -0.1,
-                        -0.2,
-                        0.05,
-                        EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                        -0.5,
+                        -3,
+                        0.5,
+                        EntityAttributeModifier.Operation.ADD_VALUE
                 )),
                 MELEE_REFORGABLE
         ));
-        registerable.register(HEAVY, new BasicReforge.Factory(
-                HEAVY,
+        registerable.register(HEAVY_MELEE, new BasicReforge.Factory(
+                HEAVY_MELEE,
                 Rarity.COMMON,
                 List.of(new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ATTACK_SPEED,
@@ -606,13 +613,68 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ), new BasicReforge.Entry(
                         EntityAttributes.GENERIC_ATTACK_DAMAGE,
-                        0.1,
-                        0.2,
+                        0.5,
+                        3,
+                        0.5,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                )),
+                MELEE_REFORGABLE
+        ));
+        registerable.register(LENGTHY, new BasicReforge.Factory(
+                LENGTHY,
+                Rarity.UNCOMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE,
+                        0.25,
+                        2,
+                        0.25,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                ), new BasicReforge.Entry(
+                        EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE,
+                        0.25,
+                        2,
+                        0.25,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                )),
+                MELEE_REFORGABLE
+        ));
+        registerable.register(SHARP, new BasicReforge.Factory(
+                WEAK,
+                Rarity.COMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                        0.5,
+                        3,
+                        0.5,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                )),
+                MELEE_REFORGABLE
+        ));
+        registerable.register(WEAK, new BasicReforge.Factory(
+                WEAK,
+                Rarity.COMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                        -0.5,
+                        -3,
+                        0.5,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                )),
+                MELEE_REFORGABLE
+        ));
+        registerable.register(SLOW, new BasicReforge.Factory(
+                SLOW,
+                Rarity.COMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_ATTACK_SPEED,
+                        -0.1,
+                        -0.25,
                         0.05,
                         EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
                 MELEE_REFORGABLE
         ));
+
         registerable.register(FORTIFIED, new BasicReforge.Factory(
                 FORTIFIED,
                 Rarity.UNCOMMON,
@@ -676,6 +738,42 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         2,
                         0.5,
                         EntityAttributeModifier.Operation.ADD_VALUE
+                )),
+                ARMOR_REFORGABLE
+        ));
+        registerable.register(CRUMBLING, new BasicReforge.Factory(
+                CRUMBLING,
+                Rarity.COMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_ARMOR,
+                        -0.25,
+                        -2,
+                        0.25,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                ), new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE,
+                        -0.1,
+                        -0.25,
+                        0.05,
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                )),
+                ARMOR_REFORGABLE
+        ));
+        registerable.register(HEAVY_ARMOR, new BasicReforge.Factory(
+                HEAVY_ARMOR,
+                Rarity.COMMON,
+                List.of(new BasicReforge.Entry(
+                        EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                        -0.1,
+                        -0.25,
+                        0.05,
+                        EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                ), new BasicReforge.Entry(
+                        EntityAttributes.PLAYER_SNEAKING_SPEED,
+                        -0.1,
+                        -0.5,
+                        0.1,
+                        EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 )),
                 ARMOR_REFORGABLE
         ));

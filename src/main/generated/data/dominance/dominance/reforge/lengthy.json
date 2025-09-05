@@ -1,0 +1,20 @@
+{
+  "type": "dominance:attribute",
+  "attributes": [
+    {
+      "attribute": "minecraft:player.entity_interaction_range",
+      "max": 2.0,
+      "min": 0.25,
+      "operation": "add_value"
+    },
+    {
+      "attribute": "minecraft:player.block_interaction_range",
+      "max": 2.0,
+      "min": 0.25,
+      "operation": "add_value"
+    }
+  ],
+  "key": "dominance:lengthy",
+  "rarity": "uncommon",
+  "tag": "#dominance:reforgable/melee"
+}

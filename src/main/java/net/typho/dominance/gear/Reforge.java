@@ -1,6 +1,5 @@
 package net.typho.dominance.gear;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.*;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
@@ -18,33 +17,14 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
-import net.minecraft.util.math.MathHelper;
 import net.typho.dominance.Dominance;
 
-import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
 public interface Reforge {
-    Codec<Color> COLOR_CODEC = Codec.either(
-            Codec.either(
-                    Codec.INT.xmap(Color::new, Color::getRGB),
-                    Codec.INT.listOf(3, 4).xmap(list -> list.size() == 3 ? new Color(list.getFirst(), list.get(1), list.get(2)) : new Color(list.getFirst(), list.get(1), list.get(2), list.get(3)), color -> List.of(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()))
-            ),
-            Codec.FLOAT.listOf(3, 4).xmap(list -> list.size() == 3 ? new Color(list.getFirst(), list.get(1), list.get(2)) : new Color(list.getFirst(), list.get(1), list.get(2), list.get(3)), color -> List.of(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f))
-    ).xmap(
-            either -> either.map(
-                    color -> color.map(
-                            color1 -> color1,
-                            color1 -> color1
-                    ),
-                    inner -> inner
-            ),
-            color -> Either.left(Either.right(color))
-    );
-
     @SuppressWarnings("unchecked")
     private static <R extends Reforge, T> void encode(MapCodec<R> codec, Reforge input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
         R r = (R) input;
@@ -116,19 +96,8 @@ public interface Reforge {
         if (stack.getItem() instanceof Equipment equipment) {
             return AttributeModifierSlot.forEquipmentSlot(equipment.getSlotType());
         } else {
-            return AttributeModifierSlot.HAND;
+            return AttributeModifierSlot.MAINHAND;
         }
-    }
-
-    static Color blendColors(Color min, Color max, double delta) {
-        delta = MathHelper.clamp(delta, 0, 1);
-
-        return new Color(
-                (int) ((max.getRed() - min.getRed()) * delta + min.getRed()),
-                (int) ((max.getGreen() - min.getGreen()) * delta + min.getGreen()),
-                (int) ((max.getBlue() - min.getBlue()) * delta + min.getBlue()),
-                (int) ((max.getAlpha() - min.getAlpha()) * delta + min.getAlpha())
-        );
     }
 
     static Factory<?> pickForStack(ItemStack stack, DynamicRegistryManager registries) {

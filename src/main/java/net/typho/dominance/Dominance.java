@@ -662,7 +662,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         0.5,
                         2,
                         0.5,
-                        EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                        EntityAttributeModifier.Operation.ADD_VALUE
                 )),
                 ARMOR_REFORGABLE
         ));

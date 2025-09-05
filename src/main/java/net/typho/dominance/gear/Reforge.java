@@ -17,11 +17,11 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.random.Random;
 import net.typho.dominance.Dominance;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Stream;
 
 public interface Reforge {
@@ -105,6 +105,10 @@ public interface Reforge {
     }
 
     static Factory<?> pickForStack(ItemStack stack, RegistryWrapper.WrapperLookup lookup) {
+        return pickForStack(stack, lookup, Random.create(ItemStack.hashCode(stack)));
+    }
+
+    static Factory<?> pickForStack(ItemStack stack, RegistryWrapper.WrapperLookup lookup, Random random) {
         List<Factory<?>> options = new LinkedList<>();
 
         int total = lookup.getWrapperOrThrow(Dominance.REFORGE_KEY).streamEntries().mapToInt(ref -> {
@@ -129,7 +133,7 @@ public interface Reforge {
             }
         }
 
-        return arr[new Random(ItemStack.hashCode(stack)).nextInt(total)];
+        return arr[random.nextInt(total)];
     }
 
     interface Factory<R extends Reforge> {

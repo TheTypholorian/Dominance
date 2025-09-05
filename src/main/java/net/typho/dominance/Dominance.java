@@ -337,6 +337,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(KATANA);
             entries.add(BURST_CROSSBOW);
             entries.add(HUNTING_BOW);
+            entries.add(REFORGE_SMITHING_TEMPLATE);
         });
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
             commandDispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>literal("reforge")

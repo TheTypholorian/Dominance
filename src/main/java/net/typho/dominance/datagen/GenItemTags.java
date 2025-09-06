@@ -37,17 +37,16 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR)
                 .add(Dominance.ROYAL_GUARD_BOOTS);
 
+        getOrCreateTagBuilder(ItemTags.SWORDS)
+                .add(Dominance.KATANA);
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
                 .add(Dominance.ROYAL_GUARD_MACE)
                 .add(Dominance.GREAT_HAMMER)
-                .add(Dominance.BASTION_BUSTER)
-                .add(Dominance.KATANA);
-        getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
-                .addOptionalTag(ItemTags.AXES)
+                .add(Dominance.BASTION_BUSTER);
+        getOrCreateTagBuilder(ItemTags.SHARP_WEAPON_ENCHANTABLE)
                 .add(Dominance.ROYAL_GUARD_MACE)
                 .add(Dominance.GREAT_HAMMER)
-                .add(Dominance.BASTION_BUSTER)
-                .add(Dominance.KATANA);
+                .add(Dominance.BASTION_BUSTER);
         getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE)
                 .addOptionalTag(ItemTags.BOW_ENCHANTABLE)
                 .add(Dominance.BURST_CROSSBOW);

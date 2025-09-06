@@ -30,5 +30,21 @@ public class GenEnchantmentTags extends FabricTagProvider.EnchantmentTagProvider
                 .add(Dominance.ACROBAT)
                 .add(Dominance.FIRE_TRAIL)
                 .add(Dominance.SWIFT_FOOTED);
+        getOrCreateTagBuilder(EnchantmentTags.NON_TREASURE)
+                .add(Dominance.AMBUSH)
+                .add(Dominance.COMMITTED)
+                .add(Dominance.COWARDICE)
+                .add(Dominance.DYNAMO)
+                .add(Dominance.EXPLODING)
+                .add(Dominance.FREEZING)
+                .add(Dominance.GRAVITY)
+                .add(Dominance.BANE_OF_ILLAGERS)
+                .add(Dominance.LEECHING)
+                .add(Dominance.RAMPAGE)
+                .add(Dominance.WEAKENING)
+                .add(Dominance.ACROBAT)
+                .add(Dominance.FIRE_TRAIL)
+                .add(Dominance.RECKLESS)
+                .add(Dominance.SWIFT_FOOTED);
     }
 }

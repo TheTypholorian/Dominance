@@ -15,6 +15,7 @@
     "PiglinBrainMixin",
     "PlayerEntityMixin",
     "ProjectileEntityMixin",
+    "RaidMixin",
     "RemoveOffHandItemTaskMixin",
     "ShaderImportProcessorMixin",
     "VeilMultiBindMixin",

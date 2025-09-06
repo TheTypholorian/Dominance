@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -26,26 +27,21 @@ import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelBasedValue;
 import net.minecraft.enchantment.effect.AttributeEnchantmentEffect;
 import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.enchantment.effect.EnchantmentEffectTarget;
 import net.minecraft.enchantment.effect.entity.ApplyMobEffectEnchantmentEffect;
 import net.minecraft.enchantment.effect.value.MultiplyEnchantmentEffect;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.ClampedEntityAttribute;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.boss.dragon.EnderDragonPart;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.*;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTables;
@@ -61,9 +57,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.EntityTypePredicate;
 import net.minecraft.recipe.Ingredient;
@@ -77,17 +71,11 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.*;
@@ -97,7 +85,6 @@ import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
-import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -195,18 +182,18 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             0.1f
     ));
 
-    public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.RARE)));
-    public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.RARE)));
-    public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.RARE)));
-    public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(10, -3.2))));
+    public static final RoyalGuardArmorItem ROYAL_GUARD_HELMET = item("royal_guard_helmet", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.HELMET.getMaxDamage(20)).rarity(Rarity.RARE)));
+    public static final RoyalGuardArmorItem ROYAL_GUARD_CHESTPLATE = item("royal_guard_chestplate", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(20)).rarity(Rarity.RARE)));
+    public static final RoyalGuardArmorItem ROYAL_GUARD_BOOTS = item("royal_guard_boots", new RoyalGuardArmorItem(ROYAL_GUARD_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.BOOTS.getMaxDamage(20)).rarity(Rarity.RARE)));
+    public static final SplashWeaponItem ROYAL_GUARD_MACE = item("royal_guard_mace", new SplashWeaponItem(1, 7, 0.5f, new Item.Settings().maxCount(1).maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(10, -3.2))));
     public static final ShieldItem ROYAL_GUARD_SHIELD = item("royal_guard_shield", new ShieldItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(504)));
-    public static final EvocationRobeItem EVOCATION_HAT = item("evocation_hat", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(22)).rarity(Rarity.EPIC)));
-    public static final EvocationRobeItem EVOCATION_ROBE = item("evocation_robe", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(22)).rarity(Rarity.EPIC)));
-    public static final PiglinArmorItem PIGLIN_HELMET = item("piglin_helmet", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
-    public static final PiglinArmorItem PIGLIN_CHESTPLATE = item("piglin_chestplate", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
-    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(14, -3))));
-    public static final SplashWeaponItem BASTION_BUSTER = item("bastion_buster", new SplashWeaponItem(4, 6, 1, new Item.Settings().maxDamage(600).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(15, -3))));
-    public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 4, -2f))));
+    public static final EvocationRobeItem EVOCATION_HAT = item("evocation_hat", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.HELMET.getMaxDamage(22)).rarity(Rarity.EPIC)));
+    public static final EvocationRobeItem EVOCATION_ROBE = item("evocation_robe", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(22)).rarity(Rarity.EPIC)));
+    public static final PiglinArmorItem PIGLIN_HELMET = item("piglin_helmet", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.HELMET.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
+    public static final PiglinArmorItem PIGLIN_CHESTPLATE = item("piglin_chestplate", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxCount(1).maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
+    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxCount(1).maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(14, -3))));
+    public static final SplashWeaponItem BASTION_BUSTER = item("bastion_buster", new SplashWeaponItem(4, 6, 1, new Item.Settings().maxCount(1).maxDamage(600).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(15, -2.8))));
+    public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 4, -2f))));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(465)));
     public static final HuntingBowItem HUNTING_BOW = item("hunting_bow", new HuntingBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(384)));
 
@@ -229,6 +216,13 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, id("entity/royal_guard_shield")
     );
     public static final ShieldEntityModel ROYAL_GUARD_SHIELD_MODEL;
+
+    public static final EntityType<RoyalGuardEntity> ROYAL_GUARD = Registry.register(Registries.ENTITY_TYPE, id("royal_guard"), EntityType.Builder.create(RoyalGuardEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.6F, 1.95F)
+            .passengerAttachments(2.0F)
+            .vehicleAttachment(-0.6F)
+            .maxTrackingRange(8)
+            .build("royal_guard"));
 
     public static final ComponentKey<DominancePlayerData> PLAYER_DATA = ComponentRegistryV3.INSTANCE.getOrCreate(id("player_data"), DominancePlayerData.class);
 
@@ -270,8 +264,6 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RegistryEntry<EntityAttribute> PLAYER_ROLL_LENGTH = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.roll_length"), new ClampedEntityAttribute("attribute.name.dominance.player.roll_length", 8, 0, 40));
     public static final RegistryEntry<EntityAttribute> PLAYER_FIRE_TRAIL = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.fire_trail"), new ClampedEntityAttribute("attribute.name.dominance.player.fire_trail", 0, 0, 1));
     public static final RegistryEntry<EntityAttribute> PLAYER_SWIFT_FOOTED = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.swift_footed"), new ClampedEntityAttribute("attribute.name.dominance.player.swift_footed", 0, 0, 1200));
-
-    public static final Map<Identifier, Color> EXCLUSIVE_SET_COLORS = new LinkedHashMap<>();
 
     public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/inflict"));
     public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/conditional"));
@@ -318,19 +310,6 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final MapCodec<RampageEffect> RAMPAGE_EFFECT = Registry.register(ENCHANTMENT_POST_KILL_EFFECTS, id("rampage"), RampageEffect.CODEC);
     public static final MapCodec<WeakeningEffect> WEAKENING_EFFECT = Registry.register(Registries.ENCHANTMENT_ENTITY_EFFECT_TYPE, id("weakening"), WeakeningEffect.CODEC);
 
-    static {
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.RIPTIDE_EXCLUSIVE_SET.id(), new Color(160, 255, 255));
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.DAMAGE_EXCLUSIVE_SET.id(), new Color(115, 40, 40));
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.ARMOR_EXCLUSIVE_SET.id(), new Color(200, 145, 255));
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.BOOTS_EXCLUSIVE_SET.id(), new Color(0, 145, 255));
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.BOW_EXCLUSIVE_SET.id(), new Color(0, 165, 130));
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.CROSSBOW_EXCLUSIVE_SET.id(), new Color(0, 110, 130));
-        EXCLUSIVE_SET_COLORS.put(EnchantmentTags.MINING_EXCLUSIVE_SET.id(), new Color(255, 230, 0));
-        EXCLUSIVE_SET_COLORS.put(INFLICT_EXCLUSIVE_SET.id(), new Color(170, 45, 45));
-        EXCLUSIVE_SET_COLORS.put(CONDITIONAL_EXCLUSIVE_SET.id(), new Color(145, 50, 115));
-        EXCLUSIVE_SET_COLORS.put(ROLL_EXCLUSIVE_SET.id(), new Color(140, 203, 255));
-    }
-
     public static final SmithingTemplateItem REFORGE_SMITHING_TEMPLATE = item("reforge_smithing_template", new SmithingTemplateItem(
             Text.translatable("item.dominance.reforge_smithing_template.applies_to").formatted(Formatting.BLUE),
             Text.translatable("item.dominance.reforge_smithing_template.ingredients").formatted(Formatting.BLUE),
@@ -350,6 +329,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     @Override
     @SuppressWarnings("unchecked")
     public void onInitialize() {
+        FabricDefaultAttributeRegistry.register(ROYAL_GUARD, RoyalGuardEntity.createRoyalGuardAttributes());
         DynamicRegistries.registerSynced(REFORGE_KEY, Reforge.Factory.CODEC);
         ModelPredicateProviderRegistry.register(
                 ROYAL_GUARD_SHIELD,
@@ -483,170 +463,6 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerForPlayers(PLAYER_DATA, DominancePlayerData::new, RespawnCopyStrategy.NEVER_COPY);
-    }
-
-    public static void attack(PlayerEntity player, Entity target) {
-        float damage = player.isUsingRiptide() ? player.riptideAttackDamage : (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-        ItemStack weapon = player.getWeaponStack();
-        DamageSource source = player.getDamageSources().playerAttack(player);
-        damage += weapon.getItem().getBonusAttackDamage(target, damage, source);
-        damage = player.getDamageAgainst(target, damage, source);
-        damage *= player.getAttackCooldownProgress(0.5f);
-        player.resetLastAttackedTicks();
-
-        if (target.getType().isIn(EntityTypeTags.REDIRECTABLE_PROJECTILE)
-                && target instanceof ProjectileEntity proj
-                && proj.deflect(ProjectileDeflection.REDIRECTED, player, player, true)) {
-            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory());
-        } else {
-            if (damage > 0) {
-                boolean knockback;
-
-                if (player.isSprinting()) {
-                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0F, 1.0F);
-                    knockback = true;
-                } else {
-                    knockback = false;
-                }
-
-                boolean crit = player.fallDistance > 0.0F
-                        && !player.isOnGround()
-                        && !player.isClimbing()
-                        && !player.isTouchingWater()
-                        && !player.hasStatusEffect(StatusEffects.BLINDNESS)
-                        && !player.hasVehicle()
-                        && target instanceof LivingEntity;
-                if (crit) {
-                    damage *= 1.25f;
-                }
-
-                boolean sweep = false;
-                double d = player.horizontalSpeed - player.prevHorizontalSpeed;
-
-                if (!crit && !knockback && player.isOnGround() && d < player.getMovementSpeed()) {
-                    ItemStack itemStack2 = player.getStackInHand(Hand.MAIN_HAND);
-
-                    if (itemStack2.getItem() instanceof SwordItem) {
-                        sweep = true;
-                    }
-                }
-
-                float hp = 0.0F;
-                if (target instanceof LivingEntity livingEntity) {
-                    hp = livingEntity.getHealth();
-                }
-
-                Vec3d vec3d = target.getVelocity();
-                boolean bl5 = target.damage(source, damage);
-
-                if (bl5) {
-                    if (player instanceof ServerPlayerEntity serverPlayer) {
-                        ServerPlayNetworking.send(serverPlayer, new DamageParticleS2C(target, serverPlayer, damage));
-                    }
-
-                    float k = player.getKnockbackAgainst(target, source) + (knockback ? 1.0F : 0.0F);
-
-                    if (k > 0.0F) {
-                        if (target instanceof LivingEntity livingEntity2) {
-                            livingEntity2.takeKnockback(
-                                    k * 0.5F, MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)), -MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0))
-                            );
-                        } else {
-                            target.addVelocity(
-                                    -MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)) * k * 0.5F, 0.1, MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0)) * k * 0.5F
-                            );
-                        }
-
-                        player.setVelocity(player.getVelocity().multiply(0.6, 1.0, 0.6));
-                        player.setSprinting(false);
-                    }
-
-                    if (sweep) {
-                        for (LivingEntity livingEntity3 : player.getWorld().getNonSpectatingEntities(LivingEntity.class, target.getBoundingBox().expand(1.0, 0.25, 1.0))) {
-                            if (livingEntity3 != player
-                                    && livingEntity3 != target
-                                    && !player.isTeammate(livingEntity3)
-                                    && (!(livingEntity3 instanceof ArmorStandEntity) || !((ArmorStandEntity)livingEntity3).isMarker())
-                                    && player.squaredDistanceTo(livingEntity3) < 9.0) {
-                                livingEntity3.takeKnockback(
-                                        0.4F, MathHelper.sin(player.getYaw() * (float) (Math.PI / 180.0)), -MathHelper.cos(player.getYaw() * (float) (Math.PI / 180.0))
-                                );
-
-                                if (livingEntity3.damage(source, damage * (float) player.getAttributeValue(EntityAttributes.PLAYER_SWEEPING_DAMAGE_RATIO)) && player instanceof ServerPlayerEntity serverPlayer) {
-                                    ServerPlayNetworking.send(serverPlayer, new DamageParticleS2C(target, serverPlayer, damage));
-                                }
-
-                                if (player.getWorld() instanceof ServerWorld serverWorld) {
-                                    EnchantmentHelper.onTargetDamaged(serverWorld, livingEntity3, source);
-                                }
-                            }
-                        }
-
-                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
-                        player.spawnSweepAttackParticles();
-                    }
-
-                    if (target instanceof ServerPlayerEntity && target.velocityModified) {
-                        ((ServerPlayerEntity)target).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(target));
-                        target.velocityModified = false;
-                        target.setVelocity(vec3d);
-                    }
-
-                    if (damage > 30) {
-                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0F, 1.0F);
-                        player.addCritParticles(target);
-                    } else if (crit) {
-                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
-                        player.addCritParticles(target);
-                    } else {
-                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0F, 1.0F);
-                    }
-
-                    player.onAttacking(target);
-                    Entity entity = target;
-                    if (target instanceof EnderDragonPart) {
-                        entity = ((EnderDragonPart)target).owner;
-                    }
-
-                    boolean bl6 = false;
-                    if (player.getWorld() instanceof ServerWorld serverWorld2) {
-                        if (entity instanceof LivingEntity livingEntity3x) {
-                            bl6 = weapon.postHit(livingEntity3x, player);
-                        }
-
-                        EnchantmentHelper.onTargetDamaged(serverWorld2, target, source);
-                    }
-
-                    if (!player.getWorld().isClient && !weapon.isEmpty() && entity instanceof LivingEntity) {
-                        if (bl6) {
-                            weapon.postDamageEntity((LivingEntity) entity, player);
-                        }
-
-                        if (weapon.isEmpty()) {
-                            if (weapon == player.getMainHandStack()) {
-                                player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
-                            } else {
-                                player.setStackInHand(Hand.OFF_HAND, ItemStack.EMPTY);
-                            }
-                        }
-                    }
-
-                    if (target instanceof LivingEntity) {
-                        float n = hp - ((LivingEntity)target).getHealth();
-                        player.increaseStat(Stats.DAMAGE_DEALT, Math.round(n * 10.0F));
-                        if (player.getWorld() instanceof ServerWorld && n > 2.0F) {
-                            int o = (int)(n * 0.5);
-                            ((ServerWorld)player.getWorld())
-                                    .spawnParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5), target.getZ(), o, 0.1, 0.0, 0.1, 0.2);
-                        }
-                    }
-
-                    player.addExhaustion(0.1F);
-                } else {
-                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0F, 1.0F);
-                }
-            }
-        }
     }
 
     public static void reforges(Registerable<Reforge.Factory<?>> registerable) {
@@ -852,7 +668,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(AMBUSH, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                6,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -866,7 +682,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(COMMITTED, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                1,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -880,7 +696,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(COWARDICE, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -893,7 +709,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(DYNAMO, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -906,7 +722,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(EXPLODING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                1,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -920,7 +736,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(FREEZING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -940,7 +756,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(GRAVITY, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                1,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -953,8 +769,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                 .build(GRAVITY.getValue()));
         registerable.register(BANE_OF_ILLAGERS, Enchantment.builder(
                         Enchantment.definition(
-                                items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                3,
+                                items.getOrThrow(ItemTags.SHARP_WEAPON_ENCHANTABLE),
+                                6,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -974,7 +790,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(LEECHING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -987,7 +803,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(RAMPAGE, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                1,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -1001,7 +817,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(WEAKENING, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.SWORD_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -1016,7 +832,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(ACROBAT, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
-                                1,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -1038,7 +854,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(FIRE_TRAIL, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -1060,7 +876,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(RECKLESS, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
-                                1,
+                                2,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),
@@ -1090,7 +906,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         registerable.register(SWIFT_FOOTED, Enchantment.builder(
                         Enchantment.definition(
                                 items.getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE),
-                                2,
+                                4,
                                 3,
                                 Enchantment.leveledCost(1, 11),
                                 Enchantment.leveledCost(21, 11),

@@ -1,17 +1,12 @@
 package net.typho.dominance.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.component.ComponentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.enchants.DamageModifier;
 import net.typho.dominance.enchants.EnchantmentModifyDamageEffect;
@@ -22,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.awt.*;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,23 +48,5 @@ public abstract class EnchantmentMixin {
         for (DamageModifier modifier : modifiers) {
             modifier.accept(damage);
         }
-    }
-
-    @ModifyReturnValue(
-            method = "getName",
-            at = @At("RETURN")
-    )
-    private static Text getName(Text original, @Local(argsOnly = true) RegistryEntry<Enchantment> enchant) {
-        TagKey<Enchantment> tag = enchant.value().exclusiveSet().getTagKey().orElse(null);
-
-        if (tag != null) {
-            Color color = Dominance.EXCLUSIVE_SET_COLORS.get(tag.id());
-
-            if (color != null) {
-                return original.copy().styled(style -> style.withColor(color.getRGB()));
-            }
-        }
-
-        return original;
     }
 }

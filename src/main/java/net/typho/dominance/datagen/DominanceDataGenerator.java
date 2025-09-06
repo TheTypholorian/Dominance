@@ -13,8 +13,8 @@ public class DominanceDataGenerator implements DataGeneratorEntrypoint {
 
         pack.addProvider(GenRecipes::new);
         pack.addProvider(GenItemTags::new);
-        pack.addProvider(GenArmorMaterialTags::new);
         pack.addProvider(GenEnchantmentTags::new);
+        pack.addProvider(GenArmorMaterialTags::new);
         pack.addProvider(GenRegistries::new);
     }
 

@@ -2,6 +2,7 @@ package net.typho.dominance.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
@@ -61,5 +62,10 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .addOptionalTag(ItemTags.ARMOR_ENCHANTABLE);
         getOrCreateTagBuilder(Dominance.MELEE_REFORGABLE)
                 .addOptionalTag(ItemTags.SWORD_ENCHANTABLE);
+
+        getOrCreateTagBuilder(Dominance.CROSSBOWS)
+                .add(Items.CROSSBOW)
+                .add(Dominance.BURST_CROSSBOW)
+                .add(Dominance.HEAVY_CROSSBOW);
     }
 }

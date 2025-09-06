@@ -27,6 +27,7 @@
     "client.AtlasLoaderMixin",
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
+    "client.HeldItemRendererMixin",
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",
     "client.LivingEntityRendererMixin"

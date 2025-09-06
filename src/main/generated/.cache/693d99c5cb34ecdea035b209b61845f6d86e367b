@@ -1,10 +1,11 @@
-// 1.21.1	2025-09-06T10:45:06.5667664	Orb of Dominance/Tags for minecraft:item
+// 1.21.1	2025-09-06T11:00:21.5665395	Orb of Dominance/Tags for minecraft:item
 917dbe79c8b6766d917dc5a1e4922f42e54df361 data\minecraft\tags\item\foot_armor.json
 12c6001130b060ac9f4eb30328fe37f343422591 data\minecraft\tags\item\enchantable\sharp_weapon.json
 294e5ba6612946c213961bdbcdac061f9ad71266 data\minecraft\tags\item\chest_armor.json
 26157bd2b00ffb47dc4150037cb6ee495b76a394 data\minecraft\tags\item\head_armor.json
 f00e20cec02e395a19e2c67d239085bad90be737 data\dominance\tags\item\reforgable\melee.json
 3c83e9733efb792d81a499e8aaa118afcbc68ae3 data\minecraft\tags\item\enchantable\crossbow.json
+d8c9d62a9d2650ac8eeacd7f007c2477ccd7734c data\dominance\tags\item\crossbows.json
 53d14867890456969eff9bedb927ae0fcb5bcbae data\c\tags\item\tools\shields.json
 dfe28234252b4d7c29b8fba4091d6d90987561b7 data\dominance\tags\item\reforgable\any.json
 225ee24cdbb7c051d8bf467bef1e2fd4e76d21c2 data\minecraft\tags\item\swords.json

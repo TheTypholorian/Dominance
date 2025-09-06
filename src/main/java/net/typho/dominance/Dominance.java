@@ -123,6 +123,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final TagKey<Item> ANY_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/any"));
     public static final TagKey<Item> ARMOR_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/armor"));
     public static final TagKey<Item> MELEE_REFORGABLE = TagKey.of(RegistryKeys.ITEM, id("reforgable/melee"));
+    public static final TagKey<Item> CROSSBOWS = TagKey.of(RegistryKeys.ITEM, id("crossbows"));
 
     public static final RecipeSerializer<ReforgeRecipe> REFORGE_RECIPE = Registry.register(Registries.RECIPE_SERIALIZER, id("reforge"), new ReforgeRecipe.Serializer());
 
@@ -224,6 +225,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             .vehicleAttachment(-0.6F)
             .maxTrackingRange(8)
             .build("royal_guard"));
+    public static final SpawnEggItem ROYAL_GUARD_SPAWN_EGG = item("royal_guard_spawn_egg", new SpawnEggItem(ROYAL_GUARD, 0x3C3C3C, 0xFFC444, new Item.Settings()));
 
     public static final ComponentKey<DominancePlayerData> PLAYER_DATA = ComponentRegistryV3.INSTANCE.getOrCreate(id("player_data"), DominancePlayerData.class);
 
@@ -363,6 +365,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(HEAVY_CROSSBOW);
             entries.add(HUNTING_BOW);
             entries.add(REFORGE_SMITHING_TEMPLATE);
+            entries.add(ROYAL_GUARD_SPAWN_EGG);
         });
         LootTableEvents.MODIFY.register((key, builder, source, wrapperLookup) -> {
             if (key == LootTables.BASTION_TREASURE_CHEST) {

@@ -204,12 +204,11 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final EvocationRobeItem EVOCATION_ROBE = item("evocation_robe", new EvocationRobeItem(EVOCATION_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(22)).rarity(Rarity.EPIC)));
     public static final PiglinArmorItem PIGLIN_HELMET = item("piglin_helmet", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxDamage(ArmorItem.Type.HELMET.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
     public static final PiglinArmorItem PIGLIN_CHESTPLATE = item("piglin_chestplate", new PiglinArmorItem(PIGLIN_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().maxDamage(ArmorItem.Type.CHESTPLATE.getMaxDamage(15)).rarity(Rarity.UNCOMMON)));
-    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(14, -3.6))));
-    public static final SplashWeaponItem BASTION_BUSTER = item("bastion_buster", new SplashWeaponItem(4, 6, 1, new Item.Settings().maxDamage(600).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(15, -3.6))));
-    public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 2, -2f))));
+    public static final SplashWeaponItem GREAT_HAMMER = item("great_hammer", new SplashWeaponItem(3, 5, 1, new Item.Settings().maxDamage(500).rarity(Rarity.RARE).attributeModifiers(weaponAttributes(14, -3))));
+    public static final SplashWeaponItem BASTION_BUSTER = item("bastion_buster", new SplashWeaponItem(4, 6, 1, new Item.Settings().maxDamage(600).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(15, -3))));
+    public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 4, -2f))));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(465)));
     public static final HuntingBowItem HUNTING_BOW = item("hunting_bow", new HuntingBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(384)));
-
 
     static {
         ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()

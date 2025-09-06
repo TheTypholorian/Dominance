@@ -32,16 +32,14 @@ public class DamageParticle extends Particle {
         MatrixStack matrices = new MatrixStack();
         matrices.push();
         matrices.translate(
-                //this.velocityX + (this.x - this.velocityX) * tickDelta - camera.getPos().x,
-                //this.velocityY + (this.y - this.velocityY) * tickDelta - camera.getPos().y,
-                //this.velocityZ + (this.z - this.velocityZ) * tickDelta - camera.getPos().z
                 x + velocityX * tickDelta - camera.getPos().x,
                 y + velocityY * tickDelta - camera.getPos().y,
                 z + velocityZ * tickDelta - camera.getPos().z
         );
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.scale(-0.02f, -0.02f, 0.02f);
+        float scale = 0.02f * MathHelper.clamp(1 - (float) age / maxAge, 0, 1);
+        matrices.scale(-scale, -scale, scale);
 
         Text text = Text.literal(String.valueOf((int) params.damage));
 
@@ -49,7 +47,7 @@ public class DamageParticle extends Particle {
                 text,
                 -MinecraftClient.getInstance().textRenderer.getWidth(text) / 2f,
                 0,
-                ((int) (MathHelper.clamp(1 - (float) age / maxAge, 0, 1) * 255) << 24) | Objects.requireNonNull(Formatting.RED.getColorValue()),
+                Objects.requireNonNull(Formatting.RED.getColorValue()),
                 false,
                 matrices.peek().getPositionMatrix(),
                 MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers(),

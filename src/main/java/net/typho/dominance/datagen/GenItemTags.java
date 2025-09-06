@@ -49,7 +49,8 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
                 .add(Dominance.BASTION_BUSTER);
         getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE)
                 .addOptionalTag(ItemTags.BOW_ENCHANTABLE)
-                .add(Dominance.BURST_CROSSBOW);
+                .add(Dominance.BURST_CROSSBOW)
+                .add(Dominance.HEAVY_CROSSBOW);
         getOrCreateTagBuilder(ItemTags.BOW_ENCHANTABLE)
                 .add(Dominance.HUNTING_BOW);
 

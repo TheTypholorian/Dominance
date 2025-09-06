@@ -195,6 +195,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final SplashWeaponItem BASTION_BUSTER = item("bastion_buster", new SplashWeaponItem(4, 6, 1, new Item.Settings().maxCount(1).maxDamage(600).rarity(Rarity.EPIC).attributeModifiers(weaponAttributes(15, -2.8))));
     public static final SwordItem KATANA = item("katana", new SwordItem(ToolMaterials.IRON, new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON).attributeModifiers(SwordItem.createAttributeModifiers(ToolMaterials.IRON, 4, -2f))));
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(465)));
+    public static final HeavyCrossbowItem HEAVY_CROSSBOW = item("heavy_crossbow", new HeavyCrossbowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(465)));
     public static final HuntingBowItem HUNTING_BOW = item("hunting_bow", new HuntingBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(384)));
 
     static {
@@ -359,6 +360,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(BASTION_BUSTER);
             entries.add(KATANA);
             entries.add(BURST_CROSSBOW);
+            entries.add(HEAVY_CROSSBOW);
             entries.add(HUNTING_BOW);
             entries.add(REFORGE_SMITHING_TEMPLATE);
         });

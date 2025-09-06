@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "dominance:item/heavy_crossbow_pulling_2"
+  }
+}

@@ -83,6 +83,23 @@ public class DominanceClient implements ClientModInitializer {
             ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
             return chargedProjectilesComponent != null && chargedProjectilesComponent.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
         });
+        ModelPredicateProviderRegistry.register(Dominance.HEAVY_CROSSBOW, Identifier.ofVanilla("pull"), (stack, world, entity, seed) -> {
+            if (entity == null) {
+                return 0.0F;
+            } else {
+                return CrossbowItem.isCharged(stack) ? 0.0F : (float)(stack.getMaxUseTime(entity) - entity.getItemUseTimeLeft()) / CrossbowItem.getPullTime(stack, entity);
+            }
+        });
+        ModelPredicateProviderRegistry.register(
+                Dominance.HEAVY_CROSSBOW,
+                Identifier.ofVanilla("pulling"),
+                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F
+        );
+        ModelPredicateProviderRegistry.register(Dominance.HEAVY_CROSSBOW, Identifier.ofVanilla("charged"), (stack, world, entity, seed) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(Dominance.HEAVY_CROSSBOW, Identifier.ofVanilla("firework"), (stack, world, entity, seed) -> {
+            ChargedProjectilesComponent chargedProjectilesComponent = stack.get(DataComponentTypes.CHARGED_PROJECTILES);
+            return chargedProjectilesComponent != null && chargedProjectilesComponent.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+        });
         ModelPredicateProviderRegistry.register(Dominance.HUNTING_BOW, Identifier.ofVanilla("pull"), (stack, world, entity, seed) -> {
             if (entity == null) {
                 return 0.0F;

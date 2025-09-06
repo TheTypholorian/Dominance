@@ -64,7 +64,7 @@ public class RoyalGuardEntity extends VindicatorEntity {
         return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 12)
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 30)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 32)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5);
     }
 

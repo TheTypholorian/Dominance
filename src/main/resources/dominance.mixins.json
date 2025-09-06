@@ -20,6 +20,7 @@
     "ShaderImportProcessorMixin",
     "VeilMultiBindMixin",
     "VeilShaderSourceMixin",
+    "VindicatorEntityMixin",
     "client.ItemStackMixin",
     "client.PlayerEntityMixin"
   ],
@@ -27,6 +28,8 @@
     "client.AtlasLoaderMixin",
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
+    "client.EntityModelsMixin",
+    "client.EntityRenderersMixin",
     "client.HeldItemRendererMixin",
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",

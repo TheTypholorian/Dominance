@@ -11,8 +11,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
@@ -46,7 +48,9 @@ public class DominanceClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(Dominance.ROYAL_GUARD, RoyalGuardEntityRenderer::new);
+        EntityRendererRegistry.register(EntityType.VINDICATOR, VindicatorEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ROYAL_GUARD_LAYER, RoyalGuardEntity::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(EntityModelLayers.VINDICATOR, RoyalGuardEntity::getTexturedModelData);
         ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         HudRenderCallback.EVENT.register((context, tickCounter) -> {

@@ -15,6 +15,10 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -102,6 +106,10 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
     public static <T extends Item> T item(String id, T item) {
         return Registry.register(Registries.ITEM, id(id), item);
+    }
+
+    public static <T extends Block> T block(String id, T block) {
+        return Registry.register(Registries.BLOCK, id(id), block);
     }
 
     public static AttributeModifiersComponent weaponAttributes(double damage, double speed) {
@@ -236,6 +244,9 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         modelPartData.addChild("handle", ModelPartBuilder.create().uv(30, 0).cuboid(-1.0F, -3.0F, -1.0F, 2.0F, 6.0F, 6.0F), ModelTransform.NONE);
         ROYAL_GUARD_SHIELD_MODEL = new ShieldEntityModel(TexturedModelData.of(modelData, 64, 64).createModel());
     }
+
+    public static final RoyalGuardStatueBlock ROYAL_GUARD_STATUE = block("royal_guard_statue", new RoyalGuardStatueBlock(AbstractBlock.Settings.copy(Blocks.TUFF)));
+    public static final BlockEntityType<RoyalGuardStatueBlockEntity> ROYAL_GUARD_STATUE_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("royal_guard_statue"), BlockEntityType.Builder.create(RoyalGuardStatueBlockEntity::new, ROYAL_GUARD_STATUE).build());
 
     public static final RegistryEntry<StatusEffect> RAMPAGE_STATUS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, id("rampage"), new RampageStatusEffect(StatusEffectCategory.BENEFICIAL, 0x660000));
 

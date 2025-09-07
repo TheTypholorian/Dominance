@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.component.DataComponentTypes;
@@ -25,7 +27,13 @@ import net.typho.dominance.DamageParticleS2C;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.DominancePlayerData;
 import net.typho.dominance.RoyalGuardEntity;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class DominanceClient implements ClientModInitializer {
     public static final KeyBinding SAVE_LIGHTMAP = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -45,14 +53,76 @@ public class DominanceClient implements ClientModInitializer {
     ));
     public static final EntityModelLayer ROYAL_GUARD_LAYER = new EntityModelLayer(Dominance.id("royal_guard"), "main");
 
+    public static BiConsumer<VertexConsumer, Integer> loadObj(String input) {
+        List<Vector3f> vertices = new LinkedList<>();
+        List<Vector2f> texCoords = new LinkedList<>();
+        List<Vector3f> normals = new LinkedList<>();
+
+        record Vertex(int v, int tc, int n) {
+            public Vertex(String s) {
+                this(s.split("/"));
+            }
+
+            public Vertex(String[] s) {
+                this(Integer.parseInt(s[0]) - 1, Integer.parseInt(s[1]) - 1, Integer.parseInt(s[2]) - 1);
+            }
+
+            public void accept(List<Vector3f> vertices, List<Vector2f> texCoords, List<Vector3f> normals, int light, VertexConsumer builder) {
+                Vector2f texCoord = texCoords.get(tc);
+                Vector3f normal = normals.get(n);
+                builder.vertex(vertices.get(v)).color(1f, 1f, 1f, 1f).overlay(0, 0).light(0xF0).texture(texCoord.x, 1 - texCoord.y).normal(normal.x, normal.y, normal.z);
+            }
+        }
+
+        record Face(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
+        }
+
+        List<Face> faces = new LinkedList<>();
+
+        for (String line : input.split("\n")) {
+            String[] tokens = line.split("\\s+");
+
+            if (tokens.length > 0) {
+                switch (tokens[0]) {
+                    case "v": {
+                        vertices.add(new Vector3f(Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])));
+                        break;
+                    }
+                    case "vt": {
+                        texCoords.add(new Vector2f(Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2])));
+                        break;
+                    }
+                    case "vn": {
+                        normals.add(new Vector3f(Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])));
+                        break;
+                    }
+                    case "f": {
+                        faces.add(new Face(new Vertex(tokens[1]), new Vertex(tokens[2]), new Vertex(tokens[3]), new Vertex(tokens[4])));
+                        break;
+                    }
+                }
+            }
+        }
+
+        return (builder, light) -> {
+            for (Face face : faces) {
+                face.v1.accept(vertices, texCoords, normals, light, builder);
+                face.v2.accept(vertices, texCoords, normals, light, builder);
+                face.v3.accept(vertices, texCoords, normals, light, builder);
+                face.v4.accept(vertices, texCoords, normals, light, builder);
+            }
+        };
+    }
+
     @Override
     public void onInitializeClient() {
+        EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         EntityRendererRegistry.register(Dominance.ROYAL_GUARD, RoyalGuardEntityRenderer::new);
         EntityRendererRegistry.register(EntityType.VINDICATOR, VindicatorEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(ROYAL_GUARD_LAYER, RoyalGuardEntity::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(EntityModelLayers.VINDICATOR, RoyalGuardEntity::getTexturedModelData);
         ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);
-        EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
+        BlockEntityRendererFactories.register(Dominance.ROYAL_GUARD_STATUE_BLOCK_ENTITY, ctx -> new RoyalGuardStatueBlockEntityRenderer());
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             if (MinecraftClient.getInstance().interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
                 PlayerEntity player = MinecraftClient.getInstance().player;

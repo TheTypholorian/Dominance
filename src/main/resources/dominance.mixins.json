@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AxeItemMixin",
+    "CarpetBlockMixin",
     "EnchantLootFunctionsMixin",
     "EnchantmentHelperMixin",
     "EnchantmentMixin",
@@ -25,6 +26,7 @@
     "client.PlayerEntityMixin"
   ],
   "client": [
+    "SectionBuilderMixin",
     "client.AtlasLoaderMixin",
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",

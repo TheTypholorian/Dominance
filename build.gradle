@@ -43,6 +43,10 @@ repositories {
         name "KosmX's maven"
         url 'https://maven.kosmx.dev/'
     }
+
+    maven {
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 dependencies {
@@ -65,6 +69,8 @@ dependencies {
     include "org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
 
     include modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim_version}")
+
+    include modImplementation("maven.modrinth:moonlight:${project.moonlight_version}")
 }
 
 processResources {

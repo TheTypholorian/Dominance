@@ -15,10 +15,9 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -80,6 +79,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldAccess;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.*;
@@ -125,6 +126,16 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
                         AttributeModifierSlot.MAINHAND
                 )
                 .build();
+    }
+
+    public static boolean alternateCarpetModel(BlockPos pos, WorldAccess world) {
+        BlockState state = world.getBlockState(pos.down());
+
+        if (!(state.getBlock() instanceof StairsBlock)) {
+            return false;
+        }
+
+        return state.get(StairsBlock.HALF) == BlockHalf.BOTTOM;
     }
 
     public static final TagKey<ArmorMaterial> PIGLIN_NEUTRAL = TagKey.of(RegistryKeys.ARMOR_MATERIAL, id("piglin_neutral"));

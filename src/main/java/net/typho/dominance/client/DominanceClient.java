@@ -2,6 +2,7 @@ package net.typho.dominance.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -116,6 +117,7 @@ public class DominanceClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModelLoadingPlugin.register(context -> context.addModels(Dominance.id("block/carpet_inside"), Dominance.id("block/carpet_outside"), Dominance.id("block/carpet_side")));
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         EntityRendererRegistry.register(Dominance.ROYAL_GUARD, RoyalGuardEntityRenderer::new);
         EntityRendererRegistry.register(EntityType.VINDICATOR, VindicatorEntityRenderer::new);

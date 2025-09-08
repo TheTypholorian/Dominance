@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.Objects;
 
@@ -29,16 +30,18 @@ public class DamageParticle extends Particle {
 
     @Override
     public void buildGeometry(VertexConsumer consumer, Camera camera, float tickDelta) {
-        MatrixStack matrices = new MatrixStack();
-        matrices.push();
-        matrices.translate(
+        Vec3d vec = new Vec3d(
                 x + velocityX * tickDelta - camera.getPos().x,
                 y + velocityY * tickDelta - camera.getPos().y,
                 z + velocityZ * tickDelta - camera.getPos().z
-        );
+        ).normalize();
+
+        MatrixStack matrices = new MatrixStack();
+        matrices.push();
+        matrices.translate(vec.x, vec.y, vec.z);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        float scale = 0.02f * MathHelper.clamp(1 - (float) age / maxAge, 0, 1);
+        float scale = 0.01f * MathHelper.clamp(1 - (float) age / maxAge, 0, 1);
         matrices.scale(-scale, -scale, scale);
 
         Text text = Text.literal(String.valueOf((int) params.damage));

@@ -217,6 +217,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final BurstCrossbowItem BURST_CROSSBOW = item("burst_crossbow", new BurstCrossbowItem(new Item.Settings().rarity(Rarity.RARE).maxCount(1).maxDamage(465)));
     public static final HeavyCrossbowItem HEAVY_CROSSBOW = item("heavy_crossbow", new HeavyCrossbowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(465)));
     public static final HuntingBowItem HUNTING_BOW = item("hunting_bow", new HuntingBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(1).maxDamage(384)));
+    public static final CorruptedBeaconItem CORRUPTED_BEACON = item("corrupted_beacon", new CorruptedBeaconItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1)));
 
     static {
         ARMOR_SET_BONUSES.put(Set.of(ROYAL_GUARD_HELMET, ROYAL_GUARD_CHESTPLATE, ROYAL_GUARD_BOOTS), AttributeModifiersComponent.builder()
@@ -386,6 +387,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(BURST_CROSSBOW);
             entries.add(HEAVY_CROSSBOW);
             entries.add(HUNTING_BOW);
+            entries.add(CORRUPTED_BEACON);
             entries.add(REFORGE_SMITHING_TEMPLATE);
             entries.add(ROYAL_GUARD_SPAWN_EGG);
         });

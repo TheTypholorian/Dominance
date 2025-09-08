@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.BlockHalf;
@@ -81,6 +82,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
+import net.typho.dominance.client.CorruptedBeaconParticleEffect;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
 import net.typho.dominance.gear.*;
@@ -262,17 +264,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
 
     public static final RegistryEntry<StatusEffect> RAMPAGE_STATUS_EFFECT = Registry.registerReference(Registries.STATUS_EFFECT, id("rampage"), new RampageStatusEffect(StatusEffectCategory.BENEFICIAL, 0x660000));
 
-    public static final ParticleType<DamageParticleEffect> DAMAGE_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, id("damage"), new ParticleType<DamageParticleEffect>(true) {
-        @Override
-        public MapCodec<DamageParticleEffect> getCodec() {
-            return DamageParticleEffect.createCodec(this);
-        }
-
-        @Override
-        public PacketCodec<? super RegistryByteBuf, DamageParticleEffect> getPacketCodec() {
-            return DamageParticleEffect.createPacketCodec(this);
-        }
-    });
+    public static final ParticleType<DamageParticleEffect> DAMAGE_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, id("damage"), FabricParticleTypes.complex(false, DamageParticleEffect::createCodec, DamageParticleEffect::createPacketCodec));
+    public static final ParticleType<CorruptedBeaconParticleEffect> CORRUPTED_BEACON_PARTICLE = Registry.register(Registries.PARTICLE_TYPE, id("corrupted_beacon"), FabricParticleTypes.complex(false, CorruptedBeaconParticleEffect::createCodec, CorruptedBeaconParticleEffect::createPacketCodec));
 
     public static final EntityType<OrbEntity> ORB_ENTITY = Registry.register(Registries.ENTITY_TYPE, id("orb"), EntityType.Builder.<OrbEntity>create(OrbEntity::new, SpawnGroup.MISC).dimensions(1f, 1f).build("orb"));
 

@@ -124,6 +124,7 @@ public class DominanceClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ROYAL_GUARD_LAYER, RoyalGuardEntity::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(EntityModelLayers.VINDICATOR, RoyalGuardEntity::getTexturedModelData);
         ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);
+        ParticleFactoryRegistry.getInstance().register(Dominance.CORRUPTED_BEACON_PARTICLE, CorruptedParticle::new);
         BlockEntityRendererFactories.register(Dominance.ROYAL_GUARD_STATUE_BLOCK_ENTITY, ctx -> new RoyalGuardStatueBlockEntityRenderer());
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             if (MinecraftClient.getInstance().interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {

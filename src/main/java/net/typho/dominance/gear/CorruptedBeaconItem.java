@@ -57,7 +57,7 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         Vec3d inc = user.getRotationVector().multiply(0.5f);
 
         for (float f = 0; f < 32; f += 0.5f) {
-            world.addParticle(new DamageParticleEffect(Dominance.DAMAGE_PARTICLE, f), pos.x, pos.y, pos.z, 0, 0, 0);
+            world.addParticle(new DamageParticleEffect(Dominance.CORRUPTED_BEACON_PARTICLE, f), pos.x, pos.y, pos.z, 0, 0, 0);
             pos = pos.add(inc);
         }
     }

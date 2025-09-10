@@ -1,5 +1,6 @@
 package net.typho.dominance.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -8,10 +9,11 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
@@ -21,6 +23,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -28,10 +31,12 @@ import net.typho.dominance.DamageParticleS2C;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.DominancePlayerData;
 import net.typho.dominance.RoyalGuardEntity;
+import net.typho.dominance.gear.CorruptedBeaconItem;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -53,6 +58,16 @@ public class DominanceClient implements ClientModInitializer {
             "key.categories.movement"
     ));
     public static final EntityModelLayer ROYAL_GUARD_LAYER = new EntityModelLayer(Dominance.id("royal_guard"), "main");
+
+    public static BiConsumer<VertexConsumer, Integer> loadObj(ResourceManager manager, Identifier id) {
+        return manager.getResource(id).map(res -> {
+            try {
+                return DominanceClient.loadObj(new String(res.getInputStream().readAllBytes()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).orElseThrow();
+    }
 
     public static BiConsumer<VertexConsumer, Integer> loadObj(String input) {
         List<Vector3f> vertices = new LinkedList<>();
@@ -117,6 +132,36 @@ public class DominanceClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+
+            if (client.player != null && client.world != null && client.player.getActiveItem().getItem() instanceof CorruptedBeaconItem beacon) {
+                float delta = context.tickCounter().getTickDelta(true);
+                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.depthMask(true);
+                RenderSystem.disableCull();
+                RenderSystem.setShaderTexture(0, Dominance.id("textures/item/corrupted_beacon_beam.png"));
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder builder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
+
+                if (builder != null) {
+                    beacon.renderBeam(
+                            client.player,
+                            builder,
+                            context.camera(),
+                            delta
+                    );
+
+                    BuiltBuffer built = builder.endNullable();
+
+                    if (built != null) {
+                        BufferRenderer.drawWithGlobalProgram(built);
+                    }
+                }
+            }
+        });
         ModelLoadingPlugin.register(context -> context.addModels(Dominance.id("block/carpet_inside"), Dominance.id("block/carpet_outside"), Dominance.id("block/carpet_side")));
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
         EntityRendererRegistry.register(Dominance.ROYAL_GUARD, RoyalGuardEntityRenderer::new);
@@ -124,7 +169,6 @@ public class DominanceClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(ROYAL_GUARD_LAYER, RoyalGuardEntity::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(EntityModelLayers.VINDICATOR, RoyalGuardEntity::getTexturedModelData);
         ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);
-        ParticleFactoryRegistry.getInstance().register(Dominance.CORRUPTED_BEACON_PARTICLE, CorruptedParticle::new);
         BlockEntityRendererFactories.register(Dominance.ROYAL_GUARD_STATUE_BLOCK_ENTITY, ctx -> new RoyalGuardStatueBlockEntityRenderer());
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             if (MinecraftClient.getInstance().interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {

@@ -1,5 +1,9 @@
 package net.typho.dominance.gear;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -12,14 +16,17 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.typho.dominance.Dominance;
-import net.typho.dominance.client.DamageParticleEffect;
+import org.joml.Matrix4fStack;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class CorruptedBeaconItem extends Item implements Equipment {
+    public static BiConsumer<VertexConsumer, Integer> BEAM_MODEL;
+
     public CorruptedBeaconItem(Settings settings) {
         super(settings);
     }
@@ -34,12 +41,39 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         return 72000;
     }
 
+    public Vec3d getUsePos(LivingEntity user, float delta) {
+        return new Vec3d(
+                MathHelper.lerp(delta, user.prevX, user.getX()),
+                MathHelper.lerp(delta, user.prevY, user.getY()),
+                MathHelper.lerp(delta, user.prevZ, user.getZ())
+        );
+    }
+
+    public void renderBeam(LivingEntity user, VertexConsumer consumer, Camera camera, float tickDelta) {
+        Vec3d pos = getUsePos(user, tickDelta);
+        Matrix4fStack matrices = RenderSystem.getModelViewStack();
+        matrices.pushMatrix();
+        matrices.translate(
+                (float) (pos.x - camera.getPos().x),
+                (float) (pos.y - camera.getPos().y),
+                (float) (pos.z - camera.getPos().z)
+        );
+        matrices.rotateY((float) Math.toRadians(-user.getYaw(tickDelta)));
+        matrices.rotateX((float) Math.toRadians(user.getPitch(tickDelta)));
+        matrices.scale(1, 1, 32);
+        RenderSystem.applyModelViewMatrix();
+
+        BEAM_MODEL.accept(consumer, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+
+        matrices.popMatrix();
+    }
+
     @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         super.usageTick(world, user, stack, remainingUseTicks);
 
         if (!world.isClient) {
-            Vec3d min = user.getPos();
+            Vec3d min = getUsePos(user, 1f);
             Vec3d max = min.add(user.getRotationVector().multiply(32f));
             Box box = new Box(min, max).expand(1);
 
@@ -51,14 +85,6 @@ public class CorruptedBeaconItem extends Item implements Equipment {
                     target.damage(user.getDamageSources().create(DamageTypes.MAGIC, user), 7.5f);
                 }
             }
-        }
-
-        Vec3d pos = user.getPos();
-        Vec3d inc = user.getRotationVector().multiply(0.5f);
-
-        for (float f = 0; f < 32; f += 0.5f) {
-            world.addParticle(new DamageParticleEffect(Dominance.CORRUPTED_BEACON_PARTICLE, f), pos.x, pos.y, pos.z, 0, 0, 0);
-            pos = pos.add(inc);
         }
     }
 

@@ -9,14 +9,13 @@ import net.minecraft.util.Identifier;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.client.DominanceClient;
 import net.typho.dominance.client.RoyalGuardStatueBlockEntityRenderer;
+import net.typho.dominance.gear.CorruptedBeaconItem;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.io.IOException;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
@@ -32,20 +31,13 @@ public class MinecraftClientMixin {
         resourceManager.registerReloader(new SimpleSynchronousResourceReloadListener() {
             @Override
             public Identifier getFabricId() {
-                return Dominance.id("royal_guard_statue");
+                return Dominance.id("obj_model_loader");
             }
 
             @Override
             public void reload(ResourceManager manager) {
-                manager.getResource(Dominance.id("models/block/royal_guard_statue.obj")).ifPresentOrElse(res -> {
-                    try {
-                        RoyalGuardStatueBlockEntityRenderer.MODEL = DominanceClient.loadObj(new String(res.getInputStream().readAllBytes()));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }, () -> {
-                    throw new NullPointerException("No royal guard statue .obj file");
-                });
+                RoyalGuardStatueBlockEntityRenderer.MODEL = DominanceClient.loadObj(manager, Dominance.id("models/block/royal_guard_statue.obj"));
+                CorruptedBeaconItem.BEAM_MODEL = DominanceClient.loadObj(manager, Dominance.id("models/item/corrupted_beacon_beam.obj"));
             }
         });
     }

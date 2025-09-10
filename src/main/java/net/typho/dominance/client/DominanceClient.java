@@ -1,6 +1,5 @@
 package net.typho.dominance.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -13,7 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
@@ -137,29 +136,12 @@ public class DominanceClient implements ClientModInitializer {
 
             if (client.player != null && client.world != null && client.player.getActiveItem().getItem() instanceof CorruptedBeaconItem beacon) {
                 float delta = context.tickCounter().getTickDelta(true);
-                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.depthMask(true);
-                RenderSystem.disableCull();
-                RenderSystem.setShaderTexture(0, Dominance.id("textures/item/corrupted_beacon_beam.png"));
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder builder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
-
-                if (builder != null) {
                     beacon.renderBeam(
                             client.player,
-                            builder,
+                            context.consumers(),
                             context.camera(),
                             delta
                     );
-
-                    BuiltBuffer built = builder.endNullable();
-
-                    if (built != null) {
-                        BufferRenderer.drawWithGlobalProgram(built);
-                    }
-                }
             }
         });
         ModelLoadingPlugin.register(context -> context.addModels(Dominance.id("block/carpet_inside"), Dominance.id("block/carpet_outside"), Dominance.id("block/carpet_side")));

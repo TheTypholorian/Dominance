@@ -1,9 +1,11 @@
 package net.typho.dominance.gear;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,6 +21,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.typho.dominance.Dominance;
 import org.joml.Matrix4fStack;
 
 import java.util.Optional;
@@ -49,7 +52,7 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         );
     }
 
-    public void renderBeam(LivingEntity user, VertexConsumer consumer, Camera camera, float tickDelta) {
+    public void renderBeam(LivingEntity user, VertexConsumerProvider consumers, Camera camera, float tickDelta) {
         Vec3d pos = getUsePos(user, tickDelta);
         Matrix4fStack matrices = RenderSystem.getModelViewStack();
         matrices.pushMatrix();
@@ -62,8 +65,11 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         matrices.rotateX((float) Math.toRadians(user.getPitch(tickDelta)));
         matrices.scale(1, 1, 32);
         RenderSystem.applyModelViewMatrix();
+        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back")), LightmapTextureManager.MAX_LIGHT_COORDINATE);
 
-        BEAM_MODEL.accept(consumer, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        matrices.scale(1.25f, 1.25f, 1);
+        RenderSystem.applyModelViewMatrix();
+        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front")), LightmapTextureManager.MAX_LIGHT_COORDINATE);
 
         matrices.popMatrix();
     }

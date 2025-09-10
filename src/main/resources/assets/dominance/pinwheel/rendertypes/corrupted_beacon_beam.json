@@ -1,0 +1,27 @@
+{
+  "format": "POSITION",
+  "mode": "QUADS",
+  "bufferSize": "TRANSIENT",
+  "sort": false,
+  "affectsCrumbling": true,
+  "outline": false,
+  "layers": [
+    {
+      "type": "veil:shader",
+      "name": "dominance:corrupted_beacon_beam"
+    },
+    {
+      "type": "minecraft:depth_test",
+      "mode": "always"
+    },
+    {
+      "type": "minecraft:write_mask",
+      "color": true,
+      "depth": true
+    },
+    {
+      "type": "minecraft:cull",
+      "face": "%1$s"
+    }
+  ]
+}

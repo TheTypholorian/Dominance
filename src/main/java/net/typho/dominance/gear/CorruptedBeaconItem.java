@@ -65,11 +65,13 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         matrices.rotateX((float) Math.toRadians(user.getPitch(tickDelta)));
         matrices.scale(1, 1, 32);
         RenderSystem.applyModelViewMatrix();
-        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back")), LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back", Dominance.id("textures/item/corrupted_beacon_beam_inner.png"))), LightmapTextureManager.MAX_LIGHT_COORDINATE);
 
-        matrices.scale(1.25f, 1.25f, 1);
+        matrices.pushMatrix();
+        matrices.rotateZ((float) Math.toRadians(45));
         RenderSystem.applyModelViewMatrix();
-        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front")), LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front", Dominance.id("textures/item/corrupted_beacon_beam_outer.png"))), LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        matrices.popMatrix();
 
         matrices.popMatrix();
     }

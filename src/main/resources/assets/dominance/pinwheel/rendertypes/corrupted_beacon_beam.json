@@ -1,11 +1,17 @@
 {
-  "format": "POSITION",
+  "format": "POSITION_TEX",
   "mode": "QUADS",
   "bufferSize": "TRANSIENT",
   "sort": false,
   "affectsCrumbling": true,
   "outline": false,
   "layers": [
+    {
+      "type": "minecraft:texture",
+      "texture": "%2$s",
+      "blur": false,
+      "mipmap": false
+    },
     {
       "type": "veil:shader",
       "name": "dominance:corrupted_beacon_beam"

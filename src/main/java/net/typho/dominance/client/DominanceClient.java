@@ -22,7 +22,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -35,7 +34,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -57,16 +55,6 @@ public class DominanceClient implements ClientModInitializer {
             "key.categories.movement"
     ));
     public static final EntityModelLayer ROYAL_GUARD_LAYER = new EntityModelLayer(Dominance.id("royal_guard"), "main");
-
-    public static BiConsumer<VertexConsumer, Integer> loadObj(ResourceManager manager, Identifier id) {
-        return manager.getResource(id).map(res -> {
-            try {
-                return DominanceClient.loadObj(new String(res.getInputStream().readAllBytes()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).orElseThrow();
-    }
 
     public static BiConsumer<VertexConsumer, Integer> loadObj(String input) {
         List<Vector3f> vertices = new LinkedList<>();

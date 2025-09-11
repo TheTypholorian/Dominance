@@ -1,6 +1,7 @@
 package net.typho.dominance.client;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -11,6 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
@@ -135,13 +137,28 @@ public class DominanceClient implements ClientModInitializer {
         WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
             MinecraftClient client = MinecraftClient.getInstance();
 
-            if (client.player != null && client.world != null && client.player.getActiveItem().getItem() instanceof CorruptedBeaconItem beacon) {
-                float delta = context.tickCounter().getTickDelta(true);
-                    beacon.renderBeam(
-                            client.player,
-                            context.camera(),
-                            delta
-                    );
+            if (client.world != null) {
+                for (AbstractClientPlayerEntity player : client.world.getPlayers()) {
+                    if (player.getActiveItem().getItem() instanceof CorruptedBeaconItem beacon) {
+                        float delta = context.tickCounter().getTickDelta(true);
+                        beacon.renderBeam(
+                                player,
+                                context.camera(),
+                                delta
+                        );
+                    }
+                }
+            }
+        });
+        ClientTickEvents.START_CLIENT_TICK.register(context -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+
+            if (client.world != null) {
+                for (AbstractClientPlayerEntity player : client.world.getPlayers()) {
+                    if (player.getActiveItem().getItem() instanceof CorruptedBeaconItem beacon) {
+                        beacon.renderBeamEnd(player);
+                    }
+                }
             }
         });
         ModelLoadingPlugin.register(context -> context.addModels(Dominance.id("block/carpet_inside"), Dominance.id("block/carpet_outside"), Dominance.id("block/carpet_side")));

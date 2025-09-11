@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/beacon",
+  "textures": {
+    "beacon": "dominance:item/corrupted_beacon",
+    "obsidian": "minecraft:block/crying_obsidian"
+  }
+}

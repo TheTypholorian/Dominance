@@ -139,7 +139,6 @@ public class DominanceClient implements ClientModInitializer {
                 float delta = context.tickCounter().getTickDelta(true);
                     beacon.renderBeam(
                             client.player,
-                            context.consumers(),
                             context.camera(),
                             delta
                     );

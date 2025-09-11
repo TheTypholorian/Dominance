@@ -18,7 +18,7 @@
     },
     {
       "type": "minecraft:depth_test",
-      "mode": "always"
+      "mode": "lequal"
     },
     {
       "type": "minecraft:write_mask",

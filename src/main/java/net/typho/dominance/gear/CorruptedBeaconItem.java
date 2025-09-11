@@ -2,10 +2,8 @@ package net.typho.dominance.gear;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import foundry.veil.api.client.render.vertex.VertexArray;
+import net.minecraft.client.render.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,10 +17,12 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.typho.dominance.Dominance;
 import org.joml.Matrix4fStack;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -52,7 +52,11 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         );
     }
 
-    public void renderBeam(LivingEntity user, VertexConsumerProvider consumers, Camera camera, float tickDelta) {
+    public float getLength() {
+        return 128;
+    }
+
+    public void renderBeam(LivingEntity user, Camera camera, float tickDelta) {
         Vec3d pos = getUsePos(user, tickDelta);
         Matrix4fStack matrices = RenderSystem.getModelViewStack();
         matrices.pushMatrix();
@@ -63,15 +67,30 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         );
         matrices.rotateY((float) Math.toRadians(-user.getYaw(tickDelta)));
         matrices.rotateX((float) Math.toRadians(user.getPitch(tickDelta)));
-        matrices.scale(1, 1, 32);
-        RenderSystem.applyModelViewMatrix();
-        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back", Dominance.id("textures/item/corrupted_beacon_beam_inner.png"))), LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        matrices.scale(1, 1, getLength());
 
-        matrices.pushMatrix();
-        matrices.rotateZ((float) Math.toRadians(45));
-        RenderSystem.applyModelViewMatrix();
-        BEAM_MODEL.accept(consumers.getBuffer(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front", Dominance.id("textures/item/corrupted_beacon_beam_outer.png"))), LightmapTextureManager.MAX_LIGHT_COORDINATE);
-        matrices.popMatrix();
+        BufferBuilder builder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        BEAM_MODEL.accept(builder, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        try (VertexArray array = VertexArray.create()) {
+            array.upload(builder.end(), VertexArray.DrawUsage.STATIC);
+            array.bind();
+
+            float pulse = (float) Math.sin(GLFW.glfwGetTime() * 8) * 0.75f + 2;
+
+            matrices.pushMatrix();
+            matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) -GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
+            matrices.scaleAround(pulse / 2, pulse / 2, 1, 0, 0.5f, 0);
+            RenderSystem.applyModelViewMatrix();
+            array.drawWithRenderType(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back", Dominance.id("textures/item/corrupted_beacon_beam_inner.png")));
+            matrices.popMatrix();
+
+            matrices.pushMatrix();
+            matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
+            matrices.scaleAround(pulse, pulse, 1, 0, 0.5f, 0);
+            RenderSystem.applyModelViewMatrix();
+            array.drawWithRenderType(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front", Dominance.id("textures/item/corrupted_beacon_beam_outer.png")));
+            matrices.popMatrix();
+        }
 
         matrices.popMatrix();
     }
@@ -82,7 +101,7 @@ public class CorruptedBeaconItem extends Item implements Equipment {
 
         if (!world.isClient) {
             Vec3d min = getUsePos(user, 1f);
-            Vec3d max = min.add(user.getRotationVector().multiply(32f));
+            Vec3d max = min.add(user.getRotationVector().multiply(getLength()));
             Box box = new Box(min, max).expand(1);
 
             for (Entity target : world.getOtherEntities(user, box, Entity::isAttackable)) {

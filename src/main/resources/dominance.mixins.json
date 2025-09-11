@@ -30,6 +30,7 @@
     "client.AtlasLoaderMixin",
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
+    "client.ClientPlayNetworkHandlerMixin",
     "client.EntityModelsMixin",
     "client.EntityRenderersMixin",
     "client.HeldItemRendererMixin",

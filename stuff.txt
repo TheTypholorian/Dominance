@@ -1,4 +1,5 @@
 dominance:highblock/statue_room
+dominance:highblock/throne_room
 
 - glaive
 - starless night

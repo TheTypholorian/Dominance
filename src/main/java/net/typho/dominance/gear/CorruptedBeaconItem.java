@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import foundry.veil.api.client.render.vertex.VertexArray;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -28,10 +28,9 @@ import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 public class CorruptedBeaconItem extends Item implements Equipment {
-    public static BiConsumer<VertexConsumer, Integer> BEAM_MODEL;
+    public static VertexArray BEAM_MODEL;
 
     public CorruptedBeaconItem(Settings settings) {
         super(settings);
@@ -73,29 +72,21 @@ public class CorruptedBeaconItem extends Item implements Equipment {
         matrices.rotateX((float) Math.toRadians(user.getPitch(tickDelta)));
         matrices.scale(1, 1, raycast.getType() == HitResult.Type.MISS ? maxLength() : (float) raycast.getPos().distanceTo(pos));
 
-        BufferBuilder builder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-        BEAM_MODEL.accept(builder, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        float pulse = (float) Math.sin(GLFW.glfwGetTime() * 8) * 0.75f + 2;
 
-        try (VertexArray array = VertexArray.create()) {
-            array.upload(builder.end(), VertexArray.DrawUsage.STATIC);
-            array.bind();
+        matrices.pushMatrix();
+        matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) -GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
+        matrices.scaleAround(pulse / 2, pulse / 2, 1, 0, 0.5f, 0);
+        RenderSystem.applyModelViewMatrix();
+        BEAM_MODEL.drawWithRenderType(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back", Dominance.id("textures/item/corrupted_beacon_beam_inner.png")));
+        matrices.popMatrix();
 
-            float pulse = (float) Math.sin(GLFW.glfwGetTime() * 8) * 0.75f + 2;
-
-            matrices.pushMatrix();
-            matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) -GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
-            matrices.scaleAround(pulse / 2, pulse / 2, 1, 0, 0.5f, 0);
-            RenderSystem.applyModelViewMatrix();
-            array.drawWithRenderType(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "back", Dominance.id("textures/item/corrupted_beacon_beam_inner.png")));
-            matrices.popMatrix();
-
-            matrices.pushMatrix();
-            matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
-            matrices.scaleAround(pulse, pulse, 1, 0, 0.5f, 0);
-            RenderSystem.applyModelViewMatrix();
-            array.drawWithRenderType(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front", Dominance.id("textures/item/corrupted_beacon_beam_outer.png")));
-            matrices.popMatrix();
-        }
+        matrices.pushMatrix();
+        matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
+        matrices.scaleAround(pulse, pulse, 1, 0, 0.5f, 0);
+        RenderSystem.applyModelViewMatrix();
+        BEAM_MODEL.drawWithRenderType(VeilRenderType.get(Dominance.id("corrupted_beacon_beam"), "front", Dominance.id("textures/item/corrupted_beacon_beam_outer.png")));
+        matrices.popMatrix();
 
         matrices.popMatrix();
     }

@@ -10,11 +10,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
@@ -25,6 +28,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
@@ -41,7 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class DominanceClient implements ClientModInitializer {
     public static final KeyBinding SAVE_LIGHTMAP = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -61,7 +64,7 @@ public class DominanceClient implements ClientModInitializer {
     ));
     public static final EntityModelLayer ROYAL_GUARD_LAYER = new EntityModelLayer(Dominance.id("royal_guard"), "main");
 
-    public static BiConsumer<VertexConsumer, Integer> loadObj(ResourceManager manager, Identifier id) {
+    public static ObjModel loadObj(ResourceManager manager, Identifier id) {
         return manager.getResource(id).map(resource -> {
             try (InputStream in = resource.getInputStream()) {
                 return loadObj(new String(in.readAllBytes()));
@@ -71,7 +74,7 @@ public class DominanceClient implements ClientModInitializer {
         }).orElseThrow();
     }
 
-    public static BiConsumer<VertexConsumer, Integer> loadObj(String input) {
+    public static ObjModel loadObj(String input) {
         List<Vector3f> vertices = new LinkedList<>();
         List<Vector2f> texCoords = new LinkedList<>();
         List<Vector3f> normals = new LinkedList<>();
@@ -134,6 +137,18 @@ public class DominanceClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+            @Override
+            public Identifier getFabricId() {
+                return Dominance.id("obj_model_loader");
+            }
+
+            @Override
+            public void reload(ResourceManager manager) {
+                RoyalGuardStatueBlockEntityRenderer.MODEL = DominanceClient.loadObj(manager, Dominance.id("models/block/royal_guard_statue.obj"));
+                CorruptedBeaconItem.BEAM_MODEL = DominanceClient.loadObj(manager, Dominance.id("models/item/corrupted_beacon_beam.obj")).toArray(VertexFormats.POSITION_TEXTURE);
+            }
+        });
         WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
             MinecraftClient client = MinecraftClient.getInstance();
 

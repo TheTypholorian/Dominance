@@ -36,8 +36,7 @@
     "client.HeldItemRendererMixin",
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",
-    "client.LivingEntityRendererMixin",
-    "client.MinecraftClientMixin"
+    "client.LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

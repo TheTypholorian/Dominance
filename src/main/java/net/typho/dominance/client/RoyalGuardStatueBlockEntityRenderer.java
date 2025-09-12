@@ -3,7 +3,6 @@ package net.typho.dominance.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,12 +12,10 @@ import net.typho.dominance.Dominance;
 import net.typho.dominance.RoyalGuardStatueBlockEntity;
 import org.joml.Matrix4fStack;
 
-import java.util.function.BiConsumer;
-
 public class RoyalGuardStatueBlockEntityRenderer implements BlockEntityRenderer<RoyalGuardStatueBlockEntity> {
     public static final Identifier TEXTURE = Dominance.id("textures/entity/illager/royal_guard_statue.png");
     public static final RenderLayer LAYER = RenderLayer.getEntitySolid(TEXTURE);
-    public static BiConsumer<VertexConsumer, Integer> MODEL;
+    public static ObjModel MODEL;
 
     @Override
     public void render(RoyalGuardStatueBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -31,7 +28,7 @@ public class RoyalGuardStatueBlockEntityRenderer implements BlockEntityRenderer<
 
             RenderSystem.applyModelViewMatrix();
 
-            MODEL.accept(vertexConsumers.getBuffer(LAYER), light);
+            MODEL.render(vertexConsumers.getBuffer(LAYER), light);
 
             stack.popMatrix();
         } else {

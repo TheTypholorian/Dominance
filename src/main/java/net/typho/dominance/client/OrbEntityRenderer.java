@@ -78,7 +78,7 @@ public class OrbEntityRenderer extends EntityRenderer<OrbEntity> {
 
                 Matrix4fStack stack1 = RenderSystem.getModelViewStack();
                 stack1.pushMatrix();
-                stack1.translate((float) (entity.getPos().getX() - cam.x - 0.5), (float) (entity.getPos().getY() - cam.y), (float) (entity.getPos().getZ() - cam.z - 0.5));
+                stack1.translate((float) (entity.getPos().getX() - cam.x - 0.5), (float) (entity.getPos().getY() - cam.y + Math.sin(GLFW.glfwGetTime())), (float) (entity.getPos().getZ() - cam.z - 0.5));
                 stack1.rotateAround(new Quaternionf().rotationXYZ((float) GLFW.glfwGetTime(), 0, (float) GLFW.glfwGetTime()), 0.5f, 0.5f, 0.5f);
                 RenderSystem.applyModelViewMatrix();
 

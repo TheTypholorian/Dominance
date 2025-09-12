@@ -74,6 +74,8 @@ public class CorruptedBeaconItem extends Item implements Equipment {
 
         float pulse = (float) Math.sin(GLFW.glfwGetTime() * 8) * 0.75f + 2;
 
+        BEAM_MODEL.bind();
+
         matrices.pushMatrix();
         matrices.rotateAround(RotationAxis.POSITIVE_Z.rotation((float) -GLFW.glfwGetTime() * 4), 0, 0.5f, 0);
         matrices.scaleAround(pulse / 2, pulse / 2, 1, 0, 0.5f, 0);

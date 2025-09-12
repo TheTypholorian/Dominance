@@ -1,5 +1,5 @@
 {
-  "format": "POSITION",
+  "format": "POSITION_TEX",
   "mode": "QUADS",
   "bufferSize": "TRANSIENT",
   "sort": false,

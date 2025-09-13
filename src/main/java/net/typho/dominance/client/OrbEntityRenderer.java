@@ -17,6 +17,58 @@ import org.joml.Quaternionf;
 import org.lwjgl.glfw.GLFW;
 
 public class OrbEntityRenderer extends EntityRenderer<OrbEntity> {
+    public static final VertexArray MODEL = VertexArray.create();
+
+    static {
+        BufferBuilder builder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+
+        for (int k = 0; k < 6; k++) {
+            if (k == 0) {
+                builder.vertex(0f, 0f, 1f);
+                builder.vertex(0f, 1f, 1f);
+                builder.vertex(1f, 1f, 1f);
+                builder.vertex(1f, 0f, 1f);
+            }
+
+            if (k == 1) {
+                builder.vertex(1f, 0f, 1f);
+                builder.vertex(1f, 1f, 1f);
+                builder.vertex(1f, 1f, 0f);
+                builder.vertex(1f, 0f, 0f);
+            }
+
+            if (k == 2) {
+                builder.vertex(1f, 0f, 0f);
+                builder.vertex(1f, 1f, 0f);
+                builder.vertex(0f, 1f, 0f);
+                builder.vertex(0f, 0f, 0f);
+            }
+
+            if (k == 3) {
+                builder.vertex(0f, 0f, 0f);
+                builder.vertex(0f, 1f, 0f);
+                builder.vertex(0f, 1f, 1f);
+                builder.vertex(0f, 0f, 1f);
+            }
+
+            if (k == 4) {
+                builder.vertex(0f, 0f, 0f);
+                builder.vertex(0f, 0f, 1f);
+                builder.vertex(1f, 0f, 1f);
+                builder.vertex(1f, 0f, 0f);
+            }
+
+            if (k == 5) {
+                builder.vertex(0f, 1f, 1f);
+                builder.vertex(0f, 1f, 0f);
+                builder.vertex(1f, 1f, 0f);
+                builder.vertex(1f, 1f, 1f);
+            }
+        }
+
+        MODEL.upload(builder.end(), VertexArray.DrawUsage.STATIC);
+    }
+
     protected OrbEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx);
     }
@@ -27,67 +79,17 @@ public class OrbEntityRenderer extends EntityRenderer<OrbEntity> {
         RenderLayer layer = VeilRenderType.get(Dominance.id("orb"));
 
         if (layer != null) {
-            BufferBuilder builder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            Matrix4fStack stack1 = RenderSystem.getModelViewStack();
+            stack1.pushMatrix();
+            stack1.translate((float) (entity.getPos().getX() - cam.x - 0.5), (float) (entity.getPos().getY() - cam.y + Math.sin(GLFW.glfwGetTime())), (float) (entity.getPos().getZ() - cam.z - 0.5));
+            stack1.rotateAround(new Quaternionf().rotationXYZ((float) GLFW.glfwGetTime(), 0, (float) GLFW.glfwGetTime()), 0.5f, 0.5f, 0.5f);
+            RenderSystem.applyModelViewMatrix();
 
-            for (int k = 0; k < 6; k++) {
-                if (k == 0) {
-                    builder.vertex(0f, 0f, 1f);
-                    builder.vertex(0f, 1f, 1f);
-                    builder.vertex(1f, 1f, 1f);
-                    builder.vertex(1f, 0f, 1f);
-                }
+            MODEL.bind();
+            MODEL.drawWithRenderType(layer);
 
-                if (k == 1) {
-                    builder.vertex(1f, 0f, 1f);
-                    builder.vertex(1f, 1f, 1f);
-                    builder.vertex(1f, 1f, 0f);
-                    builder.vertex(1f, 0f, 0f);
-                }
-
-                if (k == 2) {
-                    builder.vertex(1f, 0f, 0f);
-                    builder.vertex(1f, 1f, 0f);
-                    builder.vertex(0f, 1f, 0f);
-                    builder.vertex(0f, 0f, 0f);
-                }
-
-                if (k == 3) {
-                    builder.vertex(0f, 0f, 0f);
-                    builder.vertex(0f, 1f, 0f);
-                    builder.vertex(0f, 1f, 1f);
-                    builder.vertex(0f, 0f, 1f);
-                }
-
-                if (k == 4) {
-                    builder.vertex(0f, 0f, 0f);
-                    builder.vertex(0f, 0f, 1f);
-                    builder.vertex(1f, 0f, 1f);
-                    builder.vertex(1f, 0f, 0f);
-                }
-
-                if (k == 5) {
-                    builder.vertex(0f, 1f, 1f);
-                    builder.vertex(0f, 1f, 0f);
-                    builder.vertex(1f, 1f, 0f);
-                    builder.vertex(1f, 1f, 1f);
-                }
-            }
-
-            try (VertexArray array = VertexArray.create()) {
-                array.upload(builder.end(), VertexArray.DrawUsage.STATIC);
-
-                Matrix4fStack stack1 = RenderSystem.getModelViewStack();
-                stack1.pushMatrix();
-                stack1.translate((float) (entity.getPos().getX() - cam.x - 0.5), (float) (entity.getPos().getY() - cam.y + Math.sin(GLFW.glfwGetTime())), (float) (entity.getPos().getZ() - cam.z - 0.5));
-                stack1.rotateAround(new Quaternionf().rotationXYZ((float) GLFW.glfwGetTime(), 0, (float) GLFW.glfwGetTime()), 0.5f, 0.5f, 0.5f);
-                RenderSystem.applyModelViewMatrix();
-
-                array.bind();
-                array.drawWithRenderType(layer);
-
-                stack1.popMatrix();
-                RenderSystem.applyModelViewMatrix();
-            }
+            stack1.popMatrix();
+            RenderSystem.applyModelViewMatrix();
         }
 
         super.render(entity, yaw, tickDelta, stack, vertexConsumers, light);

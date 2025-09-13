@@ -1,4 +1,4 @@
-package net.typho.dominance.mixin;
+package net.typho.dominance.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.VertexSorter;

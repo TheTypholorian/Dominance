@@ -23,10 +23,10 @@
     "VeilShaderSourceMixin",
     "VindicatorEntityMixin",
     "client.ItemStackMixin",
-    "client.PlayerEntityMixin"
+    "client.PlayerEntityMixin",
+    "client.VanillaShaderCompilerMixin"
   ],
   "client": [
-    "SectionBuilderMixin",
     "client.AtlasLoaderMixin",
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
@@ -36,7 +36,8 @@
     "client.HeldItemRendererMixin",
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",
-    "client.LivingEntityRendererMixin"
+    "client.LivingEntityRendererMixin",
+    "client.SectionBuilderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

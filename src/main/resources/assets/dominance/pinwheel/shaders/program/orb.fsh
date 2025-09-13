@@ -1,7 +1,7 @@
 #include "dominance:glint"
 
 uniform sampler2D DiffuseSampler0;
-uniform float GameTime;
+uniform float RenderTime;
 uniform vec2 ScreenSize;
 uniform mat4 ProjMat;
 
@@ -12,5 +12,5 @@ out vec4 fragColor;
 void main() {
     vec4 min = vec4(1, 0.41, 1, 1);
     vec4 max = vec4(1, 0.76, 0.4, 1);
-    fragColor = glintCube(min, max, GameTime * 1000, fragDistance(ProjMat), FragTexCoord);
+    fragColor = glintCube(min, max, RenderTime, fragDistance(ProjMat), FragTexCoord);
 }

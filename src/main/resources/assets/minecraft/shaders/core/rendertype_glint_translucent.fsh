@@ -1,25 +1,23 @@
 #version 150
 
+#moj_import <dominance:glint.glsl>
 #moj_import <fog.glsl>
 
 uniform sampler2D Sampler0;
+uniform mat4 ProjMat;
+uniform float RenderTime;
 
 uniform vec4 ColorModulator;
 uniform float FogStart;
 uniform float FogEnd;
 uniform float GlintAlpha;
 
+in float camDistance;
 in float vertexDistance;
 in vec2 texCoord0;
 
 out vec4 fragColor;
 
 void main() {
-    vec4 color = texture(Sampler0, texCoord0) * ColorModulator;
-    if (color.a < 0.1) {
-        discard;
-    }
-    float fade = linear_fog_fade(vertexDistance, FogStart, FogEnd) * GlintAlpha;
-    //fragColor = vec4(color.rgb * fade, color.a);
-fragColor = vec4(0, 1, 1, 1);
+    fragColor = glintEnchant(RenderTime, camDistance) * ColorModulator * linear_fog_fade(vertexDistance, FogStart, FogEnd) * GlintAlpha;
 }

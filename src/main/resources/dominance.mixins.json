@@ -37,7 +37,8 @@
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",
     "client.LivingEntityRendererMixin",
-    "client.SectionBuilderMixin"
+    "client.SectionBuilderMixin",
+    "client.ShaderProgramMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,14 +1,15 @@
-// 1.21.1	2025-09-06T11:00:21.5665395	Orb of Dominance/Tags for minecraft:item
-917dbe79c8b6766d917dc5a1e4922f42e54df361 data\minecraft\tags\item\foot_armor.json
-12c6001130b060ac9f4eb30328fe37f343422591 data\minecraft\tags\item\enchantable\sharp_weapon.json
-294e5ba6612946c213961bdbcdac061f9ad71266 data\minecraft\tags\item\chest_armor.json
-26157bd2b00ffb47dc4150037cb6ee495b76a394 data\minecraft\tags\item\head_armor.json
-f00e20cec02e395a19e2c67d239085bad90be737 data\dominance\tags\item\reforgable\melee.json
-3c83e9733efb792d81a499e8aaa118afcbc68ae3 data\minecraft\tags\item\enchantable\crossbow.json
-d8c9d62a9d2650ac8eeacd7f007c2477ccd7734c data\dominance\tags\item\crossbows.json
-53d14867890456969eff9bedb927ae0fcb5bcbae data\c\tags\item\tools\shields.json
-dfe28234252b4d7c29b8fba4091d6d90987561b7 data\dominance\tags\item\reforgable\any.json
+// 1.21.1	2025-09-14T15:43:42.8446278	Orb of Dominance/Tags for minecraft:item
 225ee24cdbb7c051d8bf467bef1e2fd4e76d21c2 data\minecraft\tags\item\swords.json
-12c6001130b060ac9f4eb30328fe37f343422591 data\minecraft\tags\item\enchantable\durability.json
-c90dda53582d01eb8244c1e60c8b9bdf65315467 data\minecraft\tags\item\enchantable\bow.json
-e6f4fd66ad2f0619264c5a176a6462589a30d71e data\dominance\tags\item\reforgable\armor.json
+26157bd2b00ffb47dc4150037cb6ee495b76a394 data\minecraft\tags\item\head_armor.json
+294e5ba6612946c213961bdbcdac061f9ad71266 data\minecraft\tags\item\chest_armor.json
+53d14867890456969eff9bedb927ae0fcb5bcbae data\c\tags\item\tools\shields.json
+12c6001130b060ac9f4eb30328fe37f343422591 data\minecraft\tags\item\enchantable\sharp_weapon.json
+65bf2f374480ed05564d82c479e98522dde6dc91 data\minecraft\tags\item\enchantable\bow.json
+d8c9d62a9d2650ac8eeacd7f007c2477ccd7734c data\dominance\tags\item\crossbows.json
+12c6001130b060ac9f4eb30328fe37f343422591 data\minecraft\tags\item\enchantable\sword.json
+4ea1e4ca19165600a88b1f61260228f810f7cff4 data\minecraft\tags\item\enchantable\durability.json
+c540c9761543979e47c4c83058a0735e8e88fa11 data\minecraft\tags\item\enchantable\crossbow.json
+917dbe79c8b6766d917dc5a1e4922f42e54df361 data\minecraft\tags\item\foot_armor.json
+18245965500c1793a7ea7d5071ac4d57d1a51703 data\dominance\tags\item\reforgable\armor.json
+c922e9c39d9c9f2a645e213682320f6bec0590ad data\dominance\tags\item\reforgable\melee.json
+105cb7772b6bb28aabf4d4cd4f34bf416aa021da data\dominance\tags\item\reforgable\any.json

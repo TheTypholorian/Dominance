@@ -43,25 +43,32 @@ public class GenItemTags extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
                 .add(Dominance.ROYAL_GUARD_MACE)
                 .add(Dominance.GREAT_HAMMER)
+                .add(Dominance.BASTION_BUSTER)
+                .add(Dominance.BURST_CROSSBOW)
+                .add(Dominance.HEAVY_CROSSBOW)
+                .add(Dominance.HUNTING_BOW);
+        getOrCreateTagBuilder(ItemTags.SWORD_ENCHANTABLE)
+                .add(Dominance.ROYAL_GUARD_MACE)
+                .add(Dominance.GREAT_HAMMER)
                 .add(Dominance.BASTION_BUSTER);
         getOrCreateTagBuilder(ItemTags.SHARP_WEAPON_ENCHANTABLE)
                 .add(Dominance.ROYAL_GUARD_MACE)
                 .add(Dominance.GREAT_HAMMER)
                 .add(Dominance.BASTION_BUSTER);
         getOrCreateTagBuilder(ItemTags.CROSSBOW_ENCHANTABLE)
-                .addOptionalTag(ItemTags.BOW_ENCHANTABLE)
                 .add(Dominance.BURST_CROSSBOW)
                 .add(Dominance.HEAVY_CROSSBOW);
         getOrCreateTagBuilder(ItemTags.BOW_ENCHANTABLE)
+                .forceAddTag(ItemTags.CROSSBOW_ENCHANTABLE)
                 .add(Dominance.HUNTING_BOW);
 
         getOrCreateTagBuilder(Dominance.ANY_REFORGABLE)
-                .addOptionalTag(Dominance.ARMOR_REFORGABLE)
-                .addOptionalTag(Dominance.MELEE_REFORGABLE);
+                .forceAddTag(Dominance.ARMOR_REFORGABLE)
+                .forceAddTag(Dominance.MELEE_REFORGABLE);
         getOrCreateTagBuilder(Dominance.ARMOR_REFORGABLE)
-                .addOptionalTag(ItemTags.ARMOR_ENCHANTABLE);
+                .forceAddTag(ItemTags.ARMOR_ENCHANTABLE);
         getOrCreateTagBuilder(Dominance.MELEE_REFORGABLE)
-                .addOptionalTag(ItemTags.SWORD_ENCHANTABLE);
+                .forceAddTag(ItemTags.WEAPON_ENCHANTABLE);
 
         getOrCreateTagBuilder(Dominance.CROSSBOWS)
                 .add(Items.CROSSBOW)

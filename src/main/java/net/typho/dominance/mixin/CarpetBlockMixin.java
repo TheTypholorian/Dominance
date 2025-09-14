@@ -14,11 +14,22 @@ import net.typho.dominance.DominanceBlockProperties;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CarpetBlock.class)
 public abstract class CarpetBlockMixin extends Block {
     public CarpetBlockMixin(Settings settings) {
         super(settings);
+    }
+
+    @Inject(
+            method = "<init>",
+            at = @At("TAIL")
+    )
+    private void onInit(Settings settings, CallbackInfo ci) {
+        setDefaultState(getDefaultState().with(DominanceBlockProperties.ALTERNATE_CARPET_MODEL, false));
     }
 
     @Override

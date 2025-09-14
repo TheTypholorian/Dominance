@@ -62,6 +62,13 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
         Dominance.PLAYER_DATA.sync(player);
     }
 
+    public void decSouls() {
+        if (souls > 0) {
+            souls--;
+            Dominance.PLAYER_DATA.sync(player);
+        }
+    }
+
     public void incSouls() {
         if (souls < player.getAttributeValue(Dominance.PLAYER_MAX_SOULS)) {
             souls++;

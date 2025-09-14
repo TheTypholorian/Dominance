@@ -14,3 +14,4 @@ accessible field net/minecraft/client/render/LightmapTextureManager image Lnet/m
 accessible field net/minecraft/client/render/model/BakedModelManager models Ljava/util/Map;
 accessible method net/minecraft/client/render/model/ModelLoader getOrLoadModel (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/model/UnbakedModel;
 accessible method net/minecraft/client/render/model/ModelLoader add (Lnet/minecraft/client/util/ModelIdentifier;Lnet/minecraft/client/render/model/UnbakedModel;)V
+accessible field net/minecraft/server/network/ServerItemCooldownManager player Lnet/minecraft/server/network/ServerPlayerEntity;

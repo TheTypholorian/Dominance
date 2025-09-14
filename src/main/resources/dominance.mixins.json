@@ -11,6 +11,7 @@
     "EnchantmentMixin",
     "ExperienceOrbEntityMixin",
     "GrindstoneScreenHandlerMixin",
+    "ItemCooldownManagerMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
     "PiglinBrainMixin",
@@ -37,6 +38,7 @@
     "client.InGameHudMixin",
     "client.LightmapTextureManagerMixin",
     "client.LivingEntityRendererMixin",
+    "client.PlayerEntityRendererMixin",
     "client.SectionBuilderMixin",
     "client.ShaderProgramMixin"
   ],

@@ -49,7 +49,7 @@ public abstract class InGameHudMixin {
         context.drawGuiTexture(Dominance.id("hud/soul_bar_background"), x, l, 182, 7);
 
         if (k > 0) {
-            context.drawGuiTexture(Dominance.id("hud/soul_bar_progress"), 182, 5, 0, 0, x, l, k, 7);
+            context.drawGuiTexture(Dominance.id("hud/soul_bar_progress"), 182, 7, 0, 0, x, l, k, 7);
         }
 
         RenderSystem.disableBlend();

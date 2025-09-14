@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -24,21 +23,17 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.typho.dominance.Dominance;
+import net.typho.dominance.DominancePlayerData;
 import org.joml.Matrix4fStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
-public class CorruptedBeaconItem extends Item implements Equipment {
+public class CorruptedBeaconItem extends Item implements Equipment, ConsumesSouls {
     public static VertexArray BEAM_MODEL;
 
     public CorruptedBeaconItem(Settings settings) {
         super(settings);
-    }
-
-    @Override
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.BLOCK;
     }
 
     @Override
@@ -112,10 +107,24 @@ public class CorruptedBeaconItem extends Item implements Equipment {
     }
 
     @Override
+    public boolean hasGlint(ItemStack stack) {
+        return true;
+    }
+
+    @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-        super.usageTick(world, user, stack, remainingUseTicks);
+        DominancePlayerData data = user instanceof PlayerEntity player ? Dominance.PLAYER_DATA.get(player) : null;
+
+        if (data != null && data.getSouls() <= 0) {
+            user.clearActiveItem();
+            return;
+        }
 
         if (!world.isClient) {
+            if (remainingUseTicks % 2 == 0 && data != null) {
+                data.decSouls();
+            }
+
             Vec3d min = getUsePos(user, 1f);
             Vec3d max = user.raycast(maxLength(), 1f, false).getPos();
             Box box = new Box(min, max).expand(1);
@@ -125,10 +134,12 @@ public class CorruptedBeaconItem extends Item implements Equipment {
                 Optional<Vec3d> optional = box2.raycast(min, max);
 
                 if (box2.contains(min) || optional.isPresent()) {
-                    target.damage(user.getDamageSources().create(DamageTypes.MAGIC, user), 7.5f);
+                    target.damage(user.getDamageSources().create(DamageTypes.MAGIC, user), 15f);
                 }
             }
         }
+
+        super.usageTick(world, user, stack, remainingUseTicks);
     }
 
     @Override

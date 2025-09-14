@@ -1,5 +1,6 @@
 package net.typho.dominance;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
@@ -24,6 +25,7 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.entity.model.ShieldEntityModel;
 import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.NbtCompoundArgumentType;
 import net.minecraft.command.argument.RegistryKeyArgumentType;
 import net.minecraft.component.ComponentType;
@@ -73,12 +75,14 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldAccess;
 import net.typho.dominance.client.DamageParticleEffect;
 import net.typho.dominance.enchants.*;
@@ -345,6 +349,50 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     @Override
     @SuppressWarnings("unchecked")
     public void onInitialize() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, commandRegistryAccess, registrationEnvironment) -> {
+            dispatcher.register(
+                    CommandManager.literal("souls")
+                            .requires(source -> source.hasPermissionLevel(2))
+                            .then(
+                                    CommandManager.literal("add")
+                                            .then(
+                                                    CommandManager.argument("targets", EntityArgumentType.players())
+                                                            .then(
+                                                                    CommandManager.argument("amount", IntegerArgumentType.integer())
+                                                                            .executes(
+                                                                                    context -> {
+                                                                                        for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
+                                                                                            DominancePlayerData data = PLAYER_DATA.get(player);
+                                                                                            data.setSouls(MathHelper.clamp(data.getSouls() + IntegerArgumentType.getInteger(context, "amount"), 0, (int) player.getAttributeValue(PLAYER_MAX_SOULS)));
+                                                                                        }
+
+                                                                                        return 1;
+                                                                                    }
+                                                                            )
+                                                            )
+                                            )
+                            )
+                            .then(
+                                    CommandManager.literal("set")
+                                            .then(
+                                                    CommandManager.argument("targets", EntityArgumentType.players())
+                                                            .then(
+                                                                    CommandManager.argument("amount", IntegerArgumentType.integer(0))
+                                                                            .executes(
+                                                                                    context -> {
+                                                                                        for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
+                                                                                            DominancePlayerData data = PLAYER_DATA.get(player);
+                                                                                            data.setSouls(MathHelper.clamp(IntegerArgumentType.getInteger(context, "amount"), 0, (int) player.getAttributeValue(PLAYER_MAX_SOULS)));
+                                                                                        }
+
+                                                                                        return 1;
+                                                                                    }
+                                                                            )
+                                                            )
+                                            )
+                            )
+            );
+        });
         FabricDefaultAttributeRegistry.register(ROYAL_GUARD, RoyalGuardEntity.createRoyalGuardAttributes());
         DynamicRegistries.registerSynced(REFORGE_KEY, Reforge.Factory.CODEC);
         ModelPredicateProviderRegistry.register(

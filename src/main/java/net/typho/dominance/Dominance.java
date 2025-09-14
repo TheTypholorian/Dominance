@@ -57,6 +57,7 @@ import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.EnchantRandomlyLootFunction;
 import net.minecraft.loot.function.SetDamageLootFunction;
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -349,6 +350,25 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     @Override
     @SuppressWarnings("unchecked")
     public void onInitialize() {
+        LootTableEvents.MODIFY.register((key, builder, source, wrapperLookup) -> {
+            Identifier id = key.getValue();
+
+            if (id.getNamespace().equals("takesapillage")) {
+                if (id.getPath().equals("chests/bastille/graveyard") || id.getPath().equals("chests/bastille/center")) {
+                    builder.pool(
+                            LootPool.builder()
+                                    .with(ItemEntry.builder(ROYAL_GUARD_HELMET))
+                                    .with(ItemEntry.builder(ROYAL_GUARD_CHESTPLATE))
+                                    .with(ItemEntry.builder(ROYAL_GUARD_BOOTS))
+                                    .with(ItemEntry.builder(ROYAL_GUARD_MACE))
+                                    .with(ItemEntry.builder(ROYAL_GUARD_SHIELD))
+                                    .rolls(ConstantLootNumberProvider.create(2))
+                    );
+                } else if (id.getPath().equals("chests/bastille/church")) {
+                    builder.pool(LootPool.builder().with(ItemEntry.builder(CORRUPTED_BEACON)));
+                }
+            }
+        });
         CommandRegistrationCallback.EVENT.register((dispatcher, commandRegistryAccess, registrationEnvironment) -> {
             dispatcher.register(
                     CommandManager.literal("souls")

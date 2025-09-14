@@ -14,6 +14,7 @@ import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.HitResult;
@@ -118,6 +119,10 @@ public class CorruptedBeaconItem extends Item implements Equipment, ConsumesSoul
         if (data != null && data.getSouls() <= 0) {
             user.clearActiveItem();
             return;
+        }
+
+        if (remainingUseTicks % 4 == 0) {
+            user.playSound(SoundEvents.ENTITY_ILLUSIONER_CAST_SPELL);
         }
 
         if (!world.isClient) {

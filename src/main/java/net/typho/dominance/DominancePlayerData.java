@@ -18,7 +18,7 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, ClientTickingComponent, ServerTickingComponent {
-    private int time = 0, cooldown = 0;
+    private int rollTime = 0, rollCooldown = 0, souls = 0;
     private boolean dynamo = false;
     public final PlayerEntity player;
 
@@ -26,21 +26,21 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
         this.player = player;
     }
 
-    public int getTime() {
-        return time;
+    public int getRollTime() {
+        return rollTime;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public void setRollTime(int rollTime) {
+        this.rollTime = rollTime;
         Dominance.PLAYER_DATA.sync(player);
     }
 
-    public int getCooldown() {
-        return cooldown;
+    public int getRollCooldown() {
+        return rollCooldown;
     }
 
-    public void setCooldown(int cooldown) {
-        this.cooldown = cooldown;
+    public void setRollCooldown(int rollCooldown) {
+        this.rollCooldown = rollCooldown;
         Dominance.PLAYER_DATA.sync(player);
     }
 
@@ -53,23 +53,41 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
         Dominance.PLAYER_DATA.sync(player);
     }
 
+    public int getSouls() {
+        return souls;
+    }
+
+    public void setSouls(int souls) {
+        this.souls = souls;
+        Dominance.PLAYER_DATA.sync(player);
+    }
+
+    public void incSouls() {
+        if (souls < player.getAttributeValue(Dominance.PLAYER_MAX_SOULS)) {
+            souls++;
+            Dominance.PLAYER_DATA.sync(player);
+        }
+    }
+
     @Override
     public void readFromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        time = nbt.getInt("time");
-        cooldown = nbt.getInt("cooldown");
+        rollTime = nbt.getInt("rollTime");
+        rollCooldown = nbt.getInt("rollCooldown");
+        souls = nbt.getInt("souls");
         dynamo = nbt.getBoolean("dynamo");
     }
 
     @Override
     public void writeToNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        nbt.putInt("time", time);
-        nbt.putInt("cooldown", cooldown);
+        nbt.putInt("rollTime", rollTime);
+        nbt.putInt("rollCooldown", rollCooldown);
+        nbt.putInt("souls", souls);
         nbt.putBoolean("dynamo", dynamo);
     }
 
     @Override
     public void clientTick() {
-        if (DominanceClient.ROLL.isPressed() && cooldown == 0 && time == 0 && player.isOnGround()) {
+        if (DominanceClient.ROLL.isPressed() && rollCooldown == 0 && rollTime == 0 && player.isOnGround()) {
             ((ClientPlayerEntity) player).networkHandler.sendPacket(new CustomPayloadC2SPacket(StartRollC2S.INSTANCE));
         }
     }
@@ -78,11 +96,11 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
     public void serverTick() {
         boolean sync = false;
 
-        if (time > 0) {
-            time--;
+        if (rollTime > 0) {
+            rollTime--;
 
-            if (time == 0) {
-                cooldown = (int) player.getAttributeValue(Dominance.PLAYER_ROLL_COOLDOWN);
+            if (rollTime == 0) {
+                rollCooldown = (int) player.getAttributeValue(Dominance.PLAYER_ROLL_COOLDOWN);
                 dynamo = true;
 
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, (int) player.getAttributeValue(Dominance.PLAYER_SWIFT_FOOTED)));
@@ -106,8 +124,8 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
             }
         }
 
-        if (cooldown > 0) {
-            cooldown--;
+        if (rollCooldown > 0) {
+            rollCooldown--;
             sync = true;
         }
 

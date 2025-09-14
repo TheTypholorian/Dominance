@@ -49,12 +49,18 @@ public abstract class LivingEntityMixin extends Entity {
             )
     )
     private void applyDamage(DamageSource source, float amount, CallbackInfo ci) {
-        if (isDead() && source.getWeaponStack() != null && getWorld() instanceof ServerWorld world) {
-            EnchantmentHelper.forEachEnchantment(source.getWeaponStack(), (enchantment, level) -> {
-                for (EnchantmentEffectEntry<EnchantmentPostKillEffect> entry : enchantment.value().getEffect(Dominance.POST_KILL)) {
-                    entry.effect().apply(world, level, source.getWeaponStack(), this, source, getPos());
-                }
-            });
+        if (isDead() && getWorld() instanceof ServerWorld world) {
+            if (source.getWeaponStack() != null) {
+                EnchantmentHelper.forEachEnchantment(source.getWeaponStack(), (enchantment, level) -> {
+                    for (EnchantmentEffectEntry<EnchantmentPostKillEffect> entry : enchantment.value().getEffect(Dominance.POST_KILL)) {
+                        entry.effect().apply(world, level, source.getWeaponStack(), this, source, getPos());
+                    }
+                });
+            }
+
+            if (source.getAttacker() instanceof PlayerEntity attacker) {
+                Dominance.PLAYER_DATA.get(attacker).incSouls();
+            }
         }
 
         if (source.getAttacker() instanceof PlayerEntity attacker) {

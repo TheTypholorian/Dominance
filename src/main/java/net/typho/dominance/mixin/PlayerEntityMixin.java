@@ -24,6 +24,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         return builder.add(Dominance.PLAYER_ROLL_COOLDOWN)
                 .add(Dominance.PLAYER_ROLL_LENGTH)
                 .add(Dominance.PLAYER_FIRE_TRAIL)
-                .add(Dominance.PLAYER_SWIFT_FOOTED);
+                .add(Dominance.PLAYER_SWIFT_FOOTED)
+                .add(Dominance.PLAYER_MAX_SOULS);
     }
 }

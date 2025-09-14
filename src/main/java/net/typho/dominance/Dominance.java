@@ -279,6 +279,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final RegistryEntry<EntityAttribute> PLAYER_ROLL_LENGTH = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.roll_length"), new ClampedEntityAttribute("attribute.name.dominance.player.roll_length", 8, 0, 40));
     public static final RegistryEntry<EntityAttribute> PLAYER_FIRE_TRAIL = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.fire_trail"), new ClampedEntityAttribute("attribute.name.dominance.player.fire_trail", 0, 0, 1));
     public static final RegistryEntry<EntityAttribute> PLAYER_SWIFT_FOOTED = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.swift_footed"), new ClampedEntityAttribute("attribute.name.dominance.player.swift_footed", 0, 0, 1200));
+    public static final RegistryEntry<EntityAttribute> PLAYER_MAX_SOULS = Registry.registerReference(Registries.ATTRIBUTE, id("generic.player.max_souls"), new ClampedEntityAttribute("attribute.name.dominance.player.max_souls", 100, 0, 1000));
 
     public static final TagKey<Enchantment> INFLICT_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/inflict"));
     public static final TagKey<Enchantment> CONDITIONAL_EXCLUSIVE_SET = TagKey.of(RegistryKeys.ENCHANTMENT, id("exclusive_set/conditional"));
@@ -356,8 +357,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
         ServerPlayNetworking.registerGlobalReceiver(StartRollC2S.ID, (packet, context) -> {
             DominancePlayerData data = PLAYER_DATA.getNullable(context.player());
 
-            if (data != null && data.getCooldown() == 0 && data.getTime() == 0) {
-                data.setTime((int) context.player().getAttributeValue(PLAYER_ROLL_LENGTH));
+            if (data != null && data.getRollCooldown() == 0 && data.getRollTime() == 0) {
+                data.setRollTime((int) context.player().getAttributeValue(PLAYER_ROLL_LENGTH));
             }
         });
         ItemGroupEvents.modifyEntriesEvent(CREATIVE_TAB_KEY).register(entries -> {

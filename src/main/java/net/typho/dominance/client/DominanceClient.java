@@ -188,15 +188,15 @@ public class DominanceClient implements ClientModInitializer {
             if (MinecraftClient.getInstance().interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
                 PlayerEntity player = MinecraftClient.getInstance().player;
                 DominancePlayerData data = Dominance.PLAYER_DATA.get(player);
-                int cooldown = (int) ((float) data.getCooldown() / player.getAttributeValue(Dominance.PLAYER_ROLL_COOLDOWN) * 17);
-                int time = (int) ((float) data.getTime() / player.getAttributeValue(Dominance.PLAYER_ROLL_LENGTH) * 17);
+                int cooldown = (int) ((float) data.getRollCooldown() / player.getAttributeValue(Dominance.PLAYER_ROLL_COOLDOWN) * 17);
+                int time = (int) ((float) data.getRollTime() / player.getAttributeValue(Dominance.PLAYER_ROLL_LENGTH) * 17);
                 int x = context.getScaledWindowWidth() / 2 + (MinecraftClient.getInstance().player.getMainArm() == Arm.RIGHT ? 115 - 17 : -115), y = context.getScaledWindowHeight() - 17;
-                context.drawTexture(Identifier.of("dominance", "textures/gui/roll_full.png"), x, y, 0, 0, 17, 11, 17, 11);
+                context.drawTexture(Dominance.id("textures/gui/roll_full.png"), x, y, 0, 0, 17, 11, 17, 11);
 
                 if (time != 0) {
-                    context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x, y, 0, 0, 17 - time, 11, 17, 11);
+                    context.drawTexture(Dominance.id("textures/gui/roll_empty.png"), x, y, 0, 0, 17 - time, 11, 17, 11);
                 } else if (cooldown != 0) {
-                    context.drawTexture(Identifier.of("dominance", "textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
+                    context.drawTexture(Dominance.id("textures/gui/roll_empty.png"), x + 17 - cooldown, y, 17 - cooldown, 0, cooldown, 11, 17, 11);
                 }
             }
         });

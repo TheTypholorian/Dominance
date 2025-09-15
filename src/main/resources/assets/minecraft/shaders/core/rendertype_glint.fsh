@@ -21,5 +21,4 @@ out vec4 fragColor;
 
 void main() {
     fragColor = glintEnchant(RenderTime, camDistance, texCoord0) * ColorModulator * linear_fog_fade(vertexDistance, FogStart, FogEnd) * GlintAlpha;
-fragColor = vec4(1, 0, 0, 1);
 }

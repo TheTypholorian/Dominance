@@ -76,7 +76,7 @@ public abstract class InGameHudMixin {
             cancellable = true
     )
     private void render(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (!Cutscene.ACTIVE.isEmpty()) {
+        if (Cutscene.ACTIVE != null) {
             ci.cancel();
         }
     }

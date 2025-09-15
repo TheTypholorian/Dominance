@@ -15,3 +15,5 @@ accessible field net/minecraft/client/render/model/BakedModelManager models Ljav
 accessible method net/minecraft/client/render/model/ModelLoader getOrLoadModel (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/model/UnbakedModel;
 accessible method net/minecraft/client/render/model/ModelLoader add (Lnet/minecraft/client/util/ModelIdentifier;Lnet/minecraft/client/render/model/UnbakedModel;)V
 accessible field net/minecraft/server/network/ServerItemCooldownManager player Lnet/minecraft/server/network/ServerPlayerEntity;
+accessible method net/minecraft/client/render/Camera setPos (Lnet/minecraft/util/math/Vec3d;)V
+accessible method net/minecraft/client/render/Camera setRotation (FF)V

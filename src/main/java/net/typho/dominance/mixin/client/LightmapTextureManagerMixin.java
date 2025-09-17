@@ -1,7 +1,9 @@
 package net.typho.dominance.mixin.client;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.typho.dominance.client.DominanceClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,43 +19,48 @@ import java.io.IOException;
 public class LightmapTextureManagerMixin {
     @Shadow
     @Final
-    private NativeImage image;
+    public NativeImage image;
 
-    /*
-    @ModifyArg(
-            method = "update",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/LightmapTextureManager;getBrightness(Lnet/minecraft/world/dimension/DimensionType;I)F",
-                    ordinal = 0
-            ),
-            index = 1
-    )
-    private int updateSky(int lightLevel) {
-        float f = lightLevel / 15f;
-        f *= f;
-        return (int) (f * f * 12);
-    }
+    @Shadow
+    private boolean dirty;
 
-    @ModifyArg(
+    @Shadow
+    @Final
+    private MinecraftClient client;
+
+    @Shadow @Final private NativeImageBackedTexture texture;
+
+    @Inject(
             method = "update",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/LightmapTextureManager;getBrightness(Lnet/minecraft/world/dimension/DimensionType;I)F",
-                    ordinal = 1
-            ),
-            index = 1
+            at = @At("HEAD"),
+            cancellable = true
     )
-    private int updateBlock(int lightLevel) {
-        return lightLevel - 4;
+    private void updateHead(float delta, CallbackInfo ci) {
+        if (dirty) {
+            dirty = false;
+
+            client.getProfiler().push("lightTex");
+
+            if (client.world != null) {
+                for (int x = 0; x < 16; x++) {
+                    for (int y = 0; y < 16; y++) {
+                        image.setColor(x, y, 0xFF000000 | (x << 12) | (y << 4));
+                    }
+                }
+            }
+
+            texture.upload();
+            client.getProfiler().pop();
+
+            ci.cancel();
+        }
     }
-     */
 
     @Inject(
             method = "update",
             at = @At("TAIL")
     )
-    private void update(float delta, CallbackInfo ci) {
+    private void updateTail(float delta, CallbackInfo ci) {
         if (DominanceClient.SAVE_LIGHTMAP.isPressed()) {
             try {
                 image.writeTo(new File("lightmap.png"));

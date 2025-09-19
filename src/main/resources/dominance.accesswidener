@@ -17,3 +17,5 @@ accessible method net/minecraft/client/render/model/ModelLoader add (Lnet/minecr
 accessible field net/minecraft/server/network/ServerItemCooldownManager player Lnet/minecraft/server/network/ServerPlayerEntity;
 accessible method net/minecraft/client/render/Camera setPos (Lnet/minecraft/util/math/Vec3d;)V
 accessible method net/minecraft/client/render/Camera setRotation (FF)V
+accessible field net/minecraft/world/biome/Biome weather Lnet/minecraft/world/biome/Biome$Weather;
+accessible class net/minecraft/world/biome/Biome$Weather

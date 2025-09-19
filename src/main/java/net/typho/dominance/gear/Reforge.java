@@ -105,7 +105,11 @@ public interface Reforge {
     }
 
     static Factory<?> pickForStack(ItemStack stack, RegistryWrapper.WrapperLookup lookup) {
-        return pickForStack(stack, lookup, Random.create(ItemStack.hashCode(stack)));
+        return pickForStack(stack, lookup, 0);
+    }
+
+    static Factory<?> pickForStack(ItemStack stack, RegistryWrapper.WrapperLookup lookup, int salt) {
+        return pickForStack(stack, lookup, Random.create(ItemStack.hashCode(stack) + salt));
     }
 
     static Factory<?> pickForStack(ItemStack stack, RegistryWrapper.WrapperLookup lookup, Random random) {

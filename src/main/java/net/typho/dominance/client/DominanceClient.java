@@ -15,19 +15,15 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
@@ -35,9 +31,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.World;
 import net.typho.dominance.DamageParticleS2C;
 import net.typho.dominance.Dominance;
 import net.typho.dominance.DominancePlayerData;
@@ -53,11 +47,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DominanceClient implements ClientModInitializer {
-    public static final KeyBinding SAVE_LIGHTMAP = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "key.dominance.debug.save_lightmap",
-            GLFW.GLFW_KEY_F9,
-            "key.categories.misc"
-    ));
     public static final KeyBinding TEST_CUTSCENE = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.dominance.debug.test_cutscene",
             GLFW.GLFW_KEY_F8,
@@ -69,84 +58,6 @@ public class DominanceClient implements ClientModInitializer {
             "key.categories.movement"
     ));
     public static final EntityModelLayer ROYAL_GUARD_LAYER = new EntityModelLayer(Dominance.id("royal_guard"), "main");
-
-    public static Vector3f getTempTint(DimensionLightInfo dimLight, float temp) {
-        float[] skyScales = new float[]{1, 1, 1};
-
-        if (dimLight.minTemp() == null || dimLight.maxTemp() == null) {
-            return new Vector3f(1);
-        } else {
-            if (temp > 0.8f) {
-                float blend = MathHelper.clamp(temp - 0.8f, 0, 1);
-                skyScales = new float[]{
-                        MathHelper.lerp(blend, skyScales[0], dimLight.maxTemp()[0]),
-                        MathHelper.lerp(blend, skyScales[1], dimLight.maxTemp()[1]),
-                        MathHelper.lerp(blend, skyScales[2], dimLight.maxTemp()[2])
-                };
-            } else {
-                float blend = MathHelper.clamp(0.8f - temp, 0, 1);
-                skyScales = new float[]{
-                        MathHelper.lerp(blend, skyScales[0], dimLight.minTemp()[0]),
-                        MathHelper.lerp(blend, skyScales[1], dimLight.minTemp()[1]),
-                        MathHelper.lerp(blend, skyScales[2], dimLight.minTemp()[2])
-                };
-            }
-        }
-
-        if (dimLight.skyScale() == null) {
-            return new Vector3f(skyScales);
-        } else {
-            return new Vector3f(
-                    skyScales[0] * dimLight.skyScale()[0],
-                    skyScales[1] * dimLight.skyScale()[1],
-                    skyScales[2] * dimLight.skyScale()[2]
-            );
-        }
-    }
-
-    public static float getDay(World world) {
-        return (float) Math.sin((float) world.getTimeOfDay() / 12000 * Math.PI) / 2 + 0.5f;
-    }
-
-    public static void createLightmap(ClientWorld world, ClientPlayerEntity player, NativeImage image, float temp, float humid) {
-        DimensionLightInfo dimLight = DimensionLightInfo.get(world);
-        float day = getDay(world);
-        Vector3f tempTint = getTempTint(dimLight, temp);
-
-        for (int sky = 0; sky < image.getHeight(); sky++) {
-            float fSky = MathHelper.lerp(MathHelper.clamp(world.getDimension().ambientLight(), 0, 1), (float) sky / (image.getHeight() - 1), 1) * day;
-
-            float[] blockScales = {
-                    MathHelper.lerp(fSky, dimLight.minBlock()[0], dimLight.maxBlock()[0]),
-                    MathHelper.lerp(fSky, dimLight.minBlock()[1], dimLight.maxBlock()[1]),
-                    MathHelper.lerp(fSky, dimLight.minBlock()[2], dimLight.maxBlock()[2])
-            };
-
-            for (int block = 0; block < image.getWidth(); block++) {
-                float fBlock = (float) block / (image.getWidth() - 1);
-
-                float red = fBlock * blockScales[0];
-                float green = fBlock * blockScales[1];
-                float blue = fBlock * blockScales[2];
-
-                if (dimLight.blockScale() != null) {
-                    red *= dimLight.blockScale()[0];
-                    green *= dimLight.blockScale()[1];
-                    blue *= dimLight.blockScale()[2];
-                }
-
-                if (player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
-                    fSky = 1;
-                }
-
-                red = (red * fBlock + fSky * fSky * tempTint.x);
-                green = (green * fBlock + fSky * fSky * tempTint.y);
-                blue = (blue * fBlock + fSky * fSky * tempTint.z);
-
-                image.setColor(block, sky, 0xFF000000 | ((int) MathHelper.clamp(blue * 255, 0, 255) << 16) | ((int) MathHelper.clamp(green * 255, 0, 255) << 8) | (int) MathHelper.clamp(red * 255, 0, 255));
-            }
-        }
-    }
 
     public static ObjModel loadObj(ResourceManager manager, Identifier id) {
         return manager.getResource(id).map(resource -> {

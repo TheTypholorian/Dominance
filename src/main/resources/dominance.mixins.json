@@ -38,7 +38,6 @@
     "client.EntityRenderersMixin",
     "client.HeldItemRendererMixin",
     "client.InGameHudMixin",
-    "client.LightmapTextureManagerMixin",
     "client.LivingEntityRendererMixin",
     "client.PlayerEntityRendererMixin",
     "client.SectionBuilderMixin",

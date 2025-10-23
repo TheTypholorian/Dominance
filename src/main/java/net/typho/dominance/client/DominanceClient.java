@@ -14,16 +14,22 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.model.Dilation;
+import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.client.render.entity.PiglinEntityRenderer;
+import net.minecraft.client.render.entity.model.ArmorEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.render.entity.model.PiglinEntityModel;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Items;
@@ -58,6 +64,9 @@ public class DominanceClient implements ClientModInitializer {
             "key.categories.movement"
     ));
     public static final EntityModelLayer ROYAL_GUARD_LAYER = new EntityModelLayer(Dominance.id("royal_guard"), "main");
+    public static final EntityModelLayer CORRUPTED_PIGLIN_BRUTE_LAYER = new EntityModelLayer(Dominance.id("corrupted_piglin_brute"), "main");
+    public static final EntityModelLayer CORRUPTED_PIGLIN_BRUTE_INNER_ARMOR_LAYER = new EntityModelLayer(Dominance.id("corrupted_piglin_brute"), "inner_armor");
+    public static final EntityModelLayer CORRUPTED_PIGLIN_BRUTE_OUTER_ARMOR_LAYER = new EntityModelLayer(Dominance.id("corrupted_piglin_brute"), "outer_armor");
 
     public static ObjModel loadObj(ResourceManager manager, Identifier id) {
         return manager.getResource(id).map(resource -> {
@@ -173,8 +182,19 @@ public class DominanceClient implements ClientModInitializer {
         });
         ModelLoadingPlugin.register(context -> context.addModels(Dominance.id("block/carpet_inside"), Dominance.id("block/carpet_outside"), Dominance.id("block/carpet_side")));
         EntityRendererRegistry.register(Dominance.ORB_ENTITY, OrbEntityRenderer::new);
+        EntityRendererRegistry.register(Dominance.CORRUPTED_PIGLIN_BRUTE, context -> new PiglinEntityRenderer(
+                context, CORRUPTED_PIGLIN_BRUTE_LAYER, CORRUPTED_PIGLIN_BRUTE_INNER_ARMOR_LAYER, CORRUPTED_PIGLIN_BRUTE_OUTER_ARMOR_LAYER, false
+        ) {
+            @Override
+            public Identifier getTexture(MobEntity entity) {
+                return Dominance.id("textures/entity/corrupted_piglin_brute.png");
+            }
+        });
         EntityRendererRegistry.register(Dominance.ROYAL_GUARD, RoyalGuardEntityRenderer::new);
         EntityRendererRegistry.register(EntityType.VINDICATOR, VindicatorEntityRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(CORRUPTED_PIGLIN_BRUTE_LAYER, () -> TexturedModelData.of(PiglinEntityModel.getModelData(Dilation.NONE), 64, 64));
+        EntityModelLayerRegistry.registerModelLayer(CORRUPTED_PIGLIN_BRUTE_INNER_ARMOR_LAYER, () -> TexturedModelData.of(ArmorEntityModel.getModelData(new Dilation(0.5F)), 64, 32));
+        EntityModelLayerRegistry.registerModelLayer(CORRUPTED_PIGLIN_BRUTE_OUTER_ARMOR_LAYER, () -> TexturedModelData.of(ArmorEntityModel.getModelData(new Dilation(1.02F)), 64, 32));
         EntityModelLayerRegistry.registerModelLayer(ROYAL_GUARD_LAYER, RoyalGuardEntity::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(EntityModelLayers.VINDICATOR, RoyalGuardEntity::getTexturedModelData);
         ParticleFactoryRegistry.getInstance().register(Dominance.DAMAGE_PARTICLE, DamageParticle::new);

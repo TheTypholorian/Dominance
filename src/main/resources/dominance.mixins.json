@@ -32,7 +32,6 @@
     "client.BuiltinModelItemRendererMixin",
     "client.CameraMixin",
     "client.ClientPlayNetworkHandlerMixin",
-    "client.ClientWorldMixin",
     "client.DimensionTypeMixin",
     "client.EntityModelsMixin",
     "client.EntityRenderersMixin",

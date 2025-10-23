@@ -249,7 +249,15 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             .vehicleAttachment(-0.6F)
             .maxTrackingRange(8)
             .build("royal_guard"));
+    public static final EntityType<CorruptedPiglinBruteEntity> CORRUPTED_PIGLIN_BRUTE = Registry.register(Registries.ENTITY_TYPE, id("corrupted_piglin_brute"), EntityType.Builder.create(CorruptedPiglinBruteEntity::new, SpawnGroup.MONSTER)
+            .dimensions(0.6F, 1.95F)
+            .eyeHeight(1.79f)
+            .passengerAttachments(2.0125F)
+            .vehicleAttachment(-0.7F)
+            .maxTrackingRange(8)
+            .build("royal_guard"));
     public static final SpawnEggItem ROYAL_GUARD_SPAWN_EGG = item("royal_guard_spawn_egg", new SpawnEggItem(ROYAL_GUARD, 0x3C3C3C, 0xFFC444, new Item.Settings()));
+    public static final SpawnEggItem CORRUPTED_PIGLIN_BRUTE_SPAWN_EGG = item("corrupted_piglin_brute_spawn_egg", new SpawnEggItem(CORRUPTED_PIGLIN_BRUTE, 5843472, 0xF24DEC, new Item.Settings()));
 
     public static final ComponentKey<DominancePlayerData> PLAYER_DATA = ComponentRegistryV3.INSTANCE.getOrCreate(id("player_data"), DominancePlayerData.class);
 
@@ -276,7 +284,8 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
     public static final Registry<MapCodec<? extends EnchantmentPostKillEffect>> ENCHANTMENT_POST_KILL_EFFECTS = FabricRegistryBuilder.createSimple(ENCHANTMENT_POST_KILL_EFFECTS_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
     public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>> MODIFY_DAMAGE = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, id("modify_damage"),
             ComponentType.<List<EnchantmentEffectEntry<EnchantmentModifyDamageEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentModifyDamageEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
-    );    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>> POST_KILL = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, id("post_kill"),
+    );
+    public static final ComponentType<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>> POST_KILL = Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, id("post_kill"),
             ComponentType.<List<EnchantmentEffectEntry<EnchantmentPostKillEffect>>>builder().codec(EnchantmentEffectEntry.createCodec(EnchantmentPostKillEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()).build()
     );
 
@@ -414,6 +423,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             );
         });
         FabricDefaultAttributeRegistry.register(ROYAL_GUARD, RoyalGuardEntity.createRoyalGuardAttributes());
+        FabricDefaultAttributeRegistry.register(CORRUPTED_PIGLIN_BRUTE, CorruptedPiglinBruteEntity.createAttributes());
         DynamicRegistries.registerSynced(REFORGE_KEY, Reforge.Factory.CODEC);
         ModelPredicateProviderRegistry.register(
                 ROYAL_GUARD_SHIELD,
@@ -448,6 +458,7 @@ public class Dominance implements ModInitializer, EntityComponentInitializer {
             entries.add(CORRUPTED_BEACON);
             entries.add(REFORGE_SMITHING_TEMPLATE);
             entries.add(ROYAL_GUARD_SPAWN_EGG);
+            entries.add(CORRUPTED_PIGLIN_BRUTE_SPAWN_EGG);
         });
         LootTableEvents.MODIFY.register((key, builder, source, wrapperLookup) -> {
             if (key == LootTables.BASTION_TREASURE_CHEST) {

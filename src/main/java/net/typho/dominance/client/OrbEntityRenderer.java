@@ -20,51 +20,37 @@ public class OrbEntityRenderer extends EntityRenderer<OrbEntity> {
     public static final VertexArray MODEL = VertexArray.create();
 
     static {
-        BufferBuilder builder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+        BufferBuilder builder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 
-        for (int k = 0; k < 6; k++) {
-            if (k == 0) {
-                builder.vertex(0f, 0f, 1f);
-                builder.vertex(0f, 1f, 1f);
-                builder.vertex(1f, 1f, 1f);
-                builder.vertex(1f, 0f, 1f);
-            }
+        builder.vertex(0f, 0f, 1f).texture(0, 0);
+        builder.vertex(0f, 1f, 1f).texture(0, 1);
+        builder.vertex(1f, 1f, 1f).texture(1, 1);
+        builder.vertex(1f, 0f, 1f).texture(1, 0);
 
-            if (k == 1) {
-                builder.vertex(1f, 0f, 1f);
-                builder.vertex(1f, 1f, 1f);
-                builder.vertex(1f, 1f, 0f);
-                builder.vertex(1f, 0f, 0f);
-            }
+        builder.vertex(1f, 0f, 1f).texture(0, 0);
+        builder.vertex(1f, 1f, 1f).texture(0, 1);
+        builder.vertex(1f, 1f, 0f).texture(1, 1);
+        builder.vertex(1f, 0f, 0f).texture(1, 0);
 
-            if (k == 2) {
-                builder.vertex(1f, 0f, 0f);
-                builder.vertex(1f, 1f, 0f);
-                builder.vertex(0f, 1f, 0f);
-                builder.vertex(0f, 0f, 0f);
-            }
+        builder.vertex(1f, 0f, 0f).texture(0, 0);
+        builder.vertex(1f, 1f, 0f).texture(0, 1);
+        builder.vertex(0f, 1f, 0f).texture(1, 1);
+        builder.vertex(0f, 0f, 0f).texture(1, 0);
 
-            if (k == 3) {
-                builder.vertex(0f, 0f, 0f);
-                builder.vertex(0f, 1f, 0f);
-                builder.vertex(0f, 1f, 1f);
-                builder.vertex(0f, 0f, 1f);
-            }
+        builder.vertex(0f, 0f, 0f).texture(0, 0);
+        builder.vertex(0f, 1f, 0f).texture(0, 1);
+        builder.vertex(0f, 1f, 1f).texture(1, 1);
+        builder.vertex(0f, 0f, 1f).texture(1, 0);
 
-            if (k == 4) {
-                builder.vertex(0f, 0f, 0f);
-                builder.vertex(0f, 0f, 1f);
-                builder.vertex(1f, 0f, 1f);
-                builder.vertex(1f, 0f, 0f);
-            }
+        builder.vertex(0f, 0f, 0f).texture(0, 0);
+        builder.vertex(0f, 0f, 1f).texture(0, 1);
+        builder.vertex(1f, 0f, 1f).texture(1, 1);
+        builder.vertex(1f, 0f, 0f).texture(1, 0);
 
-            if (k == 5) {
-                builder.vertex(0f, 1f, 1f);
-                builder.vertex(0f, 1f, 0f);
-                builder.vertex(1f, 1f, 0f);
-                builder.vertex(1f, 1f, 1f);
-            }
-        }
+        builder.vertex(0f, 1f, 1f).texture(0, 0);
+        builder.vertex(0f, 1f, 0f).texture(0, 1);
+        builder.vertex(1f, 1f, 0f).texture(1, 1);
+        builder.vertex(1f, 1f, 1f).texture(1, 0);
 
         MODEL.upload(builder.end(), VertexArray.DrawUsage.STATIC);
     }

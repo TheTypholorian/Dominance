@@ -8,9 +8,9 @@ in vec2 FragTexCoord;
 out vec4 fragColor;
 
 void main() {
-    vec4 min1 = vec4(1, 0.41, 1, 1); // purple
-    vec4 min2 = vec4(1, 0.3, 0.7, 1); // red
-    vec4 max1 = vec4(1, 0.76, 0.4, 1); // orange
+    vec4 min1 = vec4(1, 0.4, 1, 1); // purple
+    vec4 min2 = vec4(1, 0.2, 0.4, 1); // red
+    vec4 max1 = vec4(1, 0.75, 0.4, 1); // orange
     vec4 max2 = vec4(1, 0.9, 0.5, 1); // yellow
 
     vec2 tcDelta = abs(FragTexCoord - vec2(0.5));

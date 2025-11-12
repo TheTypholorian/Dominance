@@ -35,6 +35,7 @@
     "client.DimensionTypeMixin",
     "client.EntityModelsMixin",
     "client.EntityRenderersMixin",
+    "client.GameRendererMixin",
     "client.HeldItemRendererMixin",
     "client.InGameHudMixin",
     "client.LivingEntityRendererMixin",

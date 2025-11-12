@@ -32,7 +32,7 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     public void setRollTime(int rollTime) {
         this.rollTime = rollTime;
-        Dominance.PLAYER_DATA.sync(player);
+        sync();
     }
 
     public int getRollCooldown() {
@@ -41,7 +41,7 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     public void setRollCooldown(int rollCooldown) {
         this.rollCooldown = rollCooldown;
-        Dominance.PLAYER_DATA.sync(player);
+        sync();
     }
 
     public boolean hasDynamo() {
@@ -50,7 +50,7 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     public void setDynamo(boolean dynamo) {
         this.dynamo = dynamo;
-        Dominance.PLAYER_DATA.sync(player);
+        sync();
     }
 
     public int getSouls() {
@@ -59,21 +59,29 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     public void setSouls(int souls) {
         this.souls = souls;
-        Dominance.PLAYER_DATA.sync(player);
+        sync();
     }
 
     public void decSouls() {
         if (souls > 0) {
             souls--;
-            Dominance.PLAYER_DATA.sync(player);
+            sync();
         }
     }
 
     public void incSouls() {
         if (souls < player.getAttributeValue(Dominance.PLAYER_MAX_SOULS)) {
             souls += 5;
-            Dominance.PLAYER_DATA.sync(player);
+            sync();
         }
+    }
+
+    public boolean isRolling() {
+        return rollTime > 0 && player.isOnGround();
+    }
+
+    public void sync() {
+        Dominance.PLAYER_DATA.sync(player);
     }
 
     @Override
@@ -94,6 +102,14 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     @Override
     public void clientTick() {
+        if (rollTime > 0) {
+            rollTime--;
+        }
+
+        if (rollCooldown > 0) {
+            rollCooldown--;
+        }
+
         if (DominanceClient.ROLL.isPressed() && rollCooldown == 0 && rollTime == 0 && player.isOnGround()) {
             ((ClientPlayerEntity) player).networkHandler.sendPacket(new CustomPayloadC2SPacket(StartRollC2S.INSTANCE));
         }
@@ -101,8 +117,6 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
 
     @Override
     public void serverTick() {
-        boolean sync = false;
-
         if (rollTime > 0) {
             rollTime--;
 
@@ -111,14 +125,13 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
                 dynamo = true;
 
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, (int) player.getAttributeValue(Dominance.PLAYER_SWIFT_FOOTED)));
+                sync();
             }
-
-            sync = true;
 
             if (player.isOnGround()) {
                 Vec3d rotVec = player.getRotationVector(0, player.getYaw());
 
-                BlockPos pos = BlockPos.ofFloored(player.getPos().subtract(rotVec.multiply(2)));
+                BlockPos pos = BlockPos.ofFloored(player.getPos().subtract(rotVec));
 
                 if (player.getRandom().nextDouble() <= player.getAttributeValue(Dominance.PLAYER_FIRE_TRAIL)) {
                     if (FireBlock.canPlaceAt(player.getWorld(), pos, Direction.DOWN)) {
@@ -126,18 +139,13 @@ public class DominancePlayerData implements ComponentV3, AutoSyncedComponent, Cl
                     }
                 }
 
-                player.addVelocity(rotVec.multiply(player.getMovementSpeed() * 20));
+                player.addVelocity(rotVec.multiply(player.getMovementSpeed() * 10));
                 player.velocityModified = true;
             }
         }
 
         if (rollCooldown > 0) {
             rollCooldown--;
-            sync = true;
-        }
-
-        if (sync) {
-            Dominance.PLAYER_DATA.sync(player);
         }
     }
 }
